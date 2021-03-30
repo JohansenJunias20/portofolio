@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full w-full">
+<html lang="en" style="overflow-y: hidden;">
 
 <head>
     <meta charset="UTF-8">
@@ -8,35 +8,122 @@
     <title>Document</title>
     <link rel="stylesheet" href="dist/app.css">
     <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+    <style>
+        /* Parallax base styles
+        --------------------------------------------- */
+
+        .parallax {
+            /* fallback for older browsers */
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-perspective: 300px;
+            perspective: 300px;
+        }
+
+        .parallax__group {
+            position: relative;
+            height: 500px;
+            /* fallback for older browsers */
+            height: 100vh;
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+        }
+
+        .parallax__layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .parallax__layer--fore {
+            -webkit-transform: translateZ(90px) scale(.7);
+            transform: translateZ(90px) scale(.7);
+            z-index: 1;
+        }
+
+        .parallax__layer--base {
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            z-index: 4;
+        }
+
+        .parallax__layer--back {
+            -webkit-transform: translateZ(-300px) scale(2.1);
+            transform: translateZ(-300px) scale(2.1);
+            z-index: 3;
+        }
+
+        .parallax__layer--deep {
+            -webkit-transform: translateZ(-600px) scale(3);
+            transform: translateZ(-600px) scale(3);
+            z-index: 2;
+        }
+
+
+
+        /* demo styles
+        --------------------------------------------- */
+    </style>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,700" rel="stylesheet">
 </head>
 
-<body class="h-full w-full">
-    <div class="z-0"
-        style="width:100%;height:100vh; background-image: url('./resources/images/background.jpg');background-repeat: no-repeat;background-size:cover">
-        <div class="absolute bottom-0">
-            <div>
-                <img src="resources/images/front.png" alt="">
+<body>
+    <div class="parallax">
+
+        <div class="parallax__group">
+            <div class="z-0 parallax__layer parallax__layer--back" style="width:100%;height:100vh; background-image: url('./resources/images/background.jpg');background-repeat: no-repeat;background-size:cover;
+        z-index: 3;">
+                <div st class="z-50 flex flex-col h-full justify-center ml-12 text-txt text-9xl"
+                    style="font-weight: 1000;">
+                    <div style="font-size: 10vh; text-shadow:0px 3px 6px darkred">
+                        EXPLORING
+                    </div>
+                    <div style="font-size: 10vh; text-shadow:0px 3px 6px darkred">
+                        UNEXPLORED
+                    </div>
+                </div>
+            </div>
+
+
+            <div class=" parallax__layer parallax__layer--base flex flex-col">
+                <img src="resources/images/front.png" class="mt-auto" alt="">
+
+
             </div>
         </div>
-        <div st class="z-50 flex flex-col h-full justify-center ml-12 text-txt text-9xl" style="font-weight: 1000;">
-            <div style="text-shadow:0px 3px 6px darkred">
-                EXPLORING
-            </div>
-            <div style="text-shadow:0px 3px 6px darkred">
-                UNEXPLORED
-            </div>
-        </div>
+        <div style="width: 100%;">
+            <div style="transform: skewY(-3deg) translateY(-3%);width:100%;height:3000px;
+            background-image: linear-gradient(to bottom, #3F1233,#B15FA6);" class="bg-redbg absolute">
+                <div style="transform: skewY(3deg);" class="pt-36 mx-4">
+                    <div class="absoulte flex">
+                        <div class=" bg-txt rounded-full h-48 w-48  ml-auto mr-24 float-right"
+                            style="box-shadow: 0px 0px 10px #FFF5CC;"></div>
 
-    </div>
-
-    <!-- <div style="width:calc(100%+300px)" class="overflow-x-hidden">
-        test
-    </div> -->
-    <div class="relative">
-        <div class="overflow-x-hidden" style="width: 100%;">
-            <div style="transform: rotate(-5deg) translateY(-200px) translateX(-100px);width:calc(100% + 300px);height:3000px;"
-                class="bg-redbg absolute">
-                TEST
+                    </div>
+                    <div class=" text-txt" style="font-weight: 700;">
+                        <div class="leading-relaxed text-6xl ml-12"
+                            style="font-style: italic;font-family: 'Montserrat';">
+                            "Adventure is<br>Worthwhile<br>in itself"
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute w-full" style="transform: skewY(3deg);">
+                    <img src='./resources/images/background.png' class="w-full ">
+                    <div style="background-color: #2B0D24;height:1000px"></div>
+                </div>
+                <div>
+                    <img class="absolute w-8 h-8" src="resources/images/stone1.png" alt="">
+                    <img class="absolute w-8 h-8" src="resources/images/stone2.png" alt="">
+                    <img class="absolute w-8 h-8" src="resources/images/stone3.png" alt="">
+                    <img class="absolute w-8 h-8" src="resources/images/stone4.png" alt="">
+                    <img class="absolute w-8 h-8" src="resources/images/stone5.png" alt="">
+                    <img class="absolute w-8 h-8" src="resources/images/stone6.png" alt="">
+                    <img class="absolute w-8 h-8" src="resources/images/stone7.png" alt="">
+                    <img class="absolute w-8 h-8" src="resources/images/stone8.png" alt="">
+                </div>
             </div>
         </div>
     </div>
