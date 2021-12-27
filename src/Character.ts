@@ -6,12 +6,13 @@ import { Group, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { clamp } from 'three/src/math/MathUtils';
 import PhysicsObject3d from './Object';
+declare var followCharacter: boolean;
 
 interface AnimationCharacter {
     walk: THREE.AnimationAction;
 }
 export default class Character extends PhysicsObject3d {
-    private isPress: {
+    public isPress: {
         w: boolean,
         a: boolean,
         s: boolean,
@@ -31,37 +32,38 @@ export default class Character extends PhysicsObject3d {
             s: false,
             d: false
         }
-        document.onkeydown = (e) => {
-            if (e.key == "w") {
-            }
-            else if (e.key == "s") {
-            }
-            else if (e.key == "a") {
-            }
-            else if (e.key == "d") {
-            }
-            else {
-                return
-            }
-            this.isPress[e.key] = true;
-        }
+        // document.onkeydown = (e) => {
+        //     if (e.key == "w") {
+        //     }
+        //     else if (e.key == "s") {
+        //     }
+        //     else if (e.key == "a") {
+        //     }
+        //     else if (e.key == "d") {
+        //     }
+        //     else {
+        //         return
+        //     }
+        //     this.isPress[e.key] = true;
+        //     followCharacter = true;
+        // }
 
-        document.onkeyup = (e) => {
-            if (e.key == "w") {
-            }
-            else if (e.key == "s") {
-            }
-            else if (e.key == "a") {
+        // document.onkeyup = (e) => {
+        //     if (e.key == "w") {
+        //     }
+        //     else if (e.key == "s") {
+        //     }
+        //     else if (e.key == "a") {
 
-            }
-            else if (e.key == "d") {
+        //     }
+        //     else if (e.key == "d") {
 
-            }
-            else {
-                return;
-            }
-            this.isPress[e.key] = false;
-        }
+        //     }
+        //     else {
+        //         return;
+        //     }
+        //     this.isPress[e.key] = false;
+        // }
 
 
 
@@ -91,7 +93,7 @@ export default class Character extends PhysicsObject3d {
         }
 
     }
-    public walk(deltatime:number) {
+    public walk(deltatime: number) {
         this.addResistance();
         if (!this.isWalking) {
             //start animating walk
@@ -105,22 +107,22 @@ export default class Character extends PhysicsObject3d {
 
             }
             else if (this.isPress.w) {
-                this.body.applyForce(new CANNON.Vec3(0, 0, -10*deltatime), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(0, 0, -10 * deltatime), this.body.position);
                 // this.body.velocity.z = -this.movementSpeed;
             }
             else if (this.isPress.s) {
-                this.body.applyForce(new CANNON.Vec3(0, 0, 10*deltatime), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(0, 0, 10 * deltatime), this.body.position);
                 // this.body.velocity.z = this.movementSpeed;
             }
         }
         if (Math.abs(this.body.velocity.x) <= this.movementSpeed) {
 
             if (this.isPress.a) {
-                this.body.applyForce(new CANNON.Vec3(-10*deltatime, 0, 0), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(-10 * deltatime, 0, 0), this.body.position);
                 // this.body.velocity.x = -this.movementSpeed;
             }
             if (this.isPress.d) {
-                this.body.applyForce(new CANNON.Vec3(10*deltatime, 0, 0), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(10 * deltatime, 0, 0), this.body.position);
                 // this.body.velocity.x = this.movementSpeed;
             }
         }

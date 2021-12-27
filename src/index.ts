@@ -39,23 +39,6 @@ plane.rotation.x = (THREE.MathUtils.degToRad(-90))
 plane.receiveShadow = true;
 scene.add(plane);
 
-// scene.add(box2);
-
-// const box1Geometry = new THREE.BoxGeometry(3, 3, 3);
-// const box1material = new THREE.MeshToonMaterial({ color: "lightred", side: THREE.DoubleSide });
-// const box1 = new THREE.Mesh(box1Geometry, box1material);
-// // box1.position.x = 0 + 10;
-// box1.position.z = 0 - 10;
-// box1.position.y = 10;
-// box1.castShadow = true;
-// box1.traverse(obj => {
-//     obj.castShadow = true;
-// })
-// scene.add(box1);
-
-// const box1Body = new CANNON.Body({ mass: 0, shape: new CANNON.Box(new Vec3(1.5, 1.5, 1.5)) });
-// box1Body.position.copy(box1.position);
-
 const SUN = new THREE.DirectionalLight(0xffffff, 0.5)
 SUN.position.set(0, 500, 0)
 SUN.shadow.camera.visible = ENABLE_SHADOW;
@@ -84,7 +67,7 @@ const groundBody = new CANNON.Body({ mass: 0, material: { friction: 1, restituti
 
 // world.addBody(box1Body)
 world.addBody(groundBody);
-const character = new Character(world, scene, new Vector3(0, 0, -10));
+const character = new Character(world, scene, new Vector3(0, 0, 0));
 character.init();
 
 
@@ -92,9 +75,53 @@ character.init();
 
 
 
+var followCharacter = false;
+canvas.onmousedown = (e) => {
+    if (e.which == 1) {
+        followCharacter = false;
+        const { x, y, z } = character.mesh.position;
+        var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
+        // const finalPosition = new Vector3().lerpVectors(camera.position, disiredPosition, 1);
+        camera.position.set(disiredPosition.x, disiredPosition.y, disiredPosition.z)
+        // camera.lookAt(character.position);
+        controls.target.copy(character.position);
+        controls.update();
+    }
+    // canvas.requestPointerLock();
+}
 
-canvas.onclick = (e) => {
-    canvas.requestPointerLock();
+document.onkeydown = (e) => {
+    if (e.key == "w") {
+    }
+    else if (e.key == "s") {
+    }
+    else if (e.key == "a") {
+    }
+    else if (e.key == "d") {
+    }
+    else {
+        return
+    }
+    character.isPress[e.key] = true;
+    followCharacter = true;
+
+}
+
+document.onkeyup = (e) => {
+    if (e.key == "w") {
+    }
+    else if (e.key == "s") {
+    }
+    else if (e.key == "a") {
+
+    }
+    else if (e.key == "d") {
+
+    }
+    else {
+        return;
+    }
+    character.isPress[e.key] = false;
 }
 const speed = 1;
 
@@ -105,7 +132,18 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const OFFSET_CAMERA = new Vector3(15, 35, 50);
 
 camera.position.copy(character.position)
-camera.position.copy(camera.position.add(OFFSET_CAMERA));
+camera.position.add(OFFSET_CAMERA)
+
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableZoom = false;
+controls.enableRotate = false;
+controls.mouseButtons = {
+    LEFT: THREE.MOUSE.RIGHT,
+    RIGHT: THREE.MOUSE.LEFT,
+    MIDDLE: THREE.MOUSE.MIDDLE,
+}
+
 
 const HOTKEYSPOSITION = new Vector3(-5, 1, 5);
 
@@ -114,27 +152,34 @@ hotkeys.init();
 
 var deltatime = 0;
 var start = 0;
+
+var cameraInitialized = false;
 function animate() {
 
     requestAnimationFrame(animate);
 
-    if (character.initialized)
+    if (character.initialized) {
         character.update(deltatime);
+        if (!cameraInitialized) {
+            camera.lookAt(character.position);
+            controls.target = character.position;
+            controls.update();
+            cameraInitialized = true;
+        }
+    }
 
     if (hotkeys.initialized)
         hotkeys.update(deltatime);
 
+    if (followCharacter) {
+        console.log("test")
+        const { x, y, z } = character.mesh.position;
+        var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
+        // const finalPosition = new Vector3().lerpVectors(camera.position, disiredPosition, 1);
+        camera.position.set(disiredPosition.x, disiredPosition.y, disiredPosition.z)
+        camera.lookAt(character.position);
 
-    // box1.position.copy(box1Body.position)
-    // box1.quaternion.copy(box1Body.quaternion)
-    const { x, y, z } = character.mesh.position;
-    var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
-    const finalPosition = new Vector3().lerpVectors(camera.position, disiredPosition, 1);
-
-    camera.position.copy(finalPosition)
-    camera.lookAt(character.position);
-
-
+    }
     renderer.render(scene, camera)
 
     deltatime = Date.now() - start
