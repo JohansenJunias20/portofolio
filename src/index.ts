@@ -174,7 +174,7 @@ function animate() {
     }
 
     if (hotkeys.initialized)
-        hotkeys.update(deltatime);
+        hotkeys.update(deltatime); 
 
     if (followCharacter) {
 
