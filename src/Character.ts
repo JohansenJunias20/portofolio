@@ -107,22 +107,22 @@ export default class Character extends PhysicsObject3d {
 
             }
             else if (this.isPress.w) {
-                this.body.applyForce(new CANNON.Vec3(0, 0, -10 * deltatime), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(0, 0, -2000 * deltatime), this.body.position);
                 // this.body.velocity.z = -this.movementSpeed;
             }
             else if (this.isPress.s) {
-                this.body.applyForce(new CANNON.Vec3(0, 0, 10 * deltatime), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(0, 0, 2000 * deltatime), this.body.position);
                 // this.body.velocity.z = this.movementSpeed;
             }
         }
         if (Math.abs(this.body.velocity.x) <= this.movementSpeed) {
 
             if (this.isPress.a) {
-                this.body.applyForce(new CANNON.Vec3(-10 * deltatime, 0, 0), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(-2000 * deltatime, 0, 0), this.body.position);
                 // this.body.velocity.x = -this.movementSpeed;
             }
             if (this.isPress.d) {
-                this.body.applyForce(new CANNON.Vec3(10 * deltatime, 0, 0), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(2000 * deltatime, 0, 0), this.body.position);
                 // this.body.velocity.x = this.movementSpeed;
             }
         }

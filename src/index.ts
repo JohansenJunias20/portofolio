@@ -1,6 +1,6 @@
 import { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import { AmbientLight, TorusBufferGeometry, Vector3, WebGLRenderer } from 'three';
+import { AmbientLight, Clock, TorusBufferGeometry, Vector3, WebGLRenderer } from 'three';
 import Character from './Character';
 import * as CANNON from 'cannon';
 import Key from './Hotkeys/Key';
@@ -75,19 +75,22 @@ character.init();
 
 
 
-var followCharacter = false;
+var followCharacter = true;
 canvas.onmousedown = (e) => {
     if (e.which == 1) {
-        followCharacter = false;
-        const { x, y, z } = character.mesh.position;
-        var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
-        // const finalPosition = new Vector3().lerpVectors(camera.position, disiredPosition, 1);
-        camera.position.set(disiredPosition.x, disiredPosition.y, disiredPosition.z)
-        // camera.lookAt(character.position);
-        controls.target.copy(character.position);
-        controls.update();
+        if (followCharacter) {
+
+            followCharacter = false;
+            const { x, y, z } = character.mesh.position;
+            var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
+            // const finalPosition = new Vector3().lerpVectors(camera.position, disiredPosition, 1);
+            camera.position.set(disiredPosition.x, disiredPosition.y, disiredPosition.z)
+            // camera.lookAt(character.position);
+            controls.target.copy(character.position);
+            controls.update();
+        }
+        // canvas.requestPointerLock();
     }
-    // canvas.requestPointerLock();
 }
 
 document.onkeydown = (e) => {
@@ -135,6 +138,7 @@ camera.position.copy(character.position)
 camera.position.add(OFFSET_CAMERA)
 
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { clamp } from 'three/src/math/MathUtils';
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableZoom = false;
 controls.enableRotate = false;
@@ -152,38 +156,44 @@ hotkeys.init();
 
 var deltatime = 0;
 var start = 0;
-
+var alpha = 0;
 var cameraInitialized = false;
+const clock = new Clock()
 function animate() {
-
+    deltatime = clock.getDelta()
     requestAnimationFrame(animate);
 
     if (character.initialized) {
         character.update(deltatime);
-        if (!cameraInitialized) {
-            camera.lookAt(character.position);
-            controls.target = character.position;
-            controls.update();
-            cameraInitialized = true;
-        }
+        // if (!cameraInitialized) {
+        //     camera.lookAt(character.position);
+        //     controls.target = character.position;
+        //     controls.update();
+        //     cameraInitialized = true;
+        // }
     }
 
     if (hotkeys.initialized)
         hotkeys.update(deltatime);
 
     if (followCharacter) {
-        console.log("test")
+
         const { x, y, z } = character.mesh.position;
         var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
-        // const finalPosition = new Vector3().lerpVectors(camera.position, disiredPosition, 1);
-        camera.position.set(disiredPosition.x, disiredPosition.y, disiredPosition.z)
-        camera.lookAt(character.position);
 
+        alpha += deltatime * 0.3
+        const finalPosition = new Vector3().copy(camera.position).lerp(disiredPosition, clamp(alpha, 0, 1));
+        console.log(clamp(alpha, 0, 1))
+        camera.position.copy(finalPosition)
+        if(clamp(alpha,0,1) >= 1)
+        camera.lookAt(character.position); // lookAt juga perlu di lerp
+
+    }
+    else {
+        alpha = 0.0;
     }
     renderer.render(scene, camera)
 
-    deltatime = Date.now() - start
-    start = Date.now();
 }
 
 animate();
