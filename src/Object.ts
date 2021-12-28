@@ -8,6 +8,7 @@ export default class PhysicsObject3d {
     protected asset: {
         url: string;
         scale: THREE.Vector3;
+        recieveShadow?: boolean;
         castShadow: boolean;
     }
     protected PhysicsWorld: CANNON.World;
@@ -17,15 +18,17 @@ export default class PhysicsObject3d {
     public scene: THREE.Scene;
     public movementSpeed: number;
     public body: CANNON.Body;
-    public shapeType: "BOX" | "SPHERE";
+    public shapeType: "BOX" | "SPHERE" | "CUSTOM";
+    private shape: CANNON.Shape | null;
     public readonly mass: number;
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 10, shape: "BOX" | "SPHERE", mass: number) {
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 10, shapeType: "BOX" | "SPHERE" | "CUSTOM", mass: number, shape: null | CANNON.Shape = null) {
         this.PhysicsWorld = world;
         this.scene = scene;
         this.initialized = false;
         this.position = position;
         this.movementSpeed = movementSpeed;
-        this.shapeType = shape;
+        this.shapeType = shapeType;
+        this.shape = shape;
         this.mass = mass;
     }
     protected async init() {
@@ -48,6 +51,8 @@ export default class PhysicsObject3d {
             loader.load(this.asset.url, (f) => {
                 f.traverse(c => {
                     c.castShadow = this.asset.castShadow;
+                    if (this.asset.recieveShadow != undefined)
+                        c.receiveShadow = this.asset.recieveShadow;
                     return c;
                 })
                 f.scale.x = this.asset.scale.x;
@@ -64,7 +69,8 @@ export default class PhysicsObject3d {
         var size = new THREE.Vector3();
         new THREE.Box3().setFromObject(fbx).getSize(size);
         console.log({ size })
-        this.body = new CANNON.Body({ mass: this.mass, material: { friction: 1, restitution: 1, id: 1, name: "test" }, shape: this.shapeType == "BOX" ? new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) : new CANNON.Sphere(1) });
+        console.log({ asset: this.asset.url })
+        this.body = new CANNON.Body({ mass: this.mass, material: { friction: 1, restitution: 1, id: 1, name: "test" }, shape: this.shapeType == "CUSTOM" ? this.shape : this.shapeType == "BOX" ? new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) : new CANNON.Sphere(1) });
         this.body.position.set(this.position.x, this.position.y, this.position.z);
         this.PhysicsWorld.addBody(this.body);
 

@@ -139,6 +139,7 @@ camera.position.add(OFFSET_CAMERA)
 
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { clamp } from 'three/src/math/MathUtils';
+import NavigationBoards from './NavigationBoards/NavigationBoards';
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableZoom = false;
 controls.enableRotate = false;
@@ -154,6 +155,9 @@ const HOTKEYSPOSITION = new Vector3(-5, 1, 5);
 const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 hotkeys.init();
 
+const navigationBoards = new NavigationBoards(world, scene);
+navigationBoards.init();
+
 var deltatime = 0;
 var start = 0;
 var alpha = 0;
@@ -165,16 +169,12 @@ function animate() {
 
     if (character.initialized) {
         character.update(deltatime);
-        // if (!cameraInitialized) {
-        //     camera.lookAt(character.position);
-        //     controls.target = character.position;
-        //     controls.update();
-        //     cameraInitialized = true;
-        // }
     }
-
     if (hotkeys.initialized)
-        hotkeys.update(deltatime); 
+        hotkeys.update(deltatime);
+
+    if (navigationBoards.initialized)
+        navigationBoards.update(deltatime)
 
     if (followCharacter) {
 
@@ -183,10 +183,9 @@ function animate() {
 
         alpha += deltatime * 0.3
         const finalPosition = new Vector3().copy(camera.position).lerp(disiredPosition, clamp(alpha, 0, 1));
-        console.log(clamp(alpha, 0, 1))
         camera.position.copy(finalPosition)
-        if(clamp(alpha,0,1) >= 1)
-        camera.lookAt(character.position); // lookAt juga perlu di lerp
+        if (clamp(alpha, 0, 1) >= 1)
+            camera.lookAt(character.position); // lookAt juga perlu di lerp
 
     }
     else {
