@@ -10,17 +10,18 @@ import PhysicsObject3d from '../PhysicsObject';
 interface AnimationCharacter {
     walk: THREE.AnimationAction;
 }
-export default class Key extends PhysicsObject3d {
+export default class ProLang extends PhysicsObject3d {
     asset = {
-        castShadow: true,
+        castShadow: false,
+        recieveShadow: false,
         url: ``,
         scale: new THREE.Vector3(0.07, 0.07, 0.07)
     }
-    public readonly key: "w" | "a" | "s" | "d";
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, key: "a" | "w" | "s" | "d") {
-        super(world, scene, position, 0, "BOX", 0.2);
-        this.key = key;
-        this.asset.url = `/assets/environment/hotkeys/key ${key}.fbx`;
+    public readonly text: "js" | "ts" | "golang" | "c#" | "python" | "html" | "css" | "php" | "c++" | "bash";
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "js" | "ts" | "golang" | "c#" | "python" | "html" | "css" | "php" | "c++" | "bash") {
+        super(world, scene, position, 0, "BOX", 0);
+        this.text = text;
+        this.asset.url = `/assets/environment/knowledge/ProLang/${text}.fbx`;
     }
     public async init() {
         await super.init()

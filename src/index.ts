@@ -1,6 +1,6 @@
 import { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import { AmbientLight, Clock, TorusBufferGeometry, Vector3, WebGLRenderer } from 'three';
+import { AmbientLight, CameraHelper, Clock, TorusBufferGeometry, Vector3, WebGLRenderer } from 'three';
 import Character from './Character';
 import * as CANNON from 'cannon';
 import Key from './Hotkeys/Key';
@@ -25,7 +25,6 @@ camera.quaternion.y = THREE.MathUtils.degToRad(15)
 renderer.render(scene, camera)
 var temp = new THREE.Vector3();
 camera.getWorldDirection(temp)
-console.log({ temp })
 
 const sizeGround = {
     x: 1000,
@@ -67,32 +66,65 @@ const groundBody = new CANNON.Body({ mass: 0, material: { friction: 1, restituti
 
 // world.addBody(box1Body)
 world.addBody(groundBody);
-const character = new Character(world, scene, new Vector3(0, 0, 0));
-character.init();
 
 
 
-
+// lobby.init();
 
 
 var followCharacter = true;
+var leftMouseDown = false;
 canvas.onmousedown = (e) => {
     if (e.which == 1) {
+        // if (controls.enablePan)
         if (followCharacter) {
-
             followCharacter = false;
             const { x, y, z } = character.mesh.position;
             var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
-            // const finalPosition = new Vector3().lerpVectors(camera.position, disiredPosition, 1);
             camera.position.set(disiredPosition.x, disiredPosition.y, disiredPosition.z)
-            // camera.lookAt(character.position);
-            controls.target.copy(character.position);
-            controls.update();
+            // controls.target.copy(character.position);
+            // controls.update();
         }
+        leftMouseDown = true;
         // canvas.requestPointerLock();
     }
-}
 
+
+}
+canvas.onmouseup = (e) => {
+    if (e.which == 1) {
+        leftMouseDown = false;
+    }
+}
+var MouselastPos = {
+    x: 0,
+    y: 0
+}
+var deltaPos = {
+    x: 0,
+    y: 0
+}
+var frontCam = new Vector3()
+var leftCam = new Vector3()
+const CameraPanSpeed = 0.035;
+canvas.onmousemove = (e) => {
+    deltaPos.x = MouselastPos.x - e.pageX;
+    deltaPos.y = MouselastPos.y - e.pageY;
+    MouselastPos.x = e.pageX;
+    MouselastPos.y = e.pageY;
+    if (!followCharacter && leftMouseDown) {
+
+        //x camera local axis logic
+        camera.getWorldDirection(frontCam);
+        leftCam = frontCam.cross(camera.up);
+        camera.position.add(leftCam.multiplyScalar(deltaPos.x).multiplyScalar(CameraPanSpeed));
+
+        //y camera local axis logic
+        camera.getWorldDirection(frontCam);
+        camera.position.x += frontCam.multiplyScalar(deltaPos.y).x * CameraPanSpeed * 3 * -1
+        camera.position.z += frontCam.y * CameraPanSpeed * 3 * -1
+    }
+}
 document.onkeydown = (e) => {
     if (e.key == "w") {
     }
@@ -131,26 +163,15 @@ const speed = 1;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 // renderer.shadowMap = true;
-
-const OFFSET_CAMERA = new Vector3(15, 35, 50);
-
-camera.position.copy(character.position)
-camera.position.add(OFFSET_CAMERA)
-
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { clamp } from 'three/src/math/MathUtils';
 import NavigationBoards from './NavigationBoards/NavigationBoards';
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableZoom = false;
-controls.enableRotate = false;
-controls.mouseButtons = {
-    LEFT: THREE.MOUSE.RIGHT,
-    RIGHT: THREE.MOUSE.LEFT,
-    MIDDLE: THREE.MOUSE.MIDDLE,
-}
-
-
-const HOTKEYSPOSITION = new Vector3(-5, 1, 5);
+import Lobby from './Lobby/Lobby';
+import RoadStones from './Lobby/RoadStones/RoadStones';
+import Johansen from './johansen/johansen';
+import ProLangs from './ProLang/ProLangs';
+//#region 3D OBJECTS
+const HOTKEYSPOSITION = new Vector3(-15, 1, 0);
 
 const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 hotkeys.init();
@@ -158,14 +179,47 @@ hotkeys.init();
 const navigationBoards = new NavigationBoards(world, scene);
 navigationBoards.init();
 
+const lobby = new Lobby(world, scene);
+lobby.init();
+const character = new Character(world, scene, new Vector3(0, 0, -5));
+character.init();
+const roadStones = new RoadStones(scene)
+roadStones.init()
+
+const johansen = new Johansen(world, scene)
+johansen.init()
+
+const prolang = new ProLangs(world, scene)
+prolang.init()
+//#endregion
+
+const OFFSET_CAMERA = new Vector3(15, 35, 50);
+camera.position.copy(character.position)
+camera.position.add(OFFSET_CAMERA)
+// const controls = new OrbitControls(camera, renderer.domElement);
+// controls.enableZoom = false;
+// controls.enablePan = false;
+// controls.enableRotate = false;
+// controls.mouseButtons = {
+//     LEFT: THREE.MOUSE.RIGHT,
+//     RIGHT: THREE.MOUSE.LEFT,
+//     MIDDLE: THREE.MOUSE.MIDDLE,
+// }
+// controls.target.copy(character.position)
+camera.lookAt(character.position)
 var deltatime = 0;
-var start = 0;
 var alpha = 0;
-var cameraInitialized = false;
+// var cameraInitialized = false;
 const clock = new Clock()
+// var allowControlCamera = false;
+
+
 function animate() {
     deltatime = clock.getDelta()
     requestAnimationFrame(animate);
+    // if (deltatime < 0.2)
+    world.step(1 / 30);
+    // else return
 
     if (character.initialized) {
         character.update(deltatime);
@@ -176,21 +230,52 @@ function animate() {
     if (navigationBoards.initialized)
         navigationBoards.update(deltatime)
 
+    if (lobby.initialized) {
+        lobby.update(deltatime)
+    }
+
+    if (roadStones.initialized) {
+        roadStones.update(deltatime)
+    }
+
+    if (johansen.initialized) {
+        johansen.update(deltatime)
+    }
+
+    if (prolang.initialized) {
+        prolang.update(deltatime)
+    }
+
     if (followCharacter) {
 
         const { x, y, z } = character.mesh.position;
         var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
+        if (camera.position == disiredPosition) {
 
+        }
         alpha += deltatime * 0.3
         const finalPosition = new Vector3().copy(camera.position).lerp(disiredPosition, clamp(alpha, 0, 1));
         camera.position.copy(finalPosition)
-        if (clamp(alpha, 0, 1) >= 1)
+        if (clamp(alpha, 0, 1) >= 1) {
             camera.lookAt(character.position); // lookAt juga perlu di lerp
+        }
 
     }
     else {
         alpha = 0.0;
+        // camera.position.y = 36;
+        // camera.quaternion.x = -0.28795955090355735;
+        // camera.quaternion.y = 0.13892679711112796;
+        // camera.quaternion.z = 0.04226348818859841;
+        // camera.quaternion.w = 0.9465687717508947;
     }
+
+    // if (character.isPress.w || character.isPress.a || character.isPress.s || character.isPress.d) {
+    //     controls.enablePan = false;
+    // }
+    // else {
+    //     controls.enablePan = true;
+    // }
     renderer.render(scene, camera)
 
 }

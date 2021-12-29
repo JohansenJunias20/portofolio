@@ -1,15 +1,18 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
-import NavigationBoard from "./NavigationBoard";
+import Statue from "./Statue";
 
 
-export default class NavigationBoards {
-    keys: Array<NavigationBoard>;
+export default class Statues {
+    keys: Array<Statue>;
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         this.keys = [
-            new NavigationBoard(world, scene, new Vector3(-10, 0, 60), "knowledge")
+            new Statue(world, scene, new Vector3(-20, -3, 25), "waving"),
+            new Statue(world, scene, new Vector3(20, -3, 25), "dab"),
+            new Statue(world, scene, new Vector3(20, -3, 65), "style"),
+            new Statue(world, scene, new Vector3(-20, -3, 65), "clapping"),
         ];
 
     }
@@ -17,8 +20,8 @@ export default class NavigationBoards {
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             await key.init();
-            key.mesh.rotateY(degToRad(-90));
-            key.body.quaternion.copy(key.mesh.quaternion)
+            // key.mesh.rotateY(degToRad(-90));
+            // key.body.quaternion.copy(key.mesh.quaternion)
             key.mesh.receiveShadow = false
         }
         this.initialized = true;

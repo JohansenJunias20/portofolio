@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { Group, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { clamp } from 'three/src/math/MathUtils';
-import PhysicsObject3d from './Object';
+import PhysicsObject3d from './PhysicsObject';
 declare var followCharacter: boolean;
 
 interface AnimationCharacter {
@@ -23,8 +23,8 @@ export default class Character extends PhysicsObject3d {
         url: `/assets/character/Ball FBX.fbx`,
         scale: new THREE.Vector3(0.01, 0.01, 0.01)
     }
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 5) {
-        super(world, scene, position, movementSpeed, "SPHERE", 3);
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 20) {
+        super(world, scene, position, movementSpeed, "SPHERE", 2);
 
         this.isPress = {
             w: false,

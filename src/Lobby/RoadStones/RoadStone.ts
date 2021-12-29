@@ -5,22 +5,17 @@ import * as THREE from 'three';
 import { Group, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { clamp } from 'three/src/math/MathUtils';
-import PhysicsObject3d from '../PhysicsObject';
+import MeshOnlyObject3d from '../../MeshOnlyObject';
 
-interface AnimationCharacter {
-    walk: THREE.AnimationAction;
-}
-export default class Key extends PhysicsObject3d {
+export default class RoadStone extends MeshOnlyObject3d {
     asset = {
         castShadow: true,
-        url: ``,
+        recieveShadow: true,
+        url: `/assets/environment/Lobby/RoadStones/RoadStone.fbx`,
         scale: new THREE.Vector3(0.07, 0.07, 0.07)
     }
-    public readonly key: "w" | "a" | "s" | "d";
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, key: "a" | "w" | "s" | "d") {
-        super(world, scene, position, 0, "BOX", 0.2);
-        this.key = key;
-        this.asset.url = `/assets/environment/hotkeys/key ${key}.fbx`;
+    constructor(scene: THREE.Scene, position: Vector3) {
+        super(scene, position);
     }
     public async init() {
         await super.init()

@@ -1,15 +1,15 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
-import NavigationBoard from "./NavigationBoard";
+import ProLang from "./ProLang";
 
 
-export default class NavigationBoards {
-    keys: Array<NavigationBoard>;
+export default class ProLangs {
+    keys: Array<ProLang>;
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         this.keys = [
-            new NavigationBoard(world, scene, new Vector3(-10, 0, 60), "knowledge")
+            new ProLang(world, scene, new Vector3(-20, -5, 100), "js")
         ];
 
     }

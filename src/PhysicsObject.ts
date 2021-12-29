@@ -44,8 +44,6 @@ export default class PhysicsObject3d {
 
     }
     private async loadAsset() {
-        console.log("initializing..")
-        console.log(this.asset)
         const fbx = await new Promise<Group>((res, rej) => {
             const loader = new FBXLoader();
             loader.load(this.asset.url, (f) => {
@@ -68,18 +66,15 @@ export default class PhysicsObject3d {
         this.scene.add(fbx);
         var size = new THREE.Vector3();
         new THREE.Box3().setFromObject(fbx).getSize(size);
-        console.log({ size })
-        console.log({ asset: this.asset.url })
         this.body = new CANNON.Body({ mass: this.mass, material: { friction: 1, restitution: 1, id: 1, name: "test" }, shape: this.shapeType == "CUSTOM" ? this.shape : this.shapeType == "BOX" ? new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) : new CANNON.Sphere(1) });
         this.body.position.set(this.position.x, this.position.y, this.position.z);
+        console.log(this.asset.url)
+        console.log(this.position)
         this.PhysicsWorld.addBody(this.body);
 
         this.initialized = true;
-        console.log("initialized")
-        console.log(this.asset.url)
     }
     private updatePhysics(deltatime: number) {
-        this.PhysicsWorld.step(1 / 60);
         this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
         this.mesh.quaternion.copy(this.body.quaternion);
     }
