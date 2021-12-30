@@ -9,14 +9,14 @@ export default class Johansen {
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         this.keys = [
-            new Word(world, scene, new Vector3(0, 7, -11), "J", new Vector3(0.07, 0.055, 0.07)),
-            new Word(world, scene, new Vector3(4.5, 7, -10), "O"),
-            new Word(world, scene, new Vector3(10, 7, -10), "H"),
-            new Word(world, scene, new Vector3(15, 7, -10), "A"),
-            new Word(world, scene, new Vector3(19.5, 7, -10), "N", new Vector3(0.05, 0.07, 0.07)),
-            new Word(world, scene, new Vector3(23, 7, -10), "S"),
-            new Word(world, scene, new Vector3(26, 7, -10), "E"),
-            new Word(world, scene, new Vector3(30, 7, -10), "N", new Vector3(0.05, 0.07, 0.07)),
+            new Word(world, scene, new Vector3(0.5, 0, -10), "J"),
+            new Word(world, scene, new Vector3(4, 0, -10), "O"),
+            new Word(world, scene, new Vector3(8, 0, -10), "H"),
+            new Word(world, scene, new Vector3(12, 0, -10), "A"),
+            new Word(world, scene, new Vector3(16, 0, -10), "N"),
+            new Word(world, scene, new Vector3(19.5, 0, -10), "S"),
+            new Word(world, scene, new Vector3(23, 0, -10), "E"),
+            new Word(world, scene, new Vector3(26.5, 0, -10), "N"),
         ];
 
     }

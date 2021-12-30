@@ -5,17 +5,21 @@ import Character from './Character';
 import * as CANNON from 'cannon';
 import Key from './Hotkeys/Key';
 import Hotkeys from './Hotkeys/Hotkeys';
-const ENABLE_SHADOW = true;
+const ENABLE_SHADOW = false;
 const canvas: HTMLCanvasElement = document.querySelector("#bg");
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
 
-
-
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
+import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true
 })
+
 
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -32,14 +36,15 @@ const sizeGround = {
 }
 
 const geometry = new THREE.PlaneGeometry(sizeGround.x, sizeGround.z);
-const material = new THREE.MeshToonMaterial({ color: "#EDA37C", side: THREE.FrontSide });
+const material = new THREE.MeshToonMaterial({ color: "#c49a66", side: THREE.FrontSide });
 const plane = new THREE.Mesh(geometry, material);
 plane.rotation.x = (THREE.MathUtils.degToRad(-90))
 plane.receiveShadow = true;
 scene.add(plane);
 
 const SUN = new THREE.DirectionalLight(0xffffff, 0.5)
-SUN.position.set(0, 500, 0)
+SUN.position.set(5, 20, 15)
+SUN.target.position.set(0, 0, 0);
 SUN.shadow.camera.visible = ENABLE_SHADOW;
 SUN.castShadow = ENABLE_SHADOW;
 SUN.shadow.camera.near = 0.1;
@@ -212,7 +217,31 @@ var alpha = 0;
 // var cameraInitialized = false;
 const clock = new Clock()
 // var allowControlCamera = false;
+import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass';
 
+const bokehPass = new BokehPass(scene, camera, {
+    focus: 62,
+    aperture: 0.00005,
+    maxblur: 0.01,
+
+    width: window.innerWidth,
+    height: window.innerHeight
+});
+console.log({ distance: new Vector3().copy(character.position).distanceTo(camera.position) });
+console.log({ uniform: bokehPass.uniforms })
+// bokehPass.uniforms.aperture.value = 4 * 0.00001;
+const renderPass = new RenderPass(scene, camera);
+
+const fxaaPass = new ShaderPass(FXAAShader);
+const pixelRatio = renderer.getPixelRatio();
+fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * pixelRatio);
+fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * pixelRatio);
+
+// renderer.physicallyCorrectLights = true;
+const composer2 = new EffectComposer(renderer);
+composer2.addPass(renderPass);
+composer2.addPass(fxaaPass);
+composer2.addPass(bokehPass);
 
 function animate() {
     deltatime = clock.getDelta()
@@ -276,7 +305,9 @@ function animate() {
     // else {
     //     controls.enablePan = true;
     // }
-    renderer.render(scene, camera)
+
+    // renderer.render(scene, camera)
+    composer2.render(deltatime)
 
 }
 

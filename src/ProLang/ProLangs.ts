@@ -9,7 +9,7 @@ export default class ProLangs {
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         this.keys = [
-            new ProLang(world, scene, new Vector3(-20, -5, 100), "js")
+            new ProLang(world, scene, new Vector3(-25, 0, 100), "js")
         ];
 
     }
@@ -17,7 +17,7 @@ export default class ProLangs {
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             await key.init();
-            key.mesh.rotateY(degToRad(-90));
+            key.mesh.rotateY(degToRad(-45));
             key.body.quaternion.copy(key.mesh.quaternion)
             key.mesh.receiveShadow = false
         }

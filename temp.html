@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Three.js TypeScript Tutorials by Sean Bradley : https://sbcode.net/threejs</title>
+    <meta name="author" content="Sean Bradley" />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <style>
+        body {
+            overflow: hidden;
+            margin: 0px;
+        }
+
+        a {
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="/view_source/physics-cannon-debug-renderer.html" id="vwSrcLink" target="_blank">&lt;&gt;</a>
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev/three@0.135.0/build/three.module.js'
+        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/controls/OrbitControls.js'
+        import Stats from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/libs/stats.module.js'
+        import { GUI } from 'https://cdn.skypack.dev/dat.gui'
+        import { OBJLoader } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/loaders/OBJLoader.js'
+        import * as CANNON from 'https://cdn.skypack.dev/cannon-es/dist/cannon-es.js'
+        import CannonUtils from './utils/cannonUtils.js'
+        import CannonDebugRenderer from './utils/cannonDebugRenderer.js'
+        
+        const scene = new THREE.Scene()
+        scene.add(new THREE.AxesHelper(5))
+
+
+
+        const normalMaterial = new THREE.MeshNormalMaterial()
+        const phongMaterial = new THREE.MeshPhongMaterial()
+
+
+
+        let monkeyMesh
+        let monkeyBody
+        let monkeyLoaded = false
+        const objLoader = new OBJLoader()
+        objLoader.load(
+            'models/monkey.obj',
+            (object) => {
+                scene.add(object)
+                monkeyMesh = object.children[0]
+                monkeyMesh.material = normalMaterial
+                monkeyMesh.position.x = -2
+                monkeyMesh.position.y = 20
+                const monkeyShape = CannonUtils.CreateTrimesh(monkeyMesh.geometry)
+
+                monkeyBody = new CANNON.Body({ mass: 1 })
+                monkeyBody.addShape(monkeyShape)
+
+                monkeyBody.position.x = monkeyMesh.position.x
+                monkeyBody.position.y = monkeyMesh.position.y
+                monkeyBody.position.z = monkeyMesh.position.z
+                world.addBody(monkeyBody)
+                monkeyLoaded = true
+            },
+            (xhr) => {
+                console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+            },
+            (error) => {
+                console.log('An error happened')
+            }
+        )
+
+
+
+
+
+        function animate() {
+            requestAnimationFrame(animate)
+
+            controls.update()
+
+            delta = Math.min(clock.getDelta(), 0.1)
+            world.step(delta)
+
+            cannonDebugRenderer.update()
+
+            // Copy coordinates from Cannon to Three.js
+
+            if (monkeyLoaded) {
+                monkeyMesh.position.set(
+                    monkeyBody.position.x,
+                    monkeyBody.position.y,
+                    monkeyBody.position.z
+                )
+                monkeyMesh.quaternion.set(
+                    monkeyBody.quaternion.x,
+                    monkeyBody.quaternion.y,
+                    monkeyBody.quaternion.z,
+                    monkeyBody.quaternion.w
+                )
+            }
+
+            render()
+
+            stats.update()
+        }
+
+        function render() {
+            renderer.render(scene, camera)
+        }
+
+        animate()
+    </script>
+</body>
+
+</html>`

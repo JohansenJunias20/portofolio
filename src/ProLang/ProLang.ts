@@ -15,11 +15,12 @@ export default class ProLang extends PhysicsObject3d {
         castShadow: false,
         recieveShadow: false,
         url: ``,
+        mtl: ``,
         scale: new THREE.Vector3(0.07, 0.07, 0.07)
     }
     public readonly text: "js" | "ts" | "golang" | "c#" | "python" | "html" | "css" | "php" | "c++" | "bash";
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "js" | "ts" | "golang" | "c#" | "python" | "html" | "css" | "php" | "c++" | "bash") {
-        super(world, scene, position, 0, "BOX", 0);
+        super(world, scene, position, 0, "TRIMESH", 0);
         this.text = text;
         this.asset.url = `/assets/environment/knowledge/ProLang/${text}.fbx`;
     }
