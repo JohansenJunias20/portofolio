@@ -1,11 +1,10 @@
-import { Group, Vector3 } from "three";
+import { Float32BufferAttribute, Group, Uint8ClampedBufferAttribute, Vector3 } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import * as CANNON from 'cannon';
 import * as THREE from "three";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
-import { threeToCannon, ShapeType } from 'three-to-cannon';
-import CannonUtils from "./utility/CannonUtils";
+import getVertices from "./utility/getVertices";
 export default class PhysicsObject3d {
     protected asset: {
         url: string;
@@ -60,6 +59,7 @@ export default class PhysicsObject3d {
                             c.receiveShadow = this.asset.recieveShadow;
                         return c;
                     })
+
                     f.scale.x = this.asset.scale.x;
                     f.scale.y = this.asset.scale.y;
                     f.scale.z = this.asset.scale.z;
@@ -70,14 +70,14 @@ export default class PhysicsObject3d {
             this.position.y += 5;
             this.mesh = fbx;
 
+
             new THREE.Box3().setFromObject(fbx).getSize(size);
             if (this.shapeType == "TRIMESH") {
-                console.log({ children: this.mesh.children })
-                var vertices = this.mesh.children[0].geometry.attributes.position.array;
-                var indices = this.mesh.children[0].geometry.getIndex();
-                console.log({ vertices, indices })
-                this.shape = new CANNON.Trimesh(vertices, [])
-                console.log({ shape: this.shape })
+                console.log({ mesh: this.mesh })
+                const vertices = this.mesh.children[0].geometry.attributes.position.array;
+                const indices = Object.keys(vertices).map(Number);
+                this.shape = new CANNON.Trimesh(vertices, indices);
+                alert("init monkey")
             }
             this.body =
                 new CANNON.Body({
@@ -91,33 +91,37 @@ export default class PhysicsObject3d {
             this.PhysicsWorld.addBody(this.body);
         }
         else {
-            var mtlLoader = new MTLLoader();
             const ref = this;
             const object = await new Promise<Group>((res, rej) => {
-                mtlLoader.load(this.asset.mtl, function (materials) {
 
-                    materials.preload();
+                var objLoader = new OBJLoader();
+                objLoader.load(ref.asset.url, function (object) {
+                    object.scale.copy(ref.asset.scale)
+                    res(object)
 
-                    var objLoader = new OBJLoader();
-                    objLoader.setMaterials(materials);
-                    objLoader.load(ref.asset.url, function (object) {
-                        res(object)
-
-                    });
-                }, () => { }, (er) => {
-                    rej()
                 });
-            })
-            this.position.y += 5;
+            });
             this.mesh = object;
-            object.scale.multiplyScalar(10)
-            new THREE.Box3().setFromObject(object).getSize(size);
-            object
+            const vertices = this.mesh.children[0].geometry.attributes.position.array;
+            const indices = Object.keys(vertices).map(Number);
+            this.shape = new CANNON.Trimesh(vertices, indices);
+            this.shape.setScale(new CANNON.Vec3(5,5,5))
+            console.log("set scaled")
+            this.position.y += 5;
+
+
+
+            // this.shape = new CANNON.Trimesh(vertices as unknown as number[], indices)
+            console.log({ shape: this.shape })
+
+            // object.scale.multiplyScalar(10)
+            // new THREE.Box3().setFromObject(object).getSize(size);
             this.body =
                 new CANNON.Body({
                     mass: this.mass, material: { friction: 1, restitution: 1, id: 1, name: "test" },
                     shape: this.shapeType == "CUSTOM" ? this.shape :
-                        this.shapeType == "BOX" ? new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) : new CANNON.Sphere(1)
+                        this.shapeType == "BOX" ? new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) :
+                            this.shapeType == "TRIMESH" ? this.shape : new CANNON.Sphere(1)
                 });
             this.body.position.set(this.position.x, this.position.y, this.position.z);
             this.PhysicsWorld.addBody(this.body);

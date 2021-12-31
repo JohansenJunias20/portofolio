@@ -9,7 +9,7 @@ export default class ProLangs {
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         this.keys = [
-            new ProLang(world, scene, new Vector3(-25, 0, 100), "js")
+            new ProLang(world, scene, new Vector3(-25, -5, 100), "js")
         ];
 
     }

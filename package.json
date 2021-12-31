@@ -27,7 +27,6 @@
     "cannon": "^0.6.2",
     "cannon-es": "^0.18.0",
     "three": "^0.135.0",
-    "three-to-cannon": "^4.0.2",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1"
   }
