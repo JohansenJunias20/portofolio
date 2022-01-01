@@ -220,7 +220,7 @@ const clock = new Clock()
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass';
 
 const bokehPass = new BokehPass(scene, camera, {
-    focus: 62,
+    focus: 60,
     aperture: 0.00005,
     maxblur: 0.01,
 
@@ -251,6 +251,7 @@ function animate() {
     // else return
 
     if (character.initialized) {
+        // alert(camera.position.distanceTo(character.position))
         character.update(deltatime);
     }
     if (hotkeys.initialized)
@@ -276,27 +277,24 @@ function animate() {
     }
 
     if (followCharacter) {
+        if (character.initialized) {
+            const { x, y, z } = character.mesh.position;
+            var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
+            if (camera.position == disiredPosition) {
 
-        const { x, y, z } = character.mesh.position;
-        var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
-        if (camera.position == disiredPosition) {
-
-        }
-        alpha += deltatime * 0.3
-        const finalPosition = new Vector3().copy(camera.position).lerp(disiredPosition, clamp(alpha, 0, 1));
-        camera.position.copy(finalPosition)
-        if (clamp(alpha, 0, 1) >= 1) {
-            camera.lookAt(character.position); // lookAt juga perlu di lerp
+            }
+            alpha += deltatime * 0.3
+            const finalPosition = new Vector3().copy(camera.position).lerp(disiredPosition, clamp(alpha, 0, 1));
+            camera.position.copy(finalPosition)
+            if (clamp(alpha, 0, 1) >= 1) {
+                camera.lookAt(character.position); // lookAt juga perlu di lerp
+            }
         }
 
     }
     else {
         alpha = 0.0;
-        // camera.position.y = 36;
-        // camera.quaternion.x = -0.28795955090355735;
-        // camera.quaternion.y = 0.13892679711112796;
-        // camera.quaternion.z = 0.04226348818859841;
-        // camera.quaternion.w = 0.9465687717508947;
+     
     }
 
     // if (character.isPress.w || character.isPress.a || character.isPress.s || character.isPress.d) {

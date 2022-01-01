@@ -92,20 +92,23 @@ export default class PhysicsObject3d {
         }
         else {
             const ref = this;
+            const mtlLoader = new MTLLoader();
+            const mtl = await mtlLoader.loadAsync(this.asset.mtl);
             const object = await new Promise<Group>((res, rej) => {
 
                 var objLoader = new OBJLoader();
+                objLoader.setMaterials(mtl);
                 objLoader.load(ref.asset.url, function (object) {
                     object.scale.copy(ref.asset.scale)
                     res(object)
-
                 });
             });
             this.mesh = object;
+            console.log({ mesh: this.mesh.children })
             const vertices = this.mesh.children[0].geometry.attributes.position.array;
             const indices = Object.keys(vertices).map(Number);
             this.shape = new CANNON.Trimesh(vertices, indices);
-            this.shape.setScale(new CANNON.Vec3(5,5,5))
+            this.shape.setScale(new CANNON.Vec3(10, 10, 10))
             console.log("set scaled")
             this.position.y += 5;
 

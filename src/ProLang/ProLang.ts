@@ -22,7 +22,8 @@ export default class ProLang extends PhysicsObject3d {
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "js" | "ts" | "golang" | "c#" | "python" | "html" | "css" | "php" | "c++" | "bash") {
         super(world, scene, position, 0, "TRIMESH", 0);
         this.text = text;
-        this.asset.url = `/assets/environment/knowledge/ProLang/js.obj`;
+        this.asset.url = `/assets/environment/knowledge/ProLang/${text}.obj`;
+        this.asset.mtl = `/assets/environment/knowledge/ProLang/${text}.mtl`;
     }
     public async init() {
         await super.init()
