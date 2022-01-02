@@ -21,7 +21,6 @@ export default class ProLangs {
 
     }
     public async init() {
-        alert("JUSTIN QONTOL")
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             await key.init();

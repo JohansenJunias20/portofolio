@@ -1,6 +1,6 @@
 import { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import { AmbientLight, CameraHelper, Clock, TorusBufferGeometry, Vector3, WebGLRenderer } from 'three';
+import { AmbientLight, CameraHelper, Clock, TorusBufferGeometry, TrianglesDrawModes, Vector3, WebGLRenderer } from 'three';
 import Character from './Character';
 import * as CANNON from 'cannon';
 import Key from './Hotkeys/Key';
@@ -281,7 +281,7 @@ function animate() {
     if (prolang.initialized) {
         prolang.update(deltatime)
     }
-
+  
     if (followCharacter) {
         if (character.initialized) {
             const { x, y, z } = character.mesh.position;

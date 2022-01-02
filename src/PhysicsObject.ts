@@ -77,7 +77,6 @@ export default class PhysicsObject3d {
                 const vertices = this.mesh.children[0].geometry.attributes.position.array;
                 const indices = Object.keys(vertices).map(Number);
                 this.shape = new CANNON.Trimesh(vertices, indices);
-                alert("init monkey")
             }
             this.body =
                 new CANNON.Body({
