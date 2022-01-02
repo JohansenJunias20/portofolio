@@ -196,6 +196,9 @@ johansen.init()
 
 const prolang = new ProLangs(world, scene)
 prolang.init()
+
+const trees = new Trees(world,scene)
+trees.init()
 //#endregion
 
 const OFFSET_CAMERA = new Vector3(15, 35, 50);
@@ -218,6 +221,7 @@ var alpha = 0;
 const clock = new Clock()
 // var allowControlCamera = false;
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass';
+import Trees from './Trees/Trees';
 
 const bokehPass = new BokehPass(scene, camera, {
     focus: 60,
@@ -249,7 +253,9 @@ function animate() {
     // if (deltatime < 0.2)
     world.step(1 / 30);
     // else return
-
+    if(trees.initialized){
+        trees.update(deltatime)
+    }
     if (character.initialized) {
         // alert(camera.position.distanceTo(character.position))
         character.update(deltatime);
