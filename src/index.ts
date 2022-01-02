@@ -197,8 +197,11 @@ johansen.init()
 const prolang = new ProLangs(world, scene)
 prolang.init()
 
-const trees = new Trees(world,scene)
+const trees = new Trees(world, scene)
 trees.init()
+
+const dbs = new DBs(world, scene)
+dbs.init()
 //#endregion
 
 const OFFSET_CAMERA = new Vector3(15, 35, 50);
@@ -222,22 +225,23 @@ const clock = new Clock()
 // var allowControlCamera = false;
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass';
 import Trees from './Trees/Trees';
+import DBs from './DB/DBs';
 
 const bokehPass = new BokehPass(scene, camera, {
     focus: 60,
-    aperture: 0.00005,
-    maxblur: 0.01,
+    aperture: 0.00001,
+    maxblur: 0.1,
 
     width: window.innerWidth,
     height: window.innerHeight
 });
 console.log({ distance: new Vector3().copy(character.position).distanceTo(camera.position) });
-console.log({ uniform: bokehPass.uniforms })
+// console.log({ uniform: bokehPass.uniforms })
 // bokehPass.uniforms.aperture.value = 4 * 0.00001;
 const renderPass = new RenderPass(scene, camera);
 
 const fxaaPass = new ShaderPass(FXAAShader);
-const pixelRatio = renderer.getPixelRatio();
+const pixelRatio = window.devicePixelRatio;
 fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * pixelRatio);
 fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * pixelRatio);
 
@@ -253,7 +257,7 @@ function animate() {
     // if (deltatime < 0.2)
     world.step(1 / 30);
     // else return
-    if(trees.initialized){
+    if (trees.initialized) {
         trees.update(deltatime)
     }
     if (character.initialized) {
@@ -281,7 +285,11 @@ function animate() {
     if (prolang.initialized) {
         prolang.update(deltatime)
     }
-  
+
+    if (dbs.initialized) {
+        dbs.update(deltatime)
+    }
+
     if (followCharacter) {
         if (character.initialized) {
             const { x, y, z } = character.mesh.position;
@@ -300,7 +308,7 @@ function animate() {
     }
     else {
         alpha = 0.0;
-     
+
     }
 
     // if (character.isPress.w || character.isPress.a || character.isPress.s || character.isPress.d) {
