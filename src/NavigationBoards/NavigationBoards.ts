@@ -9,7 +9,7 @@ export default class NavigationBoards {
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         this.keys = [
-            new NavigationBoard(world, scene, new Vector3(-10, 0, 60), "knowledge")
+            new NavigationBoard(world, scene, new Vector3(-10, -5, 60), "knowledge")
         ];
 
     }
@@ -17,7 +17,7 @@ export default class NavigationBoards {
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             await key.init();
-            key.mesh.rotateY(degToRad(-90));
+            key.mesh.rotateY(degToRad(-95));
             key.body.quaternion.copy(key.mesh.quaternion)
             key.mesh.receiveShadow = false
         }

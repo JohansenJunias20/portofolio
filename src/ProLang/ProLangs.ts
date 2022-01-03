@@ -9,14 +9,14 @@ export default class ProLangs {
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         this.keys = [
-            new ProLang(world, scene, new Vector3(-25, -5, 100), "js"),
-            new ProLang(world, scene, new Vector3(-25, -5, 120), "ts"),
-            new ProLang(world, scene, new Vector3(-25, -5, 140), "golang"),
-            new ProLang(world, scene, new Vector3(-25, -5, 160), "cs"),
-            new ProLang(world, scene, new Vector3(-25, -5, 180), "python"),
-            new ProLang(world, scene, new Vector3(-25, -5, 200), "php"),
-            new ProLang(world, scene, new Vector3(-25, -5, 220), "cpp"),
-            new ProLang(world, scene, new Vector3(-25, -5, 240), "bash"),
+            new ProLang(world, scene, new Vector3(-52.5, -5, 100), "js"),
+            new ProLang(world, scene, new Vector3(-52.5, -5, 120), "ts"),
+            new ProLang(world, scene, new Vector3(-52.5, -5, 140), "golang"),
+            new ProLang(world, scene, new Vector3(-52.5, -5, 160), "cs"),
+            new ProLang(world, scene, new Vector3(-17.5, -5, 160), "python"),
+            new ProLang(world, scene, new Vector3(17.5, -5, 160), "php"),
+            new ProLang(world, scene, new Vector3(52.5, -5, 140), "cpp"),
+            new ProLang(world, scene, new Vector3(52.5, -5, 160), "bash"),
         ];
 
     }

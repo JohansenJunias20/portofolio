@@ -10,19 +10,20 @@ import PhysicsObject3d from '../PhysicsObject';
 interface AnimationCharacter {
     walk: THREE.AnimationAction;
 }
-export default class Word extends PhysicsObject3d {
+export default class Software extends PhysicsObject3d {
     asset = {
         castShadow: true,
         recieveShadow: false,
         url: ``,
-        scale: new THREE.Vector3()
+        mtl: ``,
+        scale: new THREE.Vector3(10, 10, 10)
     }
-    public readonly text: "J" | "O" | "H" | "A" | "N" | "S" | "E";
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "J" | "O" | "H" | "A" | "N" | "S" | "E", scale: Vector3 = new THREE.Vector3(0.07, 0.07, 0.07)) {
-        super(world, scene, position, 0, "BOX", 0.3);
+    public readonly text: "blender" | "ue" | "adobe"
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "blender" | "ue" | "adobe") {
+        super(world, scene, position, 0, "TRIMESH", 0);
         this.text = text;
-        this.asset.scale = scale;
-        this.asset.url = `/assets/environment/johansen/${text}.fbx`;
+        this.asset.url = `/assets/environment/knowledge/Software/${text}.obj`;
+        this.asset.mtl = `/assets/environment/knowledge/Software/${text}.mtl`;
     }
     public async init() {
         await super.init()

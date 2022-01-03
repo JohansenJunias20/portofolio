@@ -12,8 +12,8 @@ interface AnimationCharacter {
 }
 export default class ProLang extends PhysicsObject3d {
     asset = {
-        castShadow: false,
-        recieveShadow: false,
+        castShadow: true,
+        recieveShadow: true,
         url: ``,
         mtl: ``,
         scale: new THREE.Vector3(10, 10, 10)

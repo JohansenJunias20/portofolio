@@ -20,10 +20,10 @@ export default class PhysicsObject3d {
     public scene: THREE.Scene;
     public movementSpeed: number;
     public body: CANNON.Body;
-    public shapeType: "BOX" | "SPHERE" | "CUSTOM" | "TRIMESH";
+    public shapeType: "BOX" | "SPHERE" | "CUSTOM" | "TRIMESH" | "CONVEX";
     private shape: CANNON.Shape | null;
     public readonly mass: number;
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 10, shapeType: "TRIMESH" | "BOX" | "SPHERE" | "CUSTOM", mass: number, shape: null | CANNON.Shape = null) {
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 10, shapeType: "TRIMESH" | "BOX" | "SPHERE" | "CUSTOM" | "CONVEX", mass: number, shape: null | CANNON.Shape = null) {
         this.PhysicsWorld = world;
         this.scene = scene;
         this.initialized = false;
@@ -78,6 +78,15 @@ export default class PhysicsObject3d {
                 const indices = Object.keys(vertices).map(Number);
                 this.shape = new CANNON.Trimesh(vertices, indices);
             }
+            if (this.shapeType == "CONVEX") {
+                console.log({ mesh: this.mesh })
+                const vertices = this.mesh.children[0].geometry.attributes.position.array;
+                const faces = []
+                for (let i = 0; i < vertices.length / 3; i += 3) {
+                    faces.push([i, i + 1, i + 2])
+                }
+                this.shape = new CANNON.ConvexPolyhedron(vertices, faces);
+            }
             this.body =
                 new CANNON.Body({
                     mass: this.mass, material: { friction: 1, restitution: 0.3, id: 1, name: "test" },
@@ -98,18 +107,50 @@ export default class PhysicsObject3d {
                 var objLoader = new OBJLoader();
                 objLoader.setMaterials(mtl);
                 objLoader.load(ref.asset.url, function (object) {
+                    object.traverse(c => {
+                        if(c.isMesh){
+                            c.castShadow = ref.asset.castShadow;
+                            // c.receiveShadow = ref.asset.recieveShadow;
+                        }
+                        // return c;
+                    })
                     object.scale.copy(ref.asset.scale)
                     res(object)
                 });
             });
             this.mesh = object;
             console.log({ mesh: this.mesh.children })
-            const vertices = this.mesh.children[0].geometry.attributes.position.array;
-            const indices = Object.keys(vertices).map(Number);
-            this.shape = new CANNON.Trimesh(vertices, indices);
-            this.shape.setScale(new CANNON.Vec3(10, 10, 10))
-            console.log("set scaled")
-            this.position.y += 5;
+
+            if (this.shapeType == "TRIMESH") {
+                const vertices = this.mesh.children[0].geometry.attributes.position.array;
+                const indices = Object.keys(vertices).map(Number);
+                this.shape = new CANNON.Trimesh(vertices, indices);
+                this.shape.setScale(new CANNON.Vec3(10, 10, 10))
+                console.log("set scaled")
+                this.position.y += 5;
+            }
+            else if (this.shapeType == "CONVEX") {
+                console.log({ geometry: this.mesh.children[0].geometry })
+                const oldScale = this.mesh.children[0].geometry.scale;
+                this.mesh.children[0].geometry.scale.x = 20;
+                this.mesh.children[0].geometry.scale.y = 20;
+                this.mesh.children[0].geometry.scale.z = 20;
+                const vertices = this.mesh.children[0].geometry.attributes.position.array;
+                const faces = []
+                const points = []
+                for (let i = 0; i < vertices.length; i += 3) {
+                    points.push(new CANNON.Vec3(vertices[i], vertices[i + 1], vertices[i + 2]))
+                }
+                for (let i = 0; i < vertices.length / 3; i += 3) {
+                    faces.push([i, i + 1, i + 2])
+                }
+                this.shape = new CANNON.ConvexPolyhedron(points, faces);
+                // this.shape.setScale(new CANNON.Vec3(10, 10, 10))
+                this.position.y += 5;
+                this.mesh.children[0].geometry.scale.x = oldScale.x;
+                this.mesh.children[0].geometry.scale.y = oldScale.y;
+                this.mesh.children[0].geometry.scale.z = oldScale.z;
+            }
 
 
 

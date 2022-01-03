@@ -25,6 +25,7 @@ export default class NavigationBoard extends PhysicsObject3d {
     }
     public async init() {
         await super.init()
+        this.mesh.children[2].castShadow = true;
     }
     public update(deltatime: number) {
         super.update(deltatime);

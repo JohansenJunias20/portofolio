@@ -5,7 +5,7 @@ import Character from './Character';
 import * as CANNON from 'cannon';
 import Key from './Hotkeys/Key';
 import Hotkeys from './Hotkeys/Hotkeys';
-const ENABLE_SHADOW = false;
+const ENABLE_SHADOW = true;
 const canvas: HTMLCanvasElement = document.querySelector("#bg");
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -43,13 +43,13 @@ plane.receiveShadow = true;
 scene.add(plane);
 
 const SUN = new THREE.DirectionalLight(0xffffff, 0.5)
-SUN.position.set(5, 20, 15)
+SUN.position.set(0, 200, 15)
 SUN.target.position.set(0, 0, 0);
 SUN.shadow.camera.visible = ENABLE_SHADOW;
 SUN.castShadow = ENABLE_SHADOW;
 SUN.shadow.camera.near = 0.1;
 SUN.shadow.camera.far = 1000;
-const sizeAreaShadow = 50;
+const sizeAreaShadow = 200;
 SUN.shadow.camera.top = sizeAreaShadow;
 SUN.shadow.camera.bottom = -sizeAreaShadow;
 SUN.shadow.camera.left = sizeAreaShadow;
@@ -85,7 +85,7 @@ canvas.onmousedown = (e) => {
         if (followCharacter) {
             followCharacter = false;
             const { x, y, z } = character.mesh.position;
-            var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
+            var disiredPosition = new Vector3(x, y, z).add(CURRENT_OFFSET_CAMERA)
             camera.position.set(disiredPosition.x, disiredPosition.y, disiredPosition.z)
             // controls.target.copy(character.position);
             // controls.update();
@@ -202,11 +202,22 @@ trees.init()
 
 const dbs = new DBs(world, scene)
 dbs.init()
+
+const frameworks = new Frameworks(world, scene)
+frameworks.init()
+
+const softwares = new Softwares(world, scene)
+softwares.init()
+
+const billboards = new Billboards(world, scene)
+billboards.init()
 //#endregion
 
-const OFFSET_CAMERA = new Vector3(15, 35, 50);
+const LOBBY_OFFSET_CAMERA = new Vector3(15, 35, 50);
+var CURRENT_OFFSET_CAMERA = new Vector3().copy(LOBBY_OFFSET_CAMERA);
+const KNOWLEDGE_OFFSET_CAMERA = new Vector3(15, 20, 35);
 camera.position.copy(character.position)
-camera.position.add(OFFSET_CAMERA)
+camera.position.add(CURRENT_OFFSET_CAMERA)
 // const controls = new OrbitControls(camera, renderer.domElement);
 // controls.enableZoom = false;
 // controls.enablePan = false;
@@ -226,30 +237,34 @@ const clock = new Clock()
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass';
 import Trees from './Trees/Trees';
 import DBs from './DB/DBs';
+import Frameworks from './Frameworks/Frameworks';
+import Softwares from './Softwares/Softwares';
+import Billboards from './Billboards/Billboards';
 
-const bokehPass = new BokehPass(scene, camera, {
-    focus: 60,
-    aperture: 0.00001,
-    maxblur: 0.1,
+// const bokehPass = new BokehPass(scene, camera, {
+//     focus: 60,
+//     aperture: 0.00001,
+//     maxblur: 0.1,
 
-    width: window.innerWidth,
-    height: window.innerHeight
-});
+//     width: window.innerWidth,
+//     height: window.innerHeight
+// });
 console.log({ distance: new Vector3().copy(character.position).distanceTo(camera.position) });
 // console.log({ uniform: bokehPass.uniforms })
 // bokehPass.uniforms.aperture.value = 4 * 0.00001;
 const renderPass = new RenderPass(scene, camera);
 
-const fxaaPass = new ShaderPass(FXAAShader);
-const pixelRatio = window.devicePixelRatio;
-fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * pixelRatio);
-fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * pixelRatio);
+// const fxaaPass = new ShaderPass(FXAAShader);
+// const pixelRatio = window.devicePixelRatio;
+// fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * pixelRatio);
+// fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * pixelRatio);
 
 // renderer.physicallyCorrectLights = true;
-const composer2 = new EffectComposer(renderer);
-composer2.addPass(renderPass);
-composer2.addPass(fxaaPass);
-composer2.addPass(bokehPass);
+// const composer2 = new EffectComposer(renderer);
+// composer2.setSize(window.innerWidth, window.innerHeight)
+// composer2.addPass(renderPass);
+// composer2.addPass(fxaaPass);
+// composer2.addPass(bokehPass);
 
 function animate() {
     deltatime = clock.getDelta()
@@ -290,10 +305,42 @@ function animate() {
         dbs.update(deltatime)
     }
 
+    if (frameworks.initialized) {
+        frameworks.update(deltatime)
+    }
+
+    if (softwares.initialized) {
+        softwares.update(deltatime)
+    }
+
+    if (billboards.initialized) {
+        billboards.update(deltatime)
+    }
+
     if (followCharacter) {
+        offsetChanged = false;
+        if (character.position.z >= 100) {
+            //on knowledge position
+            alphaOffsetCamera_knowledge += deltatime * 0.1;
+            if (clamp(alphaOffsetCamera_knowledge, 0, 1) < 1) {
+                CURRENT_OFFSET_CAMERA = new Vector3().copy(CURRENT_OFFSET_CAMERA).lerp(KNOWLEDGE_OFFSET_CAMERA, alphaOffsetCamera_knowledge);
+                offsetChanged = true;
+            }
+            alphaOffsetCamera_lobby = 0;
+        }
+        else {
+            //on knowledge lobby position
+            alphaOffsetCamera_knowledge = 0;
+            alphaOffsetCamera_lobby += deltatime * 0.1;
+            if (clamp(alphaOffsetCamera_lobby, 0, 1) < 1) {
+                CURRENT_OFFSET_CAMERA = new Vector3().copy(CURRENT_OFFSET_CAMERA).lerp(LOBBY_OFFSET_CAMERA, alphaOffsetCamera_lobby);
+                offsetChanged = true;
+            }
+        }
+
         if (character.initialized) {
             const { x, y, z } = character.mesh.position;
-            var disiredPosition = new Vector3(x, y, z).add(OFFSET_CAMERA)
+            var disiredPosition = new Vector3(x, y, z).add(CURRENT_OFFSET_CAMERA)
             if (camera.position == disiredPosition) {
 
             }
@@ -303,6 +350,11 @@ function animate() {
             if (clamp(alpha, 0, 1) >= 1) {
                 camera.lookAt(character.position); // lookAt juga perlu di lerp
             }
+        }
+
+        //bila offset posisi kamera sedang berubah maka camera lookAt harus diganti juga
+        if (offsetChanged) {
+            camera.lookAt(character.position)
         }
 
     }
@@ -318,9 +370,11 @@ function animate() {
     //     controls.enablePan = true;
     // }
 
-    // renderer.render(scene, camera)
-    composer2.render(deltatime)
+    renderer.render(scene, camera)
+    // composer2.render(deltatime)
 
 }
-
+var alphaOffsetCamera_knowledge = 0;
+var alphaOffsetCamera_lobby = 0;
+var offsetChanged = false;
 animate();

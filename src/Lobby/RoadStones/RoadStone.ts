@@ -9,8 +9,8 @@ import MeshOnlyObject3d from '../../MeshOnlyObject';
 
 export default class RoadStone extends MeshOnlyObject3d {
     asset = {
-        castShadow: true,
-        recieveShadow: true,
+        castShadow: false,
+        recieveShadow: false,
         url: `/assets/environment/Lobby/RoadStones/RoadStone.fbx`,
         scale: new THREE.Vector3(0.07, 0.07, 0.07)
     }

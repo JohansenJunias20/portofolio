@@ -12,7 +12,7 @@ interface AnimationCharacter {
 }
 export default class DB extends PhysicsObject3d {
     asset = {
-        castShadow: false,
+        castShadow: true,
         recieveShadow: false,
         url: ``,
         mtl: ``,
