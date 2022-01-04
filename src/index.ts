@@ -5,7 +5,7 @@ import Character from './Character';
 import * as CANNON from 'cannon';
 import Key from './Hotkeys/Key';
 import Hotkeys from './Hotkeys/Hotkeys';
-const ENABLE_SHADOW = true;
+const ENABLE_SHADOW = false;
 const canvas: HTMLCanvasElement = document.querySelector("#bg");
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -211,6 +211,9 @@ softwares.init()
 
 const billboards = new Billboards(world, scene)
 billboards.init()
+
+const popups = new PopUps(world, scene)
+popups.init()
 //#endregion
 
 const LOBBY_OFFSET_CAMERA = new Vector3(15, 35, 50);
@@ -240,6 +243,7 @@ import DBs from './DB/DBs';
 import Frameworks from './Frameworks/Frameworks';
 import Softwares from './Softwares/Softwares';
 import Billboards from './Billboards/Billboards';
+import PopUps from './PopUps/PopUps';
 
 // const bokehPass = new BokehPass(scene, camera, {
 //     focus: 60,
@@ -268,7 +272,6 @@ const renderPass = new RenderPass(scene, camera);
 
 function animate() {
     deltatime = clock.getDelta()
-    requestAnimationFrame(animate);
     // if (deltatime < 0.2)
     world.step(1 / 30);
     // else return
@@ -315,6 +318,10 @@ function animate() {
 
     if (billboards.initialized) {
         billboards.update(deltatime)
+    }
+
+    if (popups.initialized) {
+        popups.update(deltatime)
     }
 
     if (followCharacter) {
@@ -371,6 +378,8 @@ function animate() {
     // }
 
     renderer.render(scene, camera)
+    requestAnimationFrame(animate);
+
     // composer2.render(deltatime)
 
 }
