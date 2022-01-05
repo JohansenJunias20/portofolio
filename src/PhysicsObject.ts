@@ -73,13 +73,11 @@ export default class PhysicsObject3d {
 
             new THREE.Box3().setFromObject(fbx).getSize(size);
             if (this.shapeType == "TRIMESH") {
-                console.log({ mesh: this.mesh })
                 const vertices = this.mesh.children[0].geometry.attributes.position.array;
                 const indices = Object.keys(vertices).map(Number);
                 this.shape = new CANNON.Trimesh(vertices, indices);
             }
             if (this.shapeType == "CONVEX") {
-                console.log({ mesh: this.mesh })
                 const vertices = this.mesh.children[0].geometry.attributes.position.array;
                 const faces = []
                 for (let i = 0; i < vertices.length / 3; i += 3) {
@@ -119,18 +117,15 @@ export default class PhysicsObject3d {
                 });
             });
             this.mesh = object;
-            console.log({ mesh: this.mesh.children })
 
             if (this.shapeType == "TRIMESH") {
                 const vertices = this.mesh.children[0].geometry.attributes.position.array;
                 const indices = Object.keys(vertices).map(Number);
                 this.shape = new CANNON.Trimesh(vertices, indices);
                 this.shape.setScale(new CANNON.Vec3(10, 10, 10))
-                console.log("set scaled")
                 this.position.y += 5;
             }
             else if (this.shapeType == "CONVEX") {
-                console.log({ geometry: this.mesh.children[0].geometry })
                 const oldScale = this.mesh.children[0].geometry.scale;
                 this.mesh.children[0].geometry.scale.x = 20;
                 this.mesh.children[0].geometry.scale.y = 20;
@@ -155,7 +150,6 @@ export default class PhysicsObject3d {
 
 
             // this.shape = new CANNON.Trimesh(vertices as unknown as number[], indices)
-            console.log({ shape: this.shape })
 
             // object.scale.multiplyScalar(10)
             // new THREE.Box3().setFromObject(object).getSize(size);

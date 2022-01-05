@@ -9,9 +9,9 @@ export default class PopUps {
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         this.keys = [
-            new PopUp(world, scene, new Vector3(0.0, 15.0, 0.0), {
-                x: 15, y: 2, z: 8
-            },0.3)
+            // new PopUp(world, scene, new Vector3(0.0, 15.0, 0.0), {
+            //     x: 15, y: 2, z: 8
+            // },0.3)
         ];
 
     }

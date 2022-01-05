@@ -1,11 +1,11 @@
 import { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import { AmbientLight, CameraHelper, Clock, TorusBufferGeometry, TrianglesDrawModes, Vector3, WebGLRenderer } from 'three';
+import { AmbientLight, CameraHelper, Clock, Raycaster, TorusBufferGeometry, TrianglesDrawModes, Vector3, WebGLRenderer } from 'three';
 import Character from './Character';
 import * as CANNON from 'cannon';
 import Key from './Hotkeys/Key';
 import Hotkeys from './Hotkeys/Hotkeys';
-const ENABLE_SHADOW = false;
+const ENABLE_SHADOW = true;
 const canvas: HTMLCanvasElement = document.querySelector("#bg");
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -18,6 +18,7 @@ import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true
+
 })
 
 
@@ -30,17 +31,7 @@ renderer.render(scene, camera)
 var temp = new THREE.Vector3();
 camera.getWorldDirection(temp)
 
-const sizeGround = {
-    x: 1000,
-    z: 1000
-}
 
-const geometry = new THREE.PlaneGeometry(sizeGround.x, sizeGround.z);
-const material = new THREE.MeshToonMaterial({ color: "#c49a66", side: THREE.FrontSide });
-const plane = new THREE.Mesh(geometry, material);
-plane.rotation.x = (THREE.MathUtils.degToRad(-90))
-plane.receiveShadow = true;
-scene.add(plane);
 
 const SUN = new THREE.DirectionalLight(0xffffff, 0.5)
 SUN.position.set(0, 200, 15)
@@ -67,12 +58,22 @@ world.gravity.set(0, -10, 0);
 world.broadphase = new CANNON.NaiveBroadphase(); //metode physics
 world.solver.iterations = 40; //fps
 
+const sizeGround = {
+    x: 1000,
+    y: 0.1,
+    z: 1000
+}
 const groundBody = new CANNON.Body({ mass: 0, material: { friction: 1, restitution: 0.1, id: 1, name: "test" }, shape: new CANNON.Box(new Vec3(sizeGround.x, 0.1, sizeGround.z)) });
-
-// world.addBody(box1Body)
 world.addBody(groundBody);
 
-
+const plane = new Plane(world, scene, SUN, new THREE.Vector3(0, 0, 0), sizeGround, "#c49a66", "#fffff");
+// const geometry = new THREE.PlaneGeometry(sizeGround.x, sizeGround.z);
+// const material = new THREE.MeshToonMaterial({ color: "#c49a66", side: THREE.FrontSide });
+// const plane = new THREE.Mesh(geometry, material);
+// plane.rotation.x = (THREE.MathUtils.degToRad(-90))
+// plane.receiveShadow = true;
+// plane.position.set(0,0,0)
+// scene.add(plane);
 
 // lobby.init();
 
@@ -101,6 +102,7 @@ canvas.onmouseup = (e) => {
         leftMouseDown = false;
     }
 }
+var mouse = new THREE.Vector2();
 var MouselastPos = {
     x: 0,
     y: 0
@@ -112,7 +114,10 @@ var deltaPos = {
 var frontCam = new Vector3()
 var leftCam = new Vector3()
 const CameraPanSpeed = 0.035;
+const raycast = new Raycaster();
 canvas.onmousemove = (e) => {
+    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
     deltaPos.x = MouselastPos.x - e.pageX;
     deltaPos.y = MouselastPos.y - e.pageY;
     MouselastPos.x = e.pageX;
@@ -130,39 +135,7 @@ canvas.onmousemove = (e) => {
         camera.position.z += frontCam.y * CameraPanSpeed * 3 * -1
     }
 }
-document.onkeydown = (e) => {
-    if (e.key == "w") {
-    }
-    else if (e.key == "s") {
-    }
-    else if (e.key == "a") {
-    }
-    else if (e.key == "d") {
-    }
-    else {
-        return
-    }
-    character.isPress[e.key] = true;
-    followCharacter = true;
 
-}
-
-document.onkeyup = (e) => {
-    if (e.key == "w") {
-    }
-    else if (e.key == "s") {
-    }
-    else if (e.key == "a") {
-
-    }
-    else if (e.key == "d") {
-
-    }
-    else {
-        return;
-    }
-    character.isPress[e.key] = false;
-}
 const speed = 1;
 
 renderer.shadowMap.enabled = true;
@@ -216,9 +189,53 @@ const popups = new PopUps(world, scene)
 popups.init()
 //#endregion
 
+document.onkeydown = (e) => {
+    if (e.key == "w") {
+    }
+    else if (e.key == "s") {
+    }
+    else if (e.key == "a") {
+    }
+    else if (e.key == "d") {
+    }
+    else if (e.key == "z") {
+        billboards.keys[0].onPopUpMouseHover();
+        return;
+    }
+    else if (e.key == "x") {
+        billboards.keys[0].onPopUpMouseNotHover();
+        return;
+    }
+    else {
+        return
+    }
+    character.isPress[e.key] = true;
+    followCharacter = true;
+
+}
+
+document.onkeyup = (e) => {
+    if (e.key == "w") {
+    }
+    else if (e.key == "s") {
+    }
+    else if (e.key == "a") {
+
+    }
+    else if (e.key == "d") {
+
+    }
+    else {
+        return;
+    }
+    character.isPress[e.key] = false;
+}
+
+
 const LOBBY_OFFSET_CAMERA = new Vector3(15, 35, 50);
-var CURRENT_OFFSET_CAMERA = new Vector3().copy(LOBBY_OFFSET_CAMERA);
 const KNOWLEDGE_OFFSET_CAMERA = new Vector3(15, 20, 35);
+const PORTOFOLIO_OFFSET_CAMERA = new Vector3(5, 40, 20);
+var CURRENT_OFFSET_CAMERA = new Vector3().copy(LOBBY_OFFSET_CAMERA);
 camera.position.copy(character.position)
 camera.position.add(CURRENT_OFFSET_CAMERA)
 // const controls = new OrbitControls(camera, renderer.domElement);
@@ -244,6 +261,8 @@ import Frameworks from './Frameworks/Frameworks';
 import Softwares from './Softwares/Softwares';
 import Billboards from './Billboards/Billboards';
 import PopUps from './PopUps/PopUps';
+import Plane from './PlaneGround/Plane';
+import isintersect from './utility/isIntersect';
 
 // const bokehPass = new BokehPass(scene, camera, {
 //     focus: 60,
@@ -327,17 +346,30 @@ function animate() {
     if (followCharacter) {
         offsetChanged = false;
         if (character.position.z >= 100) {
+            alphaOffsetCamera_portofolio = 0;
+            alphaOffsetCamera_lobby = 0;
             //on knowledge position
             alphaOffsetCamera_knowledge += deltatime * 0.1;
             if (clamp(alphaOffsetCamera_knowledge, 0, 1) < 1) {
                 CURRENT_OFFSET_CAMERA = new Vector3().copy(CURRENT_OFFSET_CAMERA).lerp(KNOWLEDGE_OFFSET_CAMERA, alphaOffsetCamera_knowledge);
                 offsetChanged = true;
             }
+        }
+        else if (character.position.x >= 40) {
+            alphaOffsetCamera_knowledge = 0;
             alphaOffsetCamera_lobby = 0;
+
+            alphaOffsetCamera_portofolio += deltatime * 0.04;
+            if (clamp(alphaOffsetCamera_portofolio, 0, 1) < 1) {
+                CURRENT_OFFSET_CAMERA = new Vector3().copy(CURRENT_OFFSET_CAMERA).lerp(PORTOFOLIO_OFFSET_CAMERA, alphaOffsetCamera_portofolio);
+                offsetChanged = true;
+            }
         }
         else {
             //on knowledge lobby position
+            alphaOffsetCamera_portofolio = 0;
             alphaOffsetCamera_knowledge = 0;
+
             alphaOffsetCamera_lobby += deltatime * 0.1;
             if (clamp(alphaOffsetCamera_lobby, 0, 1) < 1) {
                 CURRENT_OFFSET_CAMERA = new Vector3().copy(CURRENT_OFFSET_CAMERA).lerp(LOBBY_OFFSET_CAMERA, alphaOffsetCamera_lobby);
@@ -369,15 +401,43 @@ function animate() {
         alpha = 0.0;
 
     }
+    if (billboards.initialized)
 
-    // if (character.isPress.w || character.isPress.a || character.isPress.s || character.isPress.d) {
-    //     controls.enablePan = false;
-    // }
-    // else {
-    //     controls.enablePan = true;
-    // }
+        raycast.setFromCamera(mouse, camera);
+
+    // checking intersect mouse with objects
+    const intersects = raycast.intersectObjects(scene.children);
+    document.body.style.cursor = "default";
+    if (billboards.initialized)
+        for (let j = 0; j < billboards.keys.length; j++) {
+            var hovered = false;
+
+            if (isintersect(character.body, billboards.keys[j].PopUpObject.borderFloor.body, world)) {
+                document.body.style.cursor = "pointer";
+                billboards.keys[j].onPopUpMouseHover(); // start animating fence to go up
+                hovered = true;
+                continue;
+            }
+            else {
+            }
+
+            for (let i = 0; i < intersects.length; i++) {
+                if (billboards.keys[j].PopUpObject.borderFloor.mesh.uuid == intersects[i].object.uuid) {
+                    billboards.keys[j].onPopUpMouseHover(); // start animating fence to go up
+                    document.body.style.cursor = "pointer";
+
+                    hovered = true;
+                    console.log("hovering")
+                    break;
+                }
+            }
+            if (!hovered)
+                billboards.keys[j].onPopUpMouseNotHover(); // start animating fence to go up
+        }
 
     renderer.render(scene, camera)
+    plane.setDepthTexture(SUN.shadow.map.texture);
+    plane.setWorldMatrix(SUN.matrixWorld);
     requestAnimationFrame(animate);
 
     // composer2.render(deltatime)
@@ -385,5 +445,6 @@ function animate() {
 }
 var alphaOffsetCamera_knowledge = 0;
 var alphaOffsetCamera_lobby = 0;
+var alphaOffsetCamera_portofolio = 0;
 var offsetChanged = false;
 animate();
