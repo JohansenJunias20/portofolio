@@ -31,8 +31,13 @@ export default class Billboard {
     private shape: CANNON.Shape | null;
     public readonly mass: number;
     public Yrotation: number;
-    text: string
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "miles madness" = "miles madness", scale: THREE.Vector3 = new THREE.Vector3(1, 1, 1), rotation: number = 100) {
+    private lightIntensity: number;
+    text: string;
+    urlRef: Array<string>;
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "miles madness" | "tokopedia integration" = "miles madness",
+        scale: THREE.Vector3 = new THREE.Vector3(1, 1, 1), rotation: number = 100, urlRef: Array<string> = [], lightIntensity: number = 1) {
+        this.lightIntensity = lightIntensity;
+        this.urlRef = urlRef;
         this.text = text;
         // this.asset.url = `/assets/environment/portofolio/billboard_${text}.fbx`;   this.PhysicsWorld = world;
         this.scene = scene;
@@ -96,13 +101,13 @@ export default class Billboard {
         const texture = await new THREE.TextureLoader().loadAsync(`/assets/environment/portofolio/${this.text}/billboard_image.png`);
 
 
-        const geometry = new THREE.PlaneGeometry(30 * this.asset.scale.x, 17 * this.asset.scale.y);
-
+        const geometry = new THREE.PlaneGeometry(27 * this.asset.scale.x, 16 * this.asset.scale.y);
 
         const material = new THREE.MeshLambertMaterial({
             map: texture,
             side: THREE.FrontSide,
-            lightMap: texture
+            lightMap: texture,
+            lightMapIntensity: this.lightIntensity
         });
         const plane = new THREE.Mesh(geometry, material);
         plane.position.copy(this.position)
@@ -111,21 +116,26 @@ export default class Billboard {
         new THREE.Box3().setFromObject(object).getSize(size);
         console.log({ size })
         this.body = new CANNON.Body({
-            shape: new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)),
+            shape: new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 6)), // znya ternyata lebih besar
             mass: 0,
             material: { friction: 1, restitution: 0.3, id: 1, name: "test" }
         })
-        this.body.position.set(50, 5, 40);
+        this.body.position.copy(object.position);
         this.body.quaternion.copy(object.quaternion)
         this.PhysicsWorld.addBody(this.body)
 
 
         //description
-        const descGeometry = new THREE.PlaneGeometry(70 * this.asset.scale.x, 40 * this.asset.scale.y);
+        const sizePlaneDescText = {
+            x: 70 * this.asset.scale.x,
+            y: 40 * this.asset.scale.y
+        }
+        const descGeometry = new THREE.PlaneGeometry(sizePlaneDescText.x, sizePlaneDescText.y);
         const desc_text_texture = await new THREE.TextureLoader().loadAsync(`/assets/environment/portofolio/${this.text}/desc_text.png`);
         const desc_text_material = new THREE.MeshLambertMaterial({
             map: desc_text_texture,
             lightMap: desc_text_texture,
+            lightMapIntensity: 0.2,
             side: THREE.FrontSide,
             transparent: true
         })
@@ -141,8 +151,8 @@ export default class Billboard {
 
         //#region links
 
-        this.PopUpObject = new PopUp(this.PhysicsWorld, this.scene, new Vector3(3.0, 0.1, 3.0), {
-            x: 15, y: 2, z: 8
+        this.PopUpObject = new PopUp(this.PhysicsWorld, this.scene, new Vector3(this.position.x + 3, 0.25, planeDescText.position.z + sizePlaneDescText.y / 2), {
+            x: 12, y: 2, z: 6
         }, 0.3, `/assets/environment/portofolio/${this.text}/floor.png`);
         await this.PopUpObject.init();
         this.initialized = true;

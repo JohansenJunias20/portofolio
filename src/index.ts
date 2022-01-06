@@ -82,6 +82,9 @@ var followCharacter = true;
 var leftMouseDown = false;
 canvas.onmousedown = (e) => {
     if (e.which == 1) {
+
+
+
         // if (controls.enablePan)
         if (followCharacter) {
             followCharacter = false;
@@ -97,6 +100,7 @@ canvas.onmousedown = (e) => {
 
 
 }
+
 canvas.onmouseup = (e) => {
     if (e.which == 1) {
         leftMouseDown = false;
@@ -122,17 +126,23 @@ canvas.onmousemove = (e) => {
     deltaPos.y = MouselastPos.y - e.pageY;
     MouselastPos.x = e.pageX;
     MouselastPos.y = e.pageY;
+    // camera.getWorldDirection(frontCam);
     if (!followCharacter && leftMouseDown) {
 
         //x camera local axis logic
         camera.getWorldDirection(frontCam);
         leftCam = frontCam.cross(camera.up);
+        leftCam = leftCam.normalize()
         camera.position.add(leftCam.multiplyScalar(deltaPos.x).multiplyScalar(CameraPanSpeed));
 
         //y camera local axis logic
         camera.getWorldDirection(frontCam);
-        camera.position.x += frontCam.multiplyScalar(deltaPos.y).x * CameraPanSpeed * 3 * -1
-        camera.position.z += frontCam.y * CameraPanSpeed * 3 * -1
+        frontCam.y = 0;
+        frontCam = frontCam.normalize()
+        frontCam.multiplyScalar(deltaPos.y)
+        frontCam.multiplyScalar(CameraPanSpeed);
+        frontCam.multiplyScalar(-1.5);
+        camera.position.add(frontCam);
     }
 }
 
@@ -232,6 +242,29 @@ document.onkeyup = (e) => {
 }
 
 
+
+canvas.onclick = (e) => {
+    //
+    raycast.setFromCamera(mouse, camera);
+    const intersects = raycast.intersectObjects(scene.children);
+    for (let i = 0; i < billboards.keys.length; i++) {
+        const billboard = billboards.keys[i];
+        for (let j = 0; j < intersects.length; j++) {
+            const intersect = intersects[j];
+            if (intersect.object.uuid == billboard.PopUpObject.borderFloor.mesh.uuid) {
+                for (let k = 0; k < billboard.urlRef.length; k++) {
+                    const url = billboard.urlRef[k];
+                    window.open(url, "_blank")
+
+                }
+                return;
+            }
+
+        }
+    }
+
+}
+
 const LOBBY_OFFSET_CAMERA = new Vector3(15, 35, 50);
 const KNOWLEDGE_OFFSET_CAMERA = new Vector3(15, 20, 35);
 const PORTOFOLIO_OFFSET_CAMERA = new Vector3(5, 40, 20);
@@ -263,6 +296,7 @@ import Billboards from './Billboards/Billboards';
 import PopUps from './PopUps/PopUps';
 import Plane from './PlaneGround/Plane';
 import isintersect from './utility/isIntersect';
+import Connection from './Connection/Connection';
 
 // const bokehPass = new BokehPass(scene, camera, {
 //     focus: 60,
@@ -294,6 +328,7 @@ function animate() {
     // if (deltatime < 0.2)
     world.step(1 / 30);
     // else return
+    //#region update mesh & body
     if (trees.initialized) {
         trees.update(deltatime)
     }
@@ -342,7 +377,7 @@ function animate() {
     if (popups.initialized) {
         popups.update(deltatime)
     }
-
+    //#endregion
     if (followCharacter) {
         offsetChanged = false;
         if (character.position.z >= 100) {
@@ -404,7 +439,6 @@ function animate() {
     if (billboards.initialized)
 
         raycast.setFromCamera(mouse, camera);
-
     // checking intersect mouse with objects
     const intersects = raycast.intersectObjects(scene.children);
     document.body.style.cursor = "default";
@@ -435,6 +469,7 @@ function animate() {
                 billboards.keys[j].onPopUpMouseNotHover(); // start animating fence to go up
         }
 
+
     renderer.render(scene, camera)
     plane.setDepthTexture(SUN.shadow.map.texture);
     plane.setWorldMatrix(SUN.matrixWorld);
@@ -448,3 +483,11 @@ var alphaOffsetCamera_lobby = 0;
 var alphaOffsetCamera_portofolio = 0;
 var offsetChanged = false;
 animate();
+
+
+const button: HTMLButtonElement = document.querySelector("#start");
+button.onclick = connect;
+const connection = new Connection();
+function connect() {
+    connection.connect()
+}

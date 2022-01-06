@@ -9,7 +9,8 @@ export default class Billboards {
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         this.keys = [
-            new Billboard(world, scene, new Vector3(50, 0, 40), "miles madness",new Vector3(0.5,0.5,0.5))
+            new Billboard(world, scene, new Vector3(50, 0, 40), "miles madness", new Vector3(0.5, 0.5, 0.5), 100, [`/app/Miles Madness.rar`]),
+            new Billboard(world, scene, new Vector3(90, 0, 40), "tokopedia integration", new Vector3(0.5, 0.5, 0.5), 100, [`https://www.tokopedia.com/hartono-m`, `https://www.tokopedia.com/hartono-m`], 0.15),
         ];
 
     }

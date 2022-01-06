@@ -279,16 +279,10 @@ export default class PopUp {
         this.scene.add(meshBorderFloor)
 
         const body = new CANNON.Body({
-            shape: new CANNON.Box(new CANNON.Vec3(this.borderFloor.size.x / 2, 0.01, this.borderFloor.size.y / 2)),
+            shape: new CANNON.Box(new CANNON.Vec3(this.borderFloor.size.x / 2, 0.005, this.borderFloor.size.y / 2)),
             mass: 0
         })
         body.position.copy(this.borderFloor.position);
-        body.addEventListener('collide', (e) => {
-            console.log(e.target)
-        })
-        body.addEventListener('collideExit', (e) => {
-            console.log(e.target)
-        })
         this.borderFloor.body = body;
         this.world.addBody(body);
     }
