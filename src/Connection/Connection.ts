@@ -4,9 +4,14 @@ import { io, Socket } from 'socket.io-client';
 
 export default class Connection {
     myPeer: RTCPeerConnection;
-    myDataChannel: RTCDataChannel;
+    DataChannels: Array<RTCDataChannel>;
+    remoteDataChannels: Array<RTCDataChannel>;
+    ready: boolean
     signalling: Socket;
     constructor() {
+        this.ready = false;
+        this.DataChannels = [];
+        this.remoteDataChannels = [];
         const config = {
 
         }
@@ -43,11 +48,18 @@ export default class Connection {
             console.log(`recieving ${offer_desc.type}`);
             if (offer_desc.type == "offer") {
                 ref.myPeer.ondatachannel = (e) => {
-                    ref.myDataChannel = e.channel;
-                    e.channel.onmessage = ref.recieve;
+                    ref.remoteDataChannels.push(e.channel);
+                    // ref.remoteDataChannel = e.channel;
+                    const dc = e.channel;
+                    e.channel.onopen = (e) => {
+                        ref.ready = true;
+                        alert("ready remotedatachannel")
+
+                    }
+                    e.channel.onmessage = this.recieve;
                 };
 
-                await ref.myPeer.setRemoteDescription(offer_desc);;
+                await ref.myPeer.setRemoteDescription(offer_desc)
                 var answer_desc = await ref.myPeer.createAnswer()
                 await ref.myPeer.setLocalDescription(answer_desc);
                 ref.signalling.emit("offer", ref.myPeer.localDescription);
@@ -63,8 +75,13 @@ export default class Connection {
 
         ref.signalling.on("join", () => {
             console.log("someone join")
-            ref.myDataChannel = ref.myPeer.createDataChannel("main", { ordered: false, maxRetransmits: 0 });
-
+            const tempDataChannel = ref.myPeer.createDataChannel("main", { ordered: false, maxRetransmits: 0 });
+            tempDataChannel.onopen = () => {
+                ref.ready = true;
+                alert("ready mydatachannel")
+            }
+            tempDataChannel.onmessage = ref.recieve;
+            ref.DataChannels.push(tempDataChannel);
 
 
 
@@ -76,9 +93,27 @@ export default class Connection {
 
     }
     public recieve(e: any) {
+        alert(e.data)
         console.log(e);
     }
     public send(message: string) {
+        if (!this.ready) return;
+        console.log(`mydatachannel:`, this.DataChannels)
+        console.log(`remotedatachannel:`, this.remoteDataChannels)
+        for (let i = 0; i < this.DataChannels.length; i++) {
+            const dataChannel = this.DataChannels[i];
+            dataChannel.send(message);
+        }
+        for (let i = 0; i < this.remoteDataChannels.length; i++) {
+            const dataChannel = this.remoteDataChannels[i];
+            dataChannel.send(message);
+        }
+        // this.DataChannels.send(message);
+        // console.log({ length: this.remoteDataChannels.length })
+        // for (let i = 0; i < this.remoteDataChannels.length; i++) {
+        //     const element = this.remoteDataChannels[i];
+        //     element.send(message)
+        // }
         // this.otherDataChannel.forEach(dc => {
         //     dc.send(message);
         // })

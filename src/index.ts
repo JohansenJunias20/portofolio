@@ -489,5 +489,11 @@ const button: HTMLButtonElement = document.querySelector("#start");
 button.onclick = connect;
 const connection = new Connection();
 function connect() {
+    button.innerHTML = "remote";
+    button.disabled = true;
     connection.connect()
 }
+
+const buttonBC: HTMLButtonElement = document.querySelector("#broadcast");
+var counter = 0;
+buttonBC.onclick = () => { connection.send(`test ${counter += 1}`) };
