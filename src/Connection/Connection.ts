@@ -1,90 +1,126 @@
 import { PCFShadowMap } from 'three';
 import { io, Socket } from 'socket.io-client';
 
-
+interface IHash<T> {
+    [details: string]: T;
+}
 export default class Connection {
-    myPeer: RTCPeerConnection;
-    DataChannels: Array<RTCDataChannel>;
-    remoteDataChannels: Array<RTCDataChannel>;
+    // myPeers: IHash<RTCPeerConnection>;
+    remotePeers: IHash<RTCPeerConnection>;
+    DataChannels: IHash<RTCDataChannel>;
+    remoteDataChannels: IHash<RTCDataChannel>;
     ready: boolean
     signalling: Socket;
     constructor() {
+        const ref = this
         this.ready = false;
-        this.DataChannels = [];
-        this.remoteDataChannels = [];
+        this.remotePeers = {}
+        this.DataChannels = {};
+        this.remoteDataChannels = {}
         const config = {
 
         }
         const signalling = io(`ws://localhost:2000`);
         this.signalling = signalling;
-        this.myPeer = new RTCPeerConnection({
-            iceServers: [
-                { urls: "stun:stun.budgetphone.nl:3478" },
-                { urls: "turn:admin.orbitskomputer.com:3478", credential: "somepassword", username: "guest" }]
-        })
-        const ref = this
-
-        this.myPeer.onicecandidate = ({ candidate }) => {
-            console.log(`sending candidate`);
-            console.log({ candidate })
-            ref.signalling.emit("candidate", { candidate });
-        }
-
-        ref.signalling.on("candidate", async ({ candidate }) => {
-            console.log(`recieve candidate`);
-            console.log({ candidate: JSON.stringify(candidate) })
-            ref.myPeer.addIceCandidate(candidate)
-        })
-
-        this.myPeer.onnegotiationneeded = async () => {
-            console.log("negotiation needed")
-            console.log("creating offer")
-            var offer_desc = await ref.myPeer.createOffer()
-            await ref.myPeer.setLocalDescription(offer_desc);
-            ref.signalling.emit("offer", ref.myPeer.localDescription); //broadcast to others except me
-        }
-
-        ref.signalling.on("offer", async (offer_desc: RTCSessionDescription) => {
-            console.log(`recieving ${offer_desc.type}`);
-            if (offer_desc.type == "offer") {
-                ref.myPeer.ondatachannel = (e) => {
-                    ref.remoteDataChannels.push(e.channel);
-                    // ref.remoteDataChannel = e.channel;
-                    const dc = e.channel;
-                    e.channel.onopen = (e) => {
-                        ref.ready = true;
-                        alert("ready remotedatachannel")
-
-                    }
-                    e.channel.onmessage = this.recieve;
-                };
-
-                await ref.myPeer.setRemoteDescription(offer_desc)
-                var answer_desc = await ref.myPeer.createAnswer()
-                await ref.myPeer.setLocalDescription(answer_desc);
-                ref.signalling.emit("offer", ref.myPeer.localDescription);
-            }
-            else if (offer_desc.type == "answer") {
-                await ref.myPeer.setRemoteDescription(offer_desc);
-            }
 
 
-
-
-        })
-
-        ref.signalling.on("join", () => {
+        ref.signalling.on("join", (id: string) => {
             console.log("someone join")
-            const tempDataChannel = ref.myPeer.createDataChannel("main", { ordered: false, maxRetransmits: 0 });
+
+            const tempPeer = new RTCPeerConnection({
+                iceServers: [
+                    { urls: "stun:stun.budgetphone.nl:3478" },
+                    { urls: "turn:admin.orbitskomputer.com:3478", credential: "somepassword", username: "guest" }]
+            })
+
+            tempPeer.onicecandidate = ({ candidate }) => {
+                console.log(`sending candidate`);
+                console.log({ candidate })
+                ref.signalling.emit("candidate", { id, candidate });
+            }
+
+
+
+            tempPeer.onnegotiationneeded = async () => {
+                console.log("negotiation needed")
+                console.log("creating offer")
+                var offer_desc = await tempPeer.createOffer()
+                await tempPeer.setLocalDescription(offer_desc);
+                ref.signalling.emit("offer", { id, sdp: tempPeer.localDescription }); //broadcast to others except me
+            }
+
+
+
+
+            const tempDataChannel = tempPeer.createDataChannel("main", { ordered: false, maxRetransmits: 0 });
             tempDataChannel.onopen = () => {
                 ref.ready = true;
                 alert("ready mydatachannel")
             }
             tempDataChannel.onmessage = ref.recieve;
-            ref.DataChannels.push(tempDataChannel);
+            ref.DataChannels[id] = tempDataChannel;
+            ref.remotePeers[id] = tempPeer;
 
 
 
+        })
+        ref.signalling.on("candidate", async ({ id, candidate }) => {
+            console.log(`recieve candidate from ${id}`);
+            console.log({ peers: ref.remotePeers });
+            console.log({ candidate: JSON.stringify(candidate) })
+            ref.remotePeers[id].addIceCandidate(candidate)
+        })
+        ref.signalling.on("offer", async ({ id, sdp }: { id: string, sdp: RTCSessionDescription }) => {
+
+            const tempPeer = new RTCPeerConnection({
+                iceServers: [
+                    { urls: "stun:stun.budgetphone.nl:3478" },
+                    { urls: "turn:admin.orbitskomputer.com:3478", credential: "somepassword", username: "guest" }]
+            })
+
+            tempPeer.onicecandidate = ({ candidate }) => {
+                console.log(`sending candidate`);
+                console.log({ candidate })
+                ref.signalling.emit("candidate", { id, candidate });
+            }
+
+
+            console.log(`recieving ${sdp.type} from ${id}`);
+            tempPeer.ondatachannel = (e) => {
+                ref.remoteDataChannels[id] = e.channel;
+                // ref.remoteDataChannel = e.channel;
+                const dc = e.channel;
+                e.channel.onopen = (e) => {
+                    ref.ready = true;
+                    alert("ready remotedatachannel")
+
+                }
+                e.channel.onmessage = this.recieve;
+            };
+
+            await tempPeer.setRemoteDescription(sdp)
+            var answer_desc = await tempPeer.createAnswer()
+            await tempPeer.setLocalDescription(answer_desc);
+            ref.signalling.emit("answer", { id, sdp: tempPeer.localDescription });
+            this.remotePeers[id] = tempPeer;
+        })
+
+        ref.signalling.on("answer", async ({ id, sdp }) => {
+            await ref.remotePeers[id].setRemoteDescription(sdp);
+        })
+
+        ref.signalling.on("left", id => {
+            ref.remotePeers[id].close();
+            delete ref.remotePeers[id];
+            if (ref.DataChannels.hasOwnProperty(id)) {
+                ref.DataChannels[id].close();
+                delete ref.DataChannels[id];
+            }
+            if (ref.remoteDataChannels.hasOwnProperty(id)) {
+                ref.remoteDataChannels[id].close();
+                delete ref.remoteDataChannels[id]
+
+            }
         })
     }
     public connect() {
@@ -100,14 +136,13 @@ export default class Connection {
         if (!this.ready) return;
         console.log(`mydatachannel:`, this.DataChannels)
         console.log(`remotedatachannel:`, this.remoteDataChannels)
-        for (let i = 0; i < this.DataChannels.length; i++) {
-            const dataChannel = this.DataChannels[i];
-            dataChannel.send(message);
+        for (var key in this.DataChannels) {
+            this.DataChannels[key].send(message);
         }
-        for (let i = 0; i < this.remoteDataChannels.length; i++) {
-            const dataChannel = this.remoteDataChannels[i];
-            dataChannel.send(message);
+        for (var key in this.remoteDataChannels) {
+            this.remoteDataChannels[key].send(message);
         }
+
         // this.DataChannels.send(message);
         // console.log({ length: this.remoteDataChannels.length })
         // for (let i = 0; i < this.remoteDataChannels.length; i++) {

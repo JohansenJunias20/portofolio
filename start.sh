@@ -1,3 +1,3 @@
 #!/bin/bash
 
-webpack --watch & tailwindcss --watch;
+webpack --watch & bash ./start-server.sh;
