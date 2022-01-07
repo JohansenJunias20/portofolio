@@ -63,11 +63,9 @@ export default class Connection {
 
         })
         ref.signalling.on("candidate", async ({ id, candidate }) => {
-            console.log(`recieve candidate from ${id}`);
-            console.log({ peers: ref.remotePeers });
-            console.log({ candidate: JSON.stringify(candidate) })
-            console.log({ currentPeer: ref.remotePeers[id] })
-            await ref.remotePeers[id].addIceCandidate(candidate)
+            if (ref.remotePeers.hasOwnProperty(id)) { //mencegah console error saja, tanpa if ini sebenarnya juga bisa tapi entah knapa error
+                await ref.remotePeers[id].addIceCandidate(candidate)
+            }
         })
         ref.signalling.on("offer", async ({ id, sdp }: { id: string, sdp: RTCSessionDescription }) => {
 
@@ -91,7 +89,6 @@ export default class Connection {
                 const dc = e.channel;
                 e.channel.onopen = (e) => {
                     ref.ready = true;
-                    alert("ready remotedatachannel")
 
                 }
                 e.channel.onmessage = this.recieve;
@@ -135,7 +132,7 @@ export default class Connection {
 
     }
     public recieve(e: any) {
-        alert(e.data)
+        console.log(e.data)
     }
     public send(message: string) {
         if (!this.ready) return;
