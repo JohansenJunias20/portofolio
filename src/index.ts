@@ -34,6 +34,8 @@ camera.getWorldDirection(temp)
 
 
 const SUN = new THREE.DirectionalLight(0xffffff, 0.5)
+camera.projectionMatrix;
+camera.modelViewMatrix;
 SUN.position.set(0, 200, 15)
 SUN.target.position.set(0, 0, 0);
 SUN.shadow.camera.visible = ENABLE_SHADOW;

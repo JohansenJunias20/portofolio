@@ -25,17 +25,27 @@ io.on("connection", (socket) => {
     })
     socket.on("join", () => {
         socket.broadcast.emit("join", socket.id);
-        const cloneIDs = { ...IDs };
-        console.log({ cloneIDs })
-        cloneIDs[socket.id] = false;
-        socket.emit("players", cloneIDs);
+        // const cloneIDs = { ...IDs };
+        // console.log({ cloneIDs })
+        // cloneIDs[socket.id] = false;
+        // socket.emit("players", cloneIDs);
     })
+    socket.on("init", (id_target) => {
+        io.to(id_target).emit("init", ({ id: socket.id }));
+    }) //please init peerconnection first before offering because u cannot recieve icecandidate before new RTCpeerconnection
     socket.on("disconnect", () => {
         socket.broadcast.emit("left", socket.id);
         delete IDs[socket.id];
     })
     socket.on("player_count", () => {
         socket.emit("player_count", io.engine.clientsCount);
+    })
+    socket.on("cl_ready", (id) => {
+        io.to(id).emit("cl_ready", socket.id);
+    })
+    socket.on("rm_ready",(id)=>{
+        io.to(id).emit("rm_ready", socket.id);
+
     })
     socket.emit("id", socket.id);
     IDs[socket.id] = true;

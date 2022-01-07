@@ -13,6 +13,7 @@ export default class Connection {
     signalling: Socket;
     id: string;
     config: any;
+    pending_candidates: Array<RTCIceCandidateInit>;
     constructor() {
         const ref = this;
         this.ready = false;
@@ -20,6 +21,7 @@ export default class Connection {
         this.DataChannels = {};
         this.remoteDataChannels = {}
         this.playerCount = 0;
+        this.pending_candidates = []
         this.config = {
             iceServers: [
                 { urls: "stun:stun.budgetphone.nl:3478" },
@@ -30,10 +32,10 @@ export default class Connection {
 
 
         ref.signalling.on("join", (id: string) => {
-
             const tempPeer = new RTCPeerConnection(ref.config)
 
             tempPeer.onicecandidate = ({ candidate }) => {
+                console.log("giving candidate...");
                 ref.signalling.emit("candidate", { id, candidate });
             }
 
@@ -48,52 +50,39 @@ export default class Connection {
 
 
 
-            const tempDataChannel = tempPeer.createDataChannel("main", { ordered: false, maxRetransmits: 0 });
-            tempDataChannel.onopen = () => {
-                alert("open")
-                ref.ready = true;
-            }
-            tempDataChannel.onmessage = ref.recieve.bind(ref);
-            ref.DataChannels[id] = tempDataChannel;
+            // const tempDataChannel = tempPeer.createDataChannel("main", { ordered: false, maxRetransmits: 0 });
+            // tempDataChannel.onopen = () => {
+            //     ref.ready = true;
+            // }
+            // tempDataChannel.onmessage = ref.recieve.bind(ref);
+            // ref.DataChannels[id] = tempDataChannel;
             ref.remotePeers[id] = tempPeer;
             if (ref.onnewplayer)
                 ref.onnewplayer(id)
 
+            ref.signalling.emit("rm_ready", id)
+
         })
         ref.signalling.on("candidate", async ({ id, candidate }) => {
+            if (!candidate) return;
             if (ref.remotePeers.hasOwnProperty(id)) { //mencegah console error saja, tanpa if ini sebenarnya juga bisa tapi entah knapa error
                 console.log({ candidate })
                 await ref.remotePeers[id].addIceCandidate(candidate)
             }
+            else {
+                ref.pending_candidates.push(candidate);
+                console.log("there is pending candidate")
+            }
         })
         ref.signalling.on("offer", async ({ id, sdp }: { id: string, sdp: RTCSessionDescription }) => {
 
-            const tempPeer = new RTCPeerConnection(ref.config)
-
-            tempPeer.onicecandidate = ({ candidate }) => {
-                console.log("giving candidate to other player..")
-                ref.signalling.emit("candidate", { id, candidate });
-            }
-
-
-            console.log(`recieving ${sdp.type} from ${id}`);
-            tempPeer.ondatachannel = (e) => {
-                ref.remoteDataChannels[id] = e.channel;
-                // ref.remoteDataChannel = e.channel;
-                const dc = e.channel;
-                e.channel.onopen = (e) => {
-                    ref.ready = true;
-
-                }
-                e.channel.onmessage = this.recieve.bind(ref);
-            };
-
+            const tempPeer = ref.remotePeers[id];
             await tempPeer.setRemoteDescription(sdp)
             var answer_desc = await tempPeer.createAnswer()
             await tempPeer.setLocalDescription(answer_desc);
             ref.signalling.emit("answer", { id, sdp: tempPeer.localDescription });
             this.remotePeers[id] = tempPeer;
-            console.log("pushing new peers")
+
         })
 
         ref.signalling.on("answer", async ({ id, sdp }) => {
@@ -122,15 +111,36 @@ export default class Connection {
         })
 
         //hanya ketrigger 1x saat pertama x join room
-        ref.signalling.on("players", (players: IHash<boolean>) => {
-            console.log({ players })
-            alert(players)
-            for (var key in players) {
-                if (key)
-                    ref.onnewplayer(key);
-            }
-        })
+        ref.signalling.on("rm_ready", (player_id: string) => {
+            const tempPeer = new RTCPeerConnection(ref.config)
 
+            tempPeer.onicecandidate = ({ candidate }) => {
+                console.log("giving candidate to other player..")
+                ref.signalling.emit("candidate", { id: player_id, candidate });
+            }
+
+
+            tempPeer.ondatachannel = (e) => {
+                ref.remoteDataChannels[player_id] = e.channel;
+                // ref.remoteDataChannel = e.channel;
+                const dc = e.channel;
+                e.channel.onopen = (e) => {
+                    ref.ready = true;
+                }
+                e.channel.onmessage = ref.recieve.bind(ref);
+            };
+            ref.remotePeers[player_id] = tempPeer;
+            ref.signalling.emit("cl_ready", player_id);
+
+            ref.onnewplayer(player_id);
+        })
+        ref.signalling.on("cl_ready", id => {
+            ref.DataChannels[id] = ref.remotePeers[id].createDataChannel("main", { ordered: false, maxRetransmits: 0 });
+            ref.DataChannels[id].onopen = () => {
+                ref.ready = true;
+            }
+            ref.DataChannels[id].onmessage = ref.recieve.bind(ref);
+        })
         ref.signalling.on("player_count", count => {
             ref.playerCount = count;
         })
@@ -155,10 +165,14 @@ export default class Connection {
 
         message = JSON.stringify(message);
         for (var key in this.DataChannels) {
-            this.DataChannels[key].send(message);
+            if (this.DataChannels[key].readyState == "open") {
+                this.DataChannels[key].send(message);
+            }
         }
         for (var key in this.remoteDataChannels) {
-            this.remoteDataChannels[key].send(message);
+            if (this.remoteDataChannels[key].readyState == "open") {
+                this.remoteDataChannels[key].send(message);
+            }
         }
 
         // this.DataChannels.send(message);
