@@ -25,7 +25,6 @@ export default class Connection {
 
 
         ref.signalling.on("join", (id: string) => {
-            console.log("someone join")
 
             const tempPeer = new RTCPeerConnection({
                 iceServers: [
@@ -42,8 +41,6 @@ export default class Connection {
 
 
             tempPeer.onnegotiationneeded = async () => {
-                console.log("negotiation needed")
-                console.log("creating offer")
                 var offer_desc = await tempPeer.createOffer()
                 await tempPeer.setLocalDescription(offer_desc);
                 ref.signalling.emit("offer", { id, sdp: tempPeer.localDescription }); //broadcast to others except me
@@ -60,6 +57,7 @@ export default class Connection {
             tempDataChannel.onmessage = ref.recieve;
             ref.DataChannels[id] = tempDataChannel;
             ref.remotePeers[id] = tempPeer;
+            console.log("pushing new peers")
 
 
 
@@ -68,7 +66,8 @@ export default class Connection {
             console.log(`recieve candidate from ${id}`);
             console.log({ peers: ref.remotePeers });
             console.log({ candidate: JSON.stringify(candidate) })
-            ref.remotePeers[id].addIceCandidate(candidate)
+            console.log({ currentPeer: ref.remotePeers[id] })
+            await ref.remotePeers[id].addIceCandidate(candidate)
         })
         ref.signalling.on("offer", async ({ id, sdp }: { id: string, sdp: RTCSessionDescription }) => {
 
@@ -103,6 +102,7 @@ export default class Connection {
             await tempPeer.setLocalDescription(answer_desc);
             ref.signalling.emit("answer", { id, sdp: tempPeer.localDescription });
             this.remotePeers[id] = tempPeer;
+            console.log("pushing new peers")
         })
 
         ref.signalling.on("answer", async ({ id, sdp }) => {
@@ -110,7 +110,13 @@ export default class Connection {
         })
 
         ref.signalling.on("left", id => {
-            ref.remotePeers[id].close();
+            //bila belum emit join maka bisa jadi remotePeers belum dibuat
+            if (ref.remotePeers.hasOwnProperty(id)) {
+                ref.remotePeers[id].close();
+            }
+            else {
+                return; //nothing to delete
+            }
             delete ref.remotePeers[id];
             if (ref.DataChannels.hasOwnProperty(id)) {
                 ref.DataChannels[id].close();
@@ -130,12 +136,9 @@ export default class Connection {
     }
     public recieve(e: any) {
         alert(e.data)
-        console.log(e);
     }
     public send(message: string) {
         if (!this.ready) return;
-        console.log(`mydatachannel:`, this.DataChannels)
-        console.log(`remotedatachannel:`, this.remoteDataChannels)
         for (var key in this.DataChannels) {
             this.DataChannels[key].send(message);
         }
