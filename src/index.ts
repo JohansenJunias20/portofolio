@@ -322,6 +322,10 @@ const renderPass = new RenderPass(scene, camera);
 // composer2.addPass(renderPass);
 // composer2.addPass(fxaaPass);
 // composer2.addPass(bokehPass);
+interface IHash<T> {
+    [key: string]: T
+}
+const otherPlayers: IHash<Character> = {};
 
 function animate() {
     deltatime = clock.getDelta()
@@ -377,6 +381,15 @@ function animate() {
     if (popups.initialized) {
         popups.update(deltatime)
     }
+
+    for (var key in otherPlayers) {
+        const player = otherPlayers[key];
+        if (player.initialized) {
+            player.update(deltatime);
+        }
+
+    }
+
     //#endregion
     if (followCharacter) {
         offsetChanged = false;
@@ -469,12 +482,12 @@ function animate() {
                 billboards.keys[j].onPopUpMouseNotHover(); // start animating fence to go up
         }
 
-
+    if (connection && character.body && connection.id)
+        connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
     renderer.render(scene, camera)
     plane.setDepthTexture(SUN.shadow.map.texture);
     plane.setWorldMatrix(SUN.matrixWorld);
     requestAnimationFrame(animate);
-
     // composer2.render(deltatime)
 
 }
@@ -485,13 +498,36 @@ var offsetChanged = false;
 animate();
 
 
-const button: HTMLButtonElement = document.querySelector("#start");
-button.onclick = connect;
 const connection = new Connection();
-function connect() {
-    button.innerHTML = "remote";
-    button.disabled = true;
-    connection.connect()
+const joinButton: HTMLButtonElement = document.querySelector('#join');
+joinButton.onclick = () => {
+    connection.connect();
+}
+connection.onrecieve = (e) => {
+    // console.log(e.data)
+    const message = JSON.parse(e.data);
+    switch (message.channel) {
+        case "transform":
+            // console.log({ otherPlayers });
+            message.id = message.id.toString();
+            // console.log({ id: message.id });
+            // console.log({ x: message.quaternion.x });
+            for (var key in otherPlayers) {
+                // console.log({ key })
+            }
+            otherPlayers[message.id].body.position.copy(message.position);
+            otherPlayers[message.id].body.quaternion.copy(message.quaternion);
+            break;
+        default:
+            break;
+    }
+    // console.log("onrecieve...")
+}
+connection.onnewplayer = async (id: string) => {
+    console.log("new player...")
+    otherPlayers[id] = (new Character(world, scene, new Vector3(0, 150, 0), 0));
+    await otherPlayers[id].init();
+    otherPlayers[id].body.mass = 0;//not affected to gravity
 }
 
 const buttonBC: HTMLButtonElement = document.querySelector("#broadcast");
