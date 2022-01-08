@@ -1,5 +1,5 @@
 const path = require('path');
-
+const webpack = require('webpack');
 module.exports = {
   entry: './src/index.ts',
   module: {
@@ -11,6 +11,11 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      production:false
+    })
+  ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
@@ -18,5 +23,5 @@ module.exports = {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'public/dist'),
   },
-  mode:"development"
+  mode: "development"
 };

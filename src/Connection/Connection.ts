@@ -4,6 +4,7 @@ import { io, Socket } from 'socket.io-client';
 interface IHash<T> {
     [details: string]: T;
 }
+declare var production: boolean;
 export default class Connection {
     // myPeers: IHash<RTCPeerConnection>;
     remotePeers: IHash<RTCPeerConnection>;
@@ -25,9 +26,9 @@ export default class Connection {
         this.config = {
             iceServers: [
                 { urls: "stun:stun.budgetphone.nl:3478" },
-                { urls: "turn:admin.orbitskomputer.com:3478", credential: "somepassword", username: "guest", user: "guest" }]
+                { urls: `turn:admin.orbitskomputer.com:${production ? 5349 : 3478}`, credential: "somepassword", username: "guest", user: "guest" }]
         }
-        const signalling = io(`ws://admin.orbitskomputer.com:2000`);
+        const signalling = io(`ws://${production ? 'ws_portofolio.orbitskomputer.com' : 'localhost'}:2000`);
         this.signalling = signalling;
 
 
@@ -94,6 +95,8 @@ export default class Connection {
             //bila belum emit join maka bisa jadi remotePeers belum dibuat
             if (ref.remotePeers.hasOwnProperty(id)) {
                 ref.remotePeers[id].close();
+                delete ref.remotePeers[id];
+
             }
             else {
                 return; //nothing to delete
@@ -108,6 +111,7 @@ export default class Connection {
                 delete ref.remoteDataChannels[id]
 
             }
+            ref.onleft(id);
         })
 
         //hanya ketrigger 1x saat pertama x join room
@@ -154,6 +158,7 @@ export default class Connection {
         this.signalling.emit("player_count");//get player count
 
     }
+    onleft: (id: string) => any;
     onnewplayer: (id: string) => any;
     onrecieve: (e: any) => any;
     private recieve(e: any) {

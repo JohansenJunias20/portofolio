@@ -3,7 +3,7 @@
 # start the script with ./install-coturn.sh 
 sudo apt-get -y update;
 sudo apt-get -y install coturn;
-systemctl stop coturn;
+sudo systemctl stop coturn;
 sudo echo "TURNSERVER=1" > /etc/default/coturn;
 sudo cp ./turnserver.conf /etc/turnserver.conf;
 

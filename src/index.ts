@@ -20,7 +20,9 @@ const renderer = new THREE.WebGLRenderer({
     antialias: true
 
 })
-
+declare var production: boolean; // from webpack config file.
+console.log("prod:");
+console.log({ production });
 
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
