@@ -18,7 +18,7 @@ export default class Statue extends PhysicsObject3d {
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "waving" | "dab" | "style" | "clapping") {
         super(world, scene, position, 0, "BOX", 0);
         this.text = text;
-        this.asset.url = `/assets/environment/lobby/Statues/statue_${text}.fbx`;
+        this.asset.url = `/assets/environment/Lobby/Statues/statue_${text}.fbx`;
     }
     public async init() {
         await super.init()

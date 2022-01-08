@@ -8,10 +8,10 @@ export default class Hotkeys {
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene, HOTKEYSPOSITION: Vector3) {
         this.keys = [
-            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(4, 0, 0)), "d"),
-            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(-4, 0, 0)), "a"),
-            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(0, 0, 0)), "s"),
-            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(0, 0, -4)), "w")
+            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(4, 0, 0)), "D"),
+            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(-4, 0, 0)), "A"),
+            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(0, 0, 0)), "S"),
+            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(0, 0, -4)), "W")
         ];
         
     }
