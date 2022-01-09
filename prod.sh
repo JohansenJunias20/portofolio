@@ -10,11 +10,13 @@ docker run -v "/$(pwd)/ws-server:/usr/src/app" customnode:latest npm install;
 
 # give access so docker can write files to public.
 chmod 777 public
-chmod 777 /public/*
+chmod 777 public/*
 # build dist js
-docker run -v "/$(pwd)/:/usr/src/app" customnode:latest npx webpack --config webpack.prod.js --env=TURN_DOMAIN=$PROD_TURN_DOMAIN --env=$PROD_WEBSOCKET_DOMAIN;
+docker run -v "/$(pwd)/:/usr/src/app" customnode:latest \
+    npx webpack --config webpack.prod.js \
+    --env=PROD_TURN_DOMAIN=$PROD_TURN_DOMAIN --env=PROD_WEBSOCKET_DOMAIN=$PROD_WEBSOCKET_DOMAIN;
 
 # generate ssh if expired & start socketio server 
 docker-compose -d -f docker-compose.prod.yml up;
 
-sudo bash internal_start-turn.sh prod;
+sudo bash internal_start-turn.sh PROD;

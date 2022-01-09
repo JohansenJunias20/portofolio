@@ -13,7 +13,12 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      production:false
+      production:false,
+      TURN_DOMAIN: JSON.stringify(env.DEV_TURN_DOMAIN),
+      TURN_PORT: JSON.stringify(env.DEV_TURN_PORT),
+      TURN_USERNAME: JSON.stringify(env.DEV_TURN_USERNAME),
+      TURN_PASSWORD: JSON.stringify(env.DEV_TURN_PASSWORD),
+      WEBSOCKET_DOMAIN: JSON.stringify(env.DEV_WEBSOCKET_DOMAIN)
     })
   ],
   resolve: {
