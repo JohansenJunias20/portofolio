@@ -26,9 +26,9 @@ export default class Connection {
         this.config = {
             iceServers: [
                 { urls: "stun:stun.budgetphone.nl:3478" },
-                { urls: `turn:admin.orbitskomputer.com:${production ? 5349 : 3478}`, credential: "somepassword", username: "guest", user: "guest" }]
+                { urls: `turn:portofolio.orbitskomputer.com:${production ? 5349 : 3478}`, credential: "somepassword", username: "guest", user: "guest" }]
         }
-        const signalling = io(`ws://${production ? 'ws_portofolio.orbitskomputer.com' : 'localhost'}:2000`);
+        const signalling = io(`ws://${production ? 'portofolio.orbitskomputer.com' : 'localhost'}:2000`);
         this.signalling = signalling;
 
 

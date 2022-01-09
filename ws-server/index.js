@@ -1,6 +1,13 @@
 const { Server } = require("socket.io");
+const fs = require('fs');
+const { exec } = require("child_process");
 
-const io = new Server({
+const httpServer = require("https").createServer({
+    key: fs.readFileSync("/etc/letsencrypt/archive/portofolio.orbitskomputer.com/privkey1.pem"),
+    cert: fs.readFileSync("/etc/letsencrypt/archive/portofolio.orbitskomputer.com/cert1.pem")
+});
+
+const io = require("socket.io")(httpServer, {
     cors: {
         origin: "*"
     }
@@ -43,7 +50,7 @@ io.on("connection", (socket) => {
     socket.on("cl_ready", (id) => {
         io.to(id).emit("cl_ready", socket.id);
     })
-    socket.on("rm_ready",(id)=>{
+    socket.on("rm_ready", (id) => {
         io.to(id).emit("rm_ready", socket.id);
 
     })

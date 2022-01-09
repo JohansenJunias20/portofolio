@@ -1,0 +1,23 @@
+version: '3'
+services:
+  certbot:
+    image: certbot/certbot
+    ports:
+      - "80:80"
+    env_file:
+      - .env
+    volumes:
+      - "./ssl/main:/etc"
+      - "./ssl/lib:/var/lib"
+    command: certonly --standalone --email johansen.gumbal@gmail.com --agree-tos --no-eff-email -d portofolio.orbitskomputer.com --keep-until-expiring
+  socketio:
+    image: node:lts-alpine
+    ports:
+      - "2000:2000"
+    command: sh /usr/src/app/prod.sh
+    volumes:
+      - "./ws-server:/usr/src/app"
+      - "./ssl/main:/etc/letsencrypt"
+      - "./ssl/lib:/var/lib/letsencrypt"
+    depends_on:
+      - certbot

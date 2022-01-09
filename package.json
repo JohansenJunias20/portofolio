@@ -19,7 +19,8 @@
   "homepage": "https://github.com/JohansenJunias20/portofolio#readme",
   "devDependencies": {
     "ts-loader": "^9.2.6",
-    "typescript": "^4.5.3"
+    "typescript": "^4.5.3",
+    "webpack-cli": "^4.9.1"
   },
   "dependencies": {
     "@types/cannon": "^0.1.8",
@@ -28,7 +29,6 @@
     "cannon-es": "^0.18.0",
     "socket.io-client": "^4.4.1",
     "three": "^0.135.0",
-    "webpack": "^5.65.0",
-    "webpack-cli": "^4.9.1"
+    "webpack": "^5.65.0"
   }
 }
