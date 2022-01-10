@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
-import Word from "./Word";
+import Word from "./word";
 
 
 export default class Johansen {

@@ -16,11 +16,12 @@ module.exports = (env) => {
     plugins: [
       new webpack.DefinePlugin({
         production: true,
-        TURN_DOMAIN: JSON.stringify(env.TURN_DOMAIN),
-        TURN_PORT: JSON.stringify(env.TURN_PORT),
-        TURN_USERNAME: JSON.stringify(env.TURN_USERNAME),
-        TURN_PASSWORD: JSON.stringify(env.TURN_PASSWORD),
-        WEBSOCKET_DOMAIN: JSON.stringify(env.WEBSOCKET_DOMAIN)
+        TURN_DOMAIN: JSON.stringify(env.TURN_DOMAIN.toString().replace(/\\r/g,"")), //direplace karena perbedaan OS membaca file, 
+        TURN_PORT: JSON.stringify(env.TURN_PORT.toString().replace(/\\r/g,"")),
+        TURN_USERNAME: JSON.stringify(env.TURN_USERNAME.toString().replace(/\\r/g,"")),
+        TURN_PASSWORD: JSON.stringify(env.TURN_PASSWORD.toString().replace(/\\r/g,"")),
+        WS_DOMAIN: JSON.stringify(env.WEBSOCKET_DOMAIN.toString().replace(/\\r/g,"")),
+        WS_PORT: JSON.stringify(env.WEBSOCKET_PORT.toString().replace(/\\r/g,"")),
       })
     ],
     resolve: {

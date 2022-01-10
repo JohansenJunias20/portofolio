@@ -1,11 +1,16 @@
+require('dotenv').config()
 const { Server } = require("socket.io");
 const fs = require('fs');
-const { exec } = require("child_process");
 
-const httpServer = require("https").createServer({
-    key: fs.readFileSync("/etc/letsencrypt/archive/portofolio.orbitskomputer.com/privkey1.pem"),
-    cert: fs.readFileSync("/etc/letsencrypt/archive/portofolio.orbitskomputer.com/cert1.pem")
-});
+const production = process.env.PRODUCTION ? true : false;
+const ssl = production ? process.env.PROD_WS_SSL == "TRUE" ? true : false : process.env.DEV_WS_SSL == "TRUE" ? true : false;
+const domain = production ? process.env.PROD_WS_DOMAIN : process.env.DEV_WS_DOMAIN;
+const httpServer = ssl ? require("https").createServer({
+    key: fs.readFileSync(`/etc/letsencrypt/archive/${domain}/privkey1.pem`),
+    cert: fs.readFileSync(`/etc/letsencrypt/archive/${domain}/cert1.pem`)
+}) :
+    require("http").createServer()
+    ;
 
 const io = require("socket.io")(httpServer, {
     cors: {
@@ -14,7 +19,6 @@ const io = require("socket.io")(httpServer, {
 });
 
 const IDs = [];
-
 io.on("connection", (socket) => {
     socket.on("offer", (e) => {
         const { id, sdp } = e;
@@ -59,4 +63,5 @@ io.on("connection", (socket) => {
     console.log({ IDs })
     console.log(`someone made connection ${socket.id}`)
 });
-io.listen(2000)
+
+io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT);

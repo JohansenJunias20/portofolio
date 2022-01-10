@@ -20,6 +20,7 @@ const renderer = new THREE.WebGLRenderer({
     antialias: true
 
 })
+console.log("hello")
 declare var production: boolean; // from webpack config file.
 console.log({
     production,
@@ -27,7 +28,8 @@ console.log({
     TURN_PORT,
     TURN_USERNAME,
     TURN_PASSWORD,
-    WEBSOCKET_DOMAIN
+    WS_DOMAIN,
+    
 })
 
 renderer.setPixelRatio(window.devicePixelRatio)

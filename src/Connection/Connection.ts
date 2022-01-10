@@ -5,6 +5,13 @@ interface IHash<T> {
     [details: string]: T;
 }
 declare var production: boolean;
+declare var TURN_PORT_TLS: number;
+declare var TURN_PORT: number;
+declare var TURN_DOMAIN: string;
+declare var TURN_USERNAME: string;
+declare var TURN_PASSWORD: string;
+declare var WS_PORT: number;
+declare var WS_DOMAIN: string;
 export default class Connection {
     // myPeers: IHash<RTCPeerConnection>;
     remotePeers: IHash<RTCPeerConnection>;
@@ -26,9 +33,9 @@ export default class Connection {
         this.config = {
             iceServers: [
                 { urls: "stun:stun.budgetphone.nl:3478" },
-                { urls: `turn:portofolio.orbitskomputer.com:${production ? 5349 : 3478}`, credential: "somepassword", username: "guest", user: "guest" }]
+                { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https" ? TURN_PORT_TLS : TURN_PORT}`, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
         }
-        const signalling = io(`ws://${production ? 'portofolio.orbitskomputer.com' : 'localhost'}:2000`);
+        const signalling = io(`ws://${WS_DOMAIN}:${WS_PORT}`);
         this.signalling = signalling;
 
 

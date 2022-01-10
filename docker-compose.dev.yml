@@ -1,0 +1,11 @@
+version: '3'
+services:
+  socketio:
+    build: .
+    ports:
+      - "2000:2000"
+    command: sh /usr/src/app/dev.sh
+    volumes:
+      - "./ws-server:/usr/src/app"
+      - "./ssl/main:/etc/letsencrypt"
+      - "./ssl/lib:/var/lib/letsencrypt"

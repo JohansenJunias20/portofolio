@@ -1,13 +1,17 @@
 #!/bin/bash
 
-docker build -t customnode:latest $(pwd) -f /$(pwd)/.dockerfile; # build customnode image 
+# compile typescript to dist file
+bash ./build.sh -m PROD -d;
 # installing dependencies
 docker run -v "/$(pwd)/ws-server:/usr/src/app" customnode:latest npm install;
 
-bash ./build.sh PROD;
+# copy .env file to ws-server/
+cp .env ws-server/.env;
 
+echo "RUNNING WEBSOCKET SERVER..."
+echo "" >> ws-server/.env;
+echo "PRODUCTION=TRUE" >> ws-server/.env;
+# start socketio server 
+docker-compose -f docker-compose.prod.yml up  -d;
 
-# generate ssh if expired & start socketio server 
-docker-compose -d -f docker-compose.prod.yml up;
-
-sudo bash internal_start-turn.sh PROD;
+bash internal_start-turn.sh;

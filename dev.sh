@@ -1,4 +1,7 @@
 #!/bin/bash
 
-webpack --watch --config webpack.dev.js & nodemon ws-server/index.js;
-echo "Done, please use Open Live Server Extension to open public/index.html";
+cp -f .env ws-server/.env;
+echo "" >> ws-server/.env;
+echo "" >> ws-server/.env;
+bash ./build.sh -m DEV & docker-compose -f docker-compose.dev.yml up;
+
