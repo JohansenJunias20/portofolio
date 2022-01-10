@@ -16,11 +16,11 @@ module.exports = (env) => {
     plugins: [
       new webpack.DefinePlugin({
         production: true,
-        TURN_DOMAIN: JSON.stringify(env.PROD_TURN_DOMAIN),
-        TURN_PORT: JSON.stringify(env.PROD_TURN_PORT),
-        TURN_USERNAME: JSON.stringify(env.PROD_TURN_USERNAME),
-        TURN_PASSWORD: JSON.stringify(env.PROD_TURN_PASSWORD),
-        WEBSOCKET_DOMAIN: JSON.stringify(env.PROD_WEBSOCKET_DOMAIN)
+        TURN_DOMAIN: JSON.stringify(env.TURN_DOMAIN),
+        TURN_PORT: JSON.stringify(env.TURN_PORT),
+        TURN_USERNAME: JSON.stringify(env.TURN_USERNAME),
+        TURN_PASSWORD: JSON.stringify(env.TURN_PASSWORD),
+        WEBSOCKET_DOMAIN: JSON.stringify(env.WEBSOCKET_DOMAIN)
       })
     ],
     resolve: {
