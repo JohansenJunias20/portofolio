@@ -63,5 +63,5 @@ io.on("connection", (socket) => {
     console.log({ IDs })
     console.log(`someone made connection ${socket.id}`)
 });
-
+console.log("test")
 io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT);

@@ -2,6 +2,7 @@ version: '3'
 services:
   socketio:
     build: .
+    tty: true
     ports:
       - "2000:2000"
     command: sh /usr/src/app/prod.sh
