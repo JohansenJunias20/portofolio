@@ -4,6 +4,7 @@ Run webpack build watch and nodemon websocket
     bash ./dev.sh
 ```
 Please make sure docker, node, npm installed.  
+Build Only
 <hr>
 Run Coturn Server & websocker server with forever
 ```sh
