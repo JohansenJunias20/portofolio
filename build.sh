@@ -34,7 +34,7 @@ npm and node js version of computer supported on current modules in package json
         ;;
 
     *)
-        echo "test"
+    echo "test"
         shift # past argument
         ;;
     esac
