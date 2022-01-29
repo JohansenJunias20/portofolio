@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="margin: 0; padding:0">
 
 <head>
     <meta charset="UTF-8">
@@ -8,10 +8,39 @@
     <title>Johansen Junias</title>
 </head>
 
-<body>
+<body style="margin:0;padding:0">
+    <div id="modal"
+        style="height: 100%;width: 100%; position: absolute; display: flex; justify-content: center;align-items: center;">
+        <div id="modal_content"
+            style="max-width: 900px; min-width: 600px; box-shadow: 0 0 10px 5px rgba(0,0,0,0.1); opacity:0;transition: all 500ms ease; border-radius: 5px;padding:10px;width: 75%;height: 75%;transform:translateY(-100px) ;background-color: white;">
+            <h1>test</h1>
+        </div>
+    </div>
+    <script defer>
+        document.querySelector("#modal").onclick = (e) => {
+            console.log(e)
+            if (e.target == e.currentTarget) {
+                hideModal()
+            }
+        }
+
+        function showModal() {
+            document.querySelector("#modal").style.display = "flex";
+            document.querySelector("#modal_content").style.opacity = "1";
+            document.querySelector("#modal_content").style.transform = "translateY(0)";
+        }
+        function hideModal() {
+            document.querySelector("#modal_content").style.opacity = "0";
+            document.querySelector("#modal_content").style.transform = "translateY(-100px)";
+            setTimeout(() => {
+                document.querySelector("#modal").style.display = "none";
+            }, 500);
+
+        }
+        // showModal()
+    </script>
     <button style="right:10px;position:fixed;padding:15px;" id="join">join room</button>
     <canvas id="bg">
-
     </canvas>
     <script defer src="/dist/bundle.js"></script>
 </body>

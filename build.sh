@@ -30,11 +30,15 @@ npm and node js version of computer supported on current modules in package json
 
     -* | --*)
         echo "Unknown option $1"
+        echo "-m | --mode       ) value must be DEV or PROD"
+        echo "-d | --use-docker ) using virtualization or not. If you currently under development mode (--mode DEV) on Windows we recommend DO NOT use this option \
+because windows not singalling file changes to docker mounted volumes, so webpack on container cannot trace file changes. But make sure \
+npm and node js version of computer supported on current modules in package json"
         exit 1
         ;;
 
     *)
-    echo "test"
+        echo "test"
         shift # past argument
         ;;
     esac
@@ -42,7 +46,14 @@ done
 
 # load .env file to bash script variables.
 export $(cat .env | xargs)
-
+if [ "$MODE" == "" ]; then
+    echo "please specify mode by -m"
+    echo "-m | --mode       ) value must be DEV or PROD"
+    echo "-d | --use-docker ) using virtualization or not. If you currently under development mode (--mode DEV) on Windows we recommend DO NOT use this option \
+because windows not singalling file changes to docker mounted volumes, so webpack on container cannot trace file changes. But make sure \
+npm and node js version of computer supported on current modules in package json"
+    exit
+fi
 # remove special characters. if not, it make strange behavior when template literal with other strings.
 # for example > echo "test $TURN_PORT" -> show weird result. karena newline windows & linux berbeda (windows ada tambahan \r, .env file dibuat diwindows)
 TURN_PORT=${TURN_PORT//[^[:alnum:]]/}
