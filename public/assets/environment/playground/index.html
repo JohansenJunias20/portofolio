@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;padding: 0;margin:0;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welost 123</title>
+    <style>
+        #score>div {
+            width: 60px;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        image {
+            image-rendering: -moz-crisp-edges;
+            /* Firefox        */
+            image-rendering: -o-crisp-edges;
+            /* Opera          */
+            image-rendering: -webkit-optimize-contrast;
+            /* Safari         */
+            image-rendering: optimize-contrast;
+            /* CSS3 Proposed  */
+            -ms-interpolation-mode: nearest-neighbor;
+            /* IE8+           */
+        }
+    </style>
+    <script>
+        const TIMEOUT_DRAW = 1000;
+        const INPUT_SHAPE = {
+            x: 28, // jangan diubah
+            y: 28 // jangan diubah
+        }
+        //after user draw, it crop rectangle area to the area that user just draw, this variable is "padding" of the reactangle area
+        const OFFSET_BOUNDINGBOX = 45;
+        const BRUSH_WIDTH = 20;
+    </script>
+</head>
+
+<body style="height: 100%;padding: 0;margin:0">
+    <div style="position: absolute; bottom: 0; left: 0;">
+        <p
+            style="display: block;font-weight: normal; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
+            Powered By
+        </p>
+        <a style="color: #F0B93A; font-family: xx-large;" href="https://tensorflow.org" target="_blank">
+            <img src="tensorflow.png" width="200px" alt="tensorflow">
+        </a>
+    </div>
+    <div style="height: 100%; width: 100%;display: flex;">
+        <div style="width: 50%; min-height: 900px;  display: flex;align-items: center;justify-content: center;">
+            <div>
+                <h1
+                    style="align-items: center; text-align: center; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">
+                    Draw Here</h1>
+                <canvas id="canvas" height="320px" width="320px"
+                    style="cursor: crosshair; width: 20rem; height: 20rem; background-color: black;"></canvas>
+                <button onclick="clearCanvas()"
+                    style="display:block; margin-left: auto; border-color: transparent;cursor: pointer;
+                    margin-right: auto; padding: 8px; border-radius: 3px; font-weight: bold; font-size: 1rem; background-color: #F0B93A;">CLEAR</button>
+            </div>
+        </div>
+        <div
+            style="min-height: 100% !important; width: 100%; display: flex; flex-direction: column; justify-content: ;">
+
+            <div id="score" style="display: flex;justify-content: space-around; width: 100%; height: 100%">
+                <div>
+                    <div style="height: 50%;">
+                        <div style="height: 85%; flex-direction: column; display: flex;justify-content: end;">
+                            <div id="score0"
+                                style="transition: all 500ms ease-out; margin-top: auto; height: 25%; background-color: #F0B93A;">
+                            </div>
+                        </div>
+                        <div>0</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="height: 50%;">
+                        <div style="height: 85%; flex-direction: column; display: flex;justify-content: end;">
+                            <div id="score1"
+                                style="transition: all 500ms ease-out; margin-top: auto; height: 25%; background-color: #F0B93A;">
+                            </div>
+                        </div>
+                        <div>1</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="height: 50%;">
+                        <div style="height: 85%; flex-direction: column; display: flex;justify-content: end;">
+                            <div id="score2"
+                                style="transition: all 500ms ease-out; margin-top: auto; height: 25%; background-color: #F0B93A;">
+                            </div>
+                        </div>
+                        <div>2</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="height: 50%;">
+                        <div style="height: 85%; flex-direction: column; display: flex;justify-content: end;">
+                            <div id="score3"
+                                style="transition: all 500ms ease-out; margin-top: auto; height: 25%; background-color: #F0B93A;">
+                            </div>
+                        </div>
+                        <div>3</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="height: 50%;">
+                        <div style="height: 85%; flex-direction: column; display: flex;justify-content: end;">
+                            <div id="score4"
+                                style="transition: all 500ms ease-out; margin-top: auto; height: 25%; background-color: #F0B93A;">
+                            </div>
+                        </div>
+                        <div>4</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="height: 50%;">
+                        <div style="height: 85%; flex-direction: column; display: flex;justify-content: end;">
+                            <div id="score5"
+                                style="transition: all 500ms ease-out; margin-top: auto; height: 25%; background-color: #F0B93A;">
+                            </div>
+                        </div>
+                        <div>5</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="height: 50%;">
+                        <div style="height: 85%; flex-direction: column; display: flex;justify-content: end;">
+                            <div id="score6"
+                                style="transition: all 500ms ease-out; margin-top: auto; height: 25%; background-color: #F0B93A;">
+                            </div>
+                        </div>
+                        <div>6</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="height: 50%;">
+                        <div style="height: 85%; flex-direction: column; display: flex;justify-content: end;">
+                            <div id="score7"
+                                style="transition: all 500ms ease-out; margin-top: auto; height: 25%; background-color: #F0B93A;">
+                            </div>
+                        </div>
+                        <div>7</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="height: 50%;">
+                        <div style="height: 85%; flex-direction: column; display: flex;justify-content: end;">
+                            <div id="score8"
+                                style="transition: all 500ms ease-out; margin-top: auto; height: 25%; background-color: #F0B93A;">
+                            </div>
+                        </div>
+                        <div>8</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="height: 50%;">
+                        <div style="height: 85%; flex-direction: column; display: flex;justify-content: end;">
+                            <div id="score9"
+                                style="transition: all 500ms ease-out; margin-top: auto; height: 25%; background-color: #F0B93A;">
+                            </div>
+                        </div>
+                        <div>9</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+
+        const dummyCvs = document.createElement("canvas");
+        dummyCvs.style.height = "100px";
+        dummyCvs.style.width = "100px";
+        dummyCvs.style.backgroundColor = "black";
+        // document.body.append(dummyCvs)
+        const dummy_ctx = dummyCvs.getContext('2d')
+        dummyCvs.width = INPUT_SHAPE.x; // as input model dimension
+        dummyCvs.height = INPUT_SHAPE.y; // as input model dimension
+
+
+        const canvasDOM = document.querySelector('#canvas');
+        const ctx = canvasDOM.getContext('2d');
+        var bounding_box = {
+            top: canvasDOM.height,
+            left: canvasDOM.width,
+            right: 0,
+            bottom: 0
+        }
+        // resetBoundingBox()
+        ctx.lineWidth = BRUSH_WIDTH;
+        ctx.strokeStyle = 'white';
+        ctx.lineCap = "round"
+        ctx.lineJoin = "round"
+        var mouseLeftDown = false;
+        var timeoutHandler = null;
+        const onStopDrawing = () => {
+            if (timeoutHandler != null) {
+                clearTimeout(timeoutHandler)
+                console.log("clearing timeout..")
+            }
+
+            timeoutHandler = setTimeout(() => {
+                predict()
+            }, TIMEOUT_DRAW);
+        }
+        canvasDOM.onmousedown = (e) => {
+            if (timeoutHandler != null) {
+                clearTimeout(timeoutHandler)
+                console.log("clearing timeout..")
+            }
+
+            mouseLeftDown = true;
+            ctx.beginPath();
+            const { x, y } = getCanvasCoord(e.clientX, e.clientY)
+            ctx.moveTo(x, y)
+        }
+
+        window.onmouseup = (e) => {
+            mouseLeftDown = false;
+            ctx.closePath();
+            onStopDrawing()
+        }
+        window.onblur = (e) => {
+            mouseLeftDown = false;
+            ctx.closePath();
+        }
+        // canvasDOM.onmouseleave = (e) => {
+        //     mouseLeftDown = false;
+        //     ctx.closePath();
+        // }
+        canvasDOM.onmousemove = (e) => {
+            const { x, y } = getCanvasCoord(e.clientX, e.clientY)
+            if (mouseLeftDown) {
+                ctx.lineTo(x, y)
+                ctx.stroke();
+                if (bounding_box.left > x) {
+                    bounding_box.left = x;
+                }
+
+                if (bounding_box.right < x) {
+                    bounding_box.right = x;
+                }
+
+                if (bounding_box.top > y) {
+                    bounding_box.top = y;
+                }
+                if (bounding_box.bottom < y) {
+                    bounding_box.bottom = y;
+                }
+            }
+        }
+        function resetBoundingBox() {
+            bounding_box.left = canvasDOM.width;
+            bounding_box.right = 0;
+            bounding_box.top = canvasDOM.height;
+            bounding_box.bottom = 0;
+        }
+        function getCanvasCoord(clientX, clientY) {
+            var rect = canvasDOM.getBoundingClientRect();
+            var x = clientX - rect.left;
+            var y = clientY - rect.top;
+            return { x, y }
+        }
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.7.0/dist/tf.min.js"></script>
+    <script>
+        var model;
+
+        async function init() {
+            try {
+                // alert(`http://${window.location.origin}/model.json`)
+                model = await tf.loadLayersModel(`${window.location.origin}/model.json`);
+                model.summary()
+
+            }
+            catch (ex) {
+            }
+            // console.log({ model })
+            // model.load("model.h5")
+        }
+        init()
+        async function predict() {
+            dummy_ctx.clearRect(0, 0, 28, 28)
+            const offset = OFFSET_BOUNDINGBOX;
+            dummy_ctx.drawImage(canvasDOM, bounding_box.left - offset, bounding_box.top - offset, bounding_box.right - bounding_box.left + offset * 2, bounding_box.bottom - bounding_box.top + offset * 2,
+                0, 0, 28, 28);
+            const img_arr = dummy_ctx.getImageData(0, 0, 28, 28);
+            const pixel = [];
+            var index = 0;
+            toRGB(img_arr.data).forEach((rgba, index) => {
+                var a = rgba[3];
+                const value = a / 255;
+                pixel[index] = value;
+            })
+
+            var input = tf.tensor(pixel)
+            input = input.reshape([-1, 28, 28, 1])
+            var result = await model.predict(input)
+            const resultNumber = getResult((await result.array())[0]);
+            showResult(resultNumber)
+            resetBoundingBox()
+        }
+        function toRGB(array) {
+            var i, j, temporary = [], chunk = 4;
+            for (i = 0, j = array.length; i < j; i += chunk) {
+                temporary.push(array.slice(i, i + chunk))
+                // do whatever
+            }
+            return temporary;
+        }
+
+        function getResult(array) {
+            var max_val = -1;
+            var max_ind = -1;
+            array.forEach((arr, index) => {
+                if (max_val < arr) {
+                    max_val = arr;
+                    max_ind = index;
+                }
+            })
+            return max_ind;
+        }
+        function clearCanvas() {
+            if (timeoutHandler) {
+                clearTimeout(timeoutHandler)
+                resetBoundingBox()
+                showResult(-1)
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+        }
+        function showResult(result) {
+            const scoreDOM = []
+            for (let i = 0; i < 10; i++) {
+                scoreDOM[i] = document.querySelector(`#score${i}`);
+                if (result != i)
+                    scoreDOM[i].style.height = "0px";
+                else
+                    scoreDOM[i].style.height = "100%";
+            }
+
+        }
+        showResult();
+    </script>
+</body>
+
+</html>

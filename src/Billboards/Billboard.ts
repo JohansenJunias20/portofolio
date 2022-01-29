@@ -85,7 +85,6 @@ export default class Billboard {
                 })
                 object.scale.set(10 * ref.asset.scale.x, 10 * ref.asset.scale.y, 10 * ref.asset.scale.z)
 
-                console.log("OBJECT DONE")
                 res(object)
             });
         });
@@ -114,7 +113,6 @@ export default class Billboard {
         plane.rotateY(degToRad(10));
         this.scene.add(plane);
         new THREE.Box3().setFromObject(object).getSize(size);
-        console.log({ size })
         this.body = new CANNON.Body({
             shape: new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 6)), // znya ternyata lebih besar
             mass: 0,

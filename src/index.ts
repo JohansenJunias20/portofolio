@@ -20,17 +20,8 @@ const renderer = new THREE.WebGLRenderer({
     antialias: true
 
 })
-console.log("hello")
+console.log("%c This website inspired by Bruno Simon Web https://bruno-simon.com", 'background: #222; color: #bada55; font-size:20px; font-weight:bold;')
 declare var production: boolean; // from webpack config file.
-console.log({
-    production,
-    TURN_DOMAIN,
-    TURN_PORT,
-    TURN_USERNAME,
-    TURN_PASSWORD,
-    WS_DOMAIN,
-    
-})
 
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -542,6 +533,3 @@ connection.onnewplayer = async (id: string) => {
     otherPlayers[id].body.mass = 0;//not affected to gravity
 }
 
-const buttonBC: HTMLButtonElement = document.querySelector("#broadcast");
-var counter = 0;
-buttonBC.onclick = () => { connection.send(`test ${counter += 1}`) };
