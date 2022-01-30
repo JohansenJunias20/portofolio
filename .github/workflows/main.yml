@@ -21,6 +21,8 @@ jobs:
         continue-on-error: true
       - name: Go to outside dir
         run: cd ../
+      - name: Check directory
+        run: ls;
       - name: Clone JohansenJunias20 Repository (deploy directory)
         run: git clone https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git
       - name: Copy build files to deploy directory
