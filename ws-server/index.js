@@ -18,6 +18,7 @@ const io = require("socket.io")(httpServer, {
     }
 });
 
+
 const IDs = [];
 io.on("connection", (socket) => {
     socket.on("offer", (e) => {
@@ -63,5 +64,10 @@ io.on("connection", (socket) => {
     console.log({ IDs })
     console.log(`someone made connection ${socket.id}`)
 });
-console.log("test")
-io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT);
+// io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
+//     console.log("test")
+// });
+httpServer.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT,()=>{
+    console.log("test")
+
+})

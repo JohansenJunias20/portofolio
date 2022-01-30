@@ -9,10 +9,7 @@ const ENABLE_SHADOW = true;
 const canvas: HTMLCanvasElement = document.querySelector("#bg");
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
-declare var hideModal: () => void;
-// hideModal();
-declare var showModal: () => void;
-showModal();
+
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
@@ -198,11 +195,11 @@ frameworks.init()
 const softwares = new Softwares(world, scene)
 softwares.init()
 
-const billboards = new Billboards(world, scene)
+const billboards = new Billboards(world, scene, camera)
 billboards.init()
 
-const popups = new PopUps(world, scene)
-popups.init()
+const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Vector3(0, 0.2, 0))
+digitRegocnition.init()
 //#endregion
 
 document.onkeydown = (e) => {
@@ -246,7 +243,6 @@ document.onkeyup = (e) => {
     }
     character.isPress[e.key] = false;
 }
-
 
 
 canvas.onclick = (e) => {
@@ -303,6 +299,7 @@ import PopUps from './PopUps/PopUps';
 import Plane from './PlaneGround/Plane';
 import isintersect from './utility/isIntersect';
 import Connection from './Connection/Connection';
+import DigitRecognition from './Playgrounds/DigitRegocnition';
 
 // const bokehPass = new BokehPass(scene, camera, {
 //     focus: 60,
@@ -333,11 +330,18 @@ interface IHash<T> {
 }
 const otherPlayers: IHash<Character> = {};
 
+
 function animate() {
     deltatime = clock.getDelta()
     // if (deltatime < 0.2)
     world.step(1 / 30);
     // else return
+
+    raycast.setFromCamera(mouse, camera);
+    // checking intersect mouse with objects
+    const intersects = raycast.intersectObjects(scene.children);
+    document.body.style.cursor = "default";
+
     //#region update mesh & body
     if (trees.initialized) {
         trees.update(deltatime)
@@ -381,11 +385,11 @@ function animate() {
     }
 
     if (billboards.initialized) {
-        billboards.update(deltatime)
+        billboards.update(deltatime, character.body, intersects) // give intersects because contain popup mesh
     }
 
-    if (popups.initialized) {
-        popups.update(deltatime)
+    if (digitRegocnition.initialized) {
+        digitRegocnition.update(deltatime, character.body, intersects) // give intersects because contain popup mesh
     }
 
     for (var key in otherPlayers) {
@@ -455,38 +459,8 @@ function animate() {
         alpha = 0.0;
 
     }
-    if (billboards.initialized)
 
-        raycast.setFromCamera(mouse, camera);
-    // checking intersect mouse with objects
-    const intersects = raycast.intersectObjects(scene.children);
-    document.body.style.cursor = "default";
-    if (billboards.initialized)
-        for (let j = 0; j < billboards.keys.length; j++) {
-            var hovered = false;
 
-            if (isintersect(character.body, billboards.keys[j].PopUpObject.borderFloor.body, world)) {
-                document.body.style.cursor = "pointer";
-                billboards.keys[j].onPopUpMouseHover(); // start animating fence to go up
-                hovered = true;
-                continue;
-            }
-            else {
-            }
-
-            for (let i = 0; i < intersects.length; i++) {
-                if (billboards.keys[j].PopUpObject.borderFloor.mesh.uuid == intersects[i].object.uuid) {
-                    billboards.keys[j].onPopUpMouseHover(); // start animating fence to go up
-                    document.body.style.cursor = "pointer";
-
-                    hovered = true;
-                    console.log("hovering")
-                    break;
-                }
-            }
-            if (!hovered)
-                billboards.keys[j].onPopUpMouseNotHover(); // start animating fence to go up
-        }
 
     if (connection && character.body && connection.id)
         connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
@@ -494,7 +468,6 @@ function animate() {
     plane.setDepthTexture(SUN.shadow.map.texture);
     plane.setWorldMatrix(SUN.matrixWorld);
     requestAnimationFrame(animate);
-    // composer2.render(deltatime)
 
 }
 var alphaOffsetCamera_knowledge = 0;
@@ -514,12 +487,8 @@ connection.onrecieve = (e) => {
     const message = JSON.parse(e.data);
     switch (message.channel) {
         case "transform":
-            // console.log({ otherPlayers });
             message.id = message.id.toString();
-            // console.log({ id: message.id });
-            // console.log({ x: message.quaternion.x });
             for (var key in otherPlayers) {
-                // console.log({ key })
             }
             otherPlayers[message.id].body.position.copy(message.position);
             otherPlayers[message.id].body.quaternion.copy(message.quaternion);

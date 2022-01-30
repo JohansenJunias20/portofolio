@@ -2,17 +2,12 @@
 
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
-import { Color, Group, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+import { Color, Group, PositionalAudio, Raycaster, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { clamp, degToRad } from 'three/src/math/MathUtils';
-import PhysicsObject3d from '../PhysicsObject';
 import PopUp from '../PopUps/PopUp';
 
-interface AnimationCharacter {
-    walk: THREE.AnimationAction;
-}
 export default class Billboard {
     private asset: {
         url: string;
@@ -30,19 +25,22 @@ export default class Billboard {
     // public body: CANNON.Body;
     private shape: CANNON.Shape | null;
     public readonly mass: number;
+    public floorText: "download" | "open";
     public Yrotation: number;
     private lightIntensity: number;
     text: string;
     urlRef: Array<string>;
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "miles madness" | "tokopedia integration" = "miles madness",
-        scale: THREE.Vector3 = new THREE.Vector3(1, 1, 1), rotation: number = 100, urlRef: Array<string> = [], lightIntensity: number = 1) {
+    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, position: Vector3, text: "miles madness" | "tokopedia integration" = "miles madness",
+        scale: THREE.Vector3 = new THREE.Vector3(1, 1, 1), rotation: number = 100, urlRef: Array<string> = [],
+        lightIntensity: number = 1, floorText: "download" | "open" = "download") {
         this.lightIntensity = lightIntensity;
+        this.camera = camera;
         this.urlRef = urlRef;
         this.text = text;
-        // this.asset.url = `/assets/environment/portofolio/billboard_${text}.fbx`;   this.PhysicsWorld = world;
         this.scene = scene;
         this.initialized = false;
         this.position = position;
+        this.floorText = floorText;
 
         this.mass = 0;
         this.PhysicsWorld = world;
@@ -54,17 +52,16 @@ export default class Billboard {
             castShadow: true,
             scale: scale
         }
+
+
     }
     public async init() {
         await this.loadAsset();
     }
-    public update(deltatime: number) {
-        this.PopUpObject.update(deltatime);
-
-        // this.mesh.position.copy(this.position);
-
-        // this.updatePhysics(deltatime);
+    public update(deltatime: number, characterBody: CANNON.Body, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
+        this.PopUpObject.update(deltatime, characterBody, intersects);
     }
+    camera: THREE.PerspectiveCamera;
     private async loadAsset() {
         var size = new THREE.Vector3();
 
@@ -76,7 +73,7 @@ export default class Billboard {
             var objLoader = new OBJLoader();
             objLoader.setMaterials(mtl);
             objLoader.load(ref.asset.url, function (object) {
-                object.traverse(c => {
+                object.traverse((c: THREE.Mesh) => {
                     if (c.isMesh) {
                         c.castShadow = ref.asset.castShadow;
                         // c.receiveShadow = ref.asset.recieveShadow;
@@ -118,8 +115,8 @@ export default class Billboard {
             mass: 0,
             material: { friction: 1, restitution: 0.3, id: 1, name: "test" }
         })
-        this.body.position.copy(object.position);
-        this.body.quaternion.copy(object.quaternion)
+        this.body.position.copy(object.position as any);
+        this.body.quaternion.copy(object.quaternion as any);
         this.PhysicsWorld.addBody(this.body)
 
 
@@ -149,9 +146,9 @@ export default class Billboard {
 
         //#region links
 
-        this.PopUpObject = new PopUp(this.PhysicsWorld, this.scene, new Vector3(this.position.x + 3, 0.25, planeDescText.position.z + sizePlaneDescText.y / 2), {
+        this.PopUpObject = new PopUp(this.PhysicsWorld, this.scene, this.camera, new Vector3(this.position.x + 3, 0.25, planeDescText.position.z + sizePlaneDescText.y / 2), {
             x: 12, y: 2, z: 6
-        }, 0.3, `/assets/environment/portofolio/${this.text}/floor.png`);
+        }, 0.3, `${this.floorText}`, this.urlRef);
         await this.PopUpObject.init();
         this.initialized = true;
         //#endregion

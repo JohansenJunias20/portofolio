@@ -8,6 +8,7 @@ Build Only
 <hr>
 Run Coturn Server & websocker server with forever
 ```sh
-    bash .prod.sh
+    bash ./prod.sh
 ```
 Please make sure docker installed.
+https://johansenjunias20.github.io

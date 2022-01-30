@@ -1,7 +1,9 @@
 import * as THREE from "three";
-import { ShaderMaterial, Vector2, Vector3 } from "three";
+import { Raycaster, ShaderMaterial, Vector2, Vector3 } from "three";
 import { clamp, degToRad } from "three/src/math/MathUtils";
 import * as CANNON from "cannon";
+import isintersect from "../utility/isIntersect";
+import Modal from "../Modal";
 
 
 export default class PopUp {
@@ -16,8 +18,19 @@ export default class PopUp {
         z: number
     }
     geometry: THREE.BufferGeometry
-    constructor(world: CANNON.World, scene: THREE.Scene, position: THREE.Vector3, size: { x: number, y: number, z: number }, borderWidth: number = 0.1, urlTextureFloor: string) {
+    urlRef: string[];
+    modal: Modal | undefined;
+    private floorText: "download" | "open"
+    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera,
+        position: THREE.Vector3, size: { x: number, y: number, z: number },
+        borderWidth: number = 0.1, floorText: "download" | "open" = "download", urlRef: string[] | Modal = ["#"]) {
         this.world = world;
+        this.floorText = floorText;
+        if (typeof urlRef == "string")
+            this.urlRef = urlRef;
+        else
+            this.modal = urlRef as Modal;
+
         //#region shader language for fence
         this.vert =
             ` 
@@ -54,6 +67,7 @@ export default class PopUp {
 
         }
         `
+
         //#endregion
         this.scene = scene;
         this.position = position;
@@ -69,8 +83,7 @@ export default class PopUp {
         this.floor = {
             size: new Vector2(size.x, size.z),
             mesh: new THREE.Mesh(),
-            position: position,
-            urlTexture: urlTextureFloor
+            position: position
         }
         this.borderFloor = {
             size: new Vector2(size.x, size.z),
@@ -79,7 +92,32 @@ export default class PopUp {
             urlTexture: `/assets/environment/portofolio/border floor.png`,
             body: new CANNON.Body()
         }
+        const canvas = document.querySelector("#bg");
+        const raycast = new Raycaster();
+        const mouse = new THREE.Vector2();
+        const ref = this;
+        canvas.addEventListener('click', (e: PointerEvent) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+            raycast.setFromCamera(mouse, camera);
+            const intersects = raycast.intersectObjects(scene.children);
+            for (let i = 0; i < intersects.length; i++) {
+                const intersect = intersects[i];
+                if (intersect.object.uuid == this.borderFloor.mesh.uuid) {
+                    if(this.modal){
+                        document.body.style.cursor = "default";
+                        this.modal.open();
+                        return;
+                    }
 
+                    for (let i = 0; i < ref.urlRef.length; i++) {
+                        const url = ref.urlRef[i];
+                        window.open(url, "_blank")
+                    }
+
+                }
+            }
+        }, false) // false to make it assignable another event from other class
 
     }
     initialized: boolean;
@@ -214,7 +252,6 @@ export default class PopUp {
         mesh: THREE.Mesh;
         size: THREE.Vector2;
         position: THREE.Vector3;
-        urlTexture: string;
     }
     borderFloor: {
         mesh: THREE.Mesh;
@@ -242,16 +279,34 @@ export default class PopUp {
         this.alphaAnimationUp = 0;
 
     }
-    update(deltatime: number) {
+    update(deltatime: number, characterBody: CANNON.Body, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
+
         this.fence.material.uniforms.move.value += 1 * deltatime;
         this.fence.material.needsUpdate = true;
+        if (this.initialized) {
+            for (let i = 0; i < intersects.length; i++) {
+                const intersect = intersects[i];
+                if (this.borderFloor.mesh.uuid == intersect.object.uuid) {
+                    this.onMouseHover(); // start animating fence to go up
+                    document.body.style.cursor = "pointer";
+                    return;
+                }
 
+            }
+
+            if (isintersect(characterBody, this.borderFloor.body, this.world)) {
+                this.onMouseHover();
+                return
+            }
+        }
+
+        this.onMouseNotHover();
     }
 
     async initFloor() {
         const planeFloorGeom = new THREE.PlaneGeometry(this.floor.size.x, this.floor.size.y);
 
-        const textureFloor = await new THREE.TextureLoader().loadAsync(this.floor.urlTexture);
+        const textureFloor = await new THREE.TextureLoader().loadAsync(`/assets/environment/PopUp Floor/${this.floorText}.png`);
         const planeFloorMaterial = new THREE.MeshLambertMaterial({
             lightMap: textureFloor,
             map: textureFloor,
@@ -282,7 +337,7 @@ export default class PopUp {
             shape: new CANNON.Box(new CANNON.Vec3(this.borderFloor.size.x / 2, 0.005, this.borderFloor.size.y / 2)),
             mass: 0
         })
-        body.position.copy(this.borderFloor.position);
+        body.position.copy(this.borderFloor.position as any);
         this.borderFloor.body = body;
         this.world.addBody(body);
     }
