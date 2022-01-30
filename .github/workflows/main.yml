@@ -24,7 +24,7 @@ jobs:
       - name: Clone JohansenJunias20 Repository (deploy directory)
         run: git clone https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git
       - name: Copy build files to deploy directory
-        run: cp -r portofolio/public/* ./JohansenJunias20.github.io/
+        run: ls; cp -r portofolio/public/* ./JohansenJunias20.github.io/
       - name: Change Directory to deploy directory
         run: cd ./JohansenJunias20.github.io
       - name: Push to Deploy Repository
