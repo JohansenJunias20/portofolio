@@ -17,7 +17,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build Files
-        run: bash ./build.sh -m PROD
+        run: bash ./build.sh -m PROD --use-docker
+        continue-on-error: true
       - name: Clone JohansenJunias20 Repository (deploy directory)
         run: git clone https://JohansenJunias20:${{ secrets.PASSOWRD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git
       - name: Copy build files to deploy directory

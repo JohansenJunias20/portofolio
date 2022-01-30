@@ -31,6 +31,6 @@ module.exports = (env) => {
       filename: 'bundle.js',
       path: path.resolve(__dirname, 'public/dist'),
     },
-    mode: "development"
+    mode: "production"
   }
 }
