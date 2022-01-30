@@ -19,13 +19,9 @@ jobs:
       - name: Build Files
         run: bash ./build.sh -m PROD --use-docker
         continue-on-error: true
-      - name: Go to outside dir
+      - name: Clone deploy repo (johansenjunias20.github.io)
         run: cd ../;git clone https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git
-      - name: Check directory
-        run: cd ../;ls;
       - name: Copy build files to deploy directory
-        run: ls; cp -r portofolio/public/* ./JohansenJunias20.github.io/
-      - name: Change Directory to deploy directory
-        run: cd ./JohansenJunias20.github.io
+        run: ls; cp -r -f public/* ../JohansenJunias20.github.io/
       - name: Push to Deploy Repository
-        run: git add .; git commit -m "new changes";git push https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git;
+        run: cd ../JohansenJunias20.github.io/; git add .; git commit -m "new changes";git push https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git;
