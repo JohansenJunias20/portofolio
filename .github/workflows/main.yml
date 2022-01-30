@@ -23,5 +23,7 @@ jobs:
         run: cd ../;git clone https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git
       - name: Copy build files to deploy directory
         run: ls; cp -r -f public/* ../JohansenJunias20.github.io/
+      - name: Set up identity before push to deploy server
+        run: git config --global user.email "johansen.gumbal@gmail.com" user.name "JohansenJunias20"
       - name: Push to Deploy Repository
         run: cd ../JohansenJunias20.github.io/; git add .; git commit -m "new changes";git push https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git;
