@@ -35,6 +35,8 @@ export default class Connection {
                 { urls: "stun:stun.budgetphone.nl:3478" },
                 { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https" ? TURN_PORT_TLS : TURN_PORT}`, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
         }
+        console.log("url ws:")
+        console.log(`${location.protocol == "https" ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`)
         const signalling = io(`${location.protocol == "https" ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: location.protocol == "https" });
         this.signalling = signalling;
 
