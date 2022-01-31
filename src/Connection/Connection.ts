@@ -36,8 +36,8 @@ export default class Connection {
                 { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https" ? TURN_PORT_TLS : TURN_PORT}`, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
         }
         console.log("url ws:")
-        console.log(`${location.protocol == "https" ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`)
-        const signalling = io(`${location.protocol == "https" ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: location.protocol == "https" });
+        console.log(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`) // belum di commit
+        const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
         this.signalling = signalling;
 
 

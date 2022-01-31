@@ -36,6 +36,7 @@ export default class DigitRecognition {
     public initialized: boolean;
     public async init(): Promise<void> {
         await this.PopUp.init()
+        // this.PopUp.rotation(0, 0, 0);
         // await super.inist()
         this.initialized = true;
     }

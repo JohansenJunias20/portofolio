@@ -10,7 +10,7 @@ export default class Billboards {
     constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera) {
         this.keys = [
             new Billboard(world, scene, camera, new Vector3(50, 0, 40), "miles madness", new Vector3(0.5, 0.5, 0.5), 100, [`/app/Miles Madness.rar`], 0.15, "download"),
-            new Billboard(world, scene, camera, new Vector3(90, 0, 40), "tokopedia integration", new Vector3(0.5, 0.5, 0.5), 100, [`https://www.tokopedia.com/hartono-m`, `https://www.tokopedia.com/kasri-motor`], 0.15, "open"),
+            new Billboard(world, scene, camera, new Vector3(100, 0, 40), "tokopedia integration", new Vector3(0.5, 0.5, 0.5), 100, [`https://www.tokopedia.com/hartono-m`, `https://www.tokopedia.com/kasri-motor`, `https://shopee.co.id/shop/151664583/`], 0.15, "open"),
         ];
 
     }

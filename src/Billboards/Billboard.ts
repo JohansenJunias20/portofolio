@@ -41,7 +41,7 @@ export default class Billboard {
         this.initialized = false;
         this.position = position;
         this.floorText = floorText;
-
+        this.PopUpObjects = [];
         this.mass = 0;
         this.PhysicsWorld = world;
 
@@ -59,7 +59,7 @@ export default class Billboard {
         await this.loadAsset();
     }
     public update(deltatime: number, characterBody: CANNON.Body, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
-        this.PopUpObject.update(deltatime, characterBody, intersects);
+        this.PopUpObjects.forEach(popup => popup.update(deltatime, characterBody, intersects))
     }
     camera: THREE.PerspectiveCamera;
     private async loadAsset() {
@@ -121,46 +121,47 @@ export default class Billboard {
 
 
         //description
+
+        const desc_text_texture = await new THREE.TextureLoader().loadAsync(`/assets/environment/portofolio/${this.text}/desc_text.png`);
         const sizePlaneDescText = {
-            x: 70 * this.asset.scale.x,
-            y: 40 * this.asset.scale.y
+            x: desc_text_texture.image.width as number / 25,
+            y: desc_text_texture.image.height as number / 25
         }
         const descGeometry = new THREE.PlaneGeometry(sizePlaneDescText.x, sizePlaneDescText.y);
-        const desc_text_texture = await new THREE.TextureLoader().loadAsync(`/assets/environment/portofolio/${this.text}/desc_text.png`);
-        const desc_text_material = new THREE.MeshLambertMaterial({
-            map: desc_text_texture,
-            lightMap: desc_text_texture,
-            lightMapIntensity: 0.2,
-            side: THREE.FrontSide,
+
+        const desc_text_material = new THREE.MeshBasicMaterial({
+            // map: desc_text_texture,
+            alphaMap: desc_text_texture,
+            // lightMapIntensity: 0.2,
+            // side: THREE.FrontSide,
             transparent: true
         })
         const planeDescText = new THREE.Mesh(descGeometry, desc_text_material);
         planeDescText.position.copy(this.position);
         planeDescText.receiveShadow = false;
         planeDescText.castShadow = false;
-        planeDescText.position.y -= 6.8;
-        planeDescText.position.z += 14;
+        planeDescText.position.y = 0.1;
+        planeDescText.position.z += sizePlaneDescText.y / 2 + 5;
         planeDescText.position.x += 12;
         planeDescText.rotateX(degToRad(-90))
         this.scene.add(planeDescText);
 
         //#region links
-
-        this.PopUpObject = new PopUp(this.PhysicsWorld, this.scene, this.camera, new Vector3(this.position.x + 3, 0.25, planeDescText.position.z + sizePlaneDescText.y / 2), {
+        const popUpSize = {
             x: 12, y: 2, z: 6
-        }, 0.3, `${this.floorText}`, this.urlRef);
-        await this.PopUpObject.init();
+        }
+        for (let i = 0; i < this.urlRef.length; i++) {
+            const url = this.urlRef[i];
+            console.log({ url })
+            const popUp = new PopUp(this.PhysicsWorld, this.scene, this.camera, new Vector3(this.position.x + (i * (popUpSize.x + 2)), 0.25, planeDescText.position.z + sizePlaneDescText.y / 2 + 5),
+                popUpSize, 0.3, `${this.floorText}`, url);
+            await popUp.init();
+            this.PopUpObjects.push(popUp);
+        }
         this.initialized = true;
         //#endregion
     }
-    onPopUpMouseHover() {
-        this.PopUpObject.onMouseHover()
-
-    }
-    onPopUpMouseNotHover() {
-        this.PopUpObject.onMouseNotHover()
-    }
-    PopUpObject: PopUp;
+    PopUpObjects: PopUp[];
     body: CANNON.Body;
 
 

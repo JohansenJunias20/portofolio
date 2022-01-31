@@ -2,3 +2,4 @@ node_modules
 dist
 public/dist
 ssl/main/live/*
+ssl/main/archive/*

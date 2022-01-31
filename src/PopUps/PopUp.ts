@@ -18,12 +18,12 @@ export default class PopUp {
         z: number
     }
     geometry: THREE.BufferGeometry
-    urlRef: string[];
+    urlRef: string;
     modal: Modal | undefined;
     private floorText: "download" | "open"
     constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera,
         position: THREE.Vector3, size: { x: number, y: number, z: number },
-        borderWidth: number = 0.1, floorText: "download" | "open" = "download", urlRef: string[] | Modal = ["#"]) {
+        borderWidth: number = 0.1, floorText: "download" | "open" = "download", urlRef: string | Modal = "#") {
         this.world = world;
         this.floorText = floorText;
         if (typeof urlRef == "string")
@@ -104,17 +104,13 @@ export default class PopUp {
             for (let i = 0; i < intersects.length; i++) {
                 const intersect = intersects[i];
                 if (intersect.object.uuid == this.borderFloor.mesh.uuid) {
-                    if(this.modal){
+                    if (this.modal) {
                         document.body.style.cursor = "default";
                         this.modal.open();
                         return;
                     }
 
-                    for (let i = 0; i < ref.urlRef.length; i++) {
-                        const url = ref.urlRef[i];
-                        window.open(url, "_blank")
-                    }
-
+                    window.open(ref.urlRef, "_blank")
                 }
             }
         }, false) // false to make it assignable another event from other class
@@ -335,11 +331,27 @@ export default class PopUp {
 
         const body = new CANNON.Body({
             shape: new CANNON.Box(new CANNON.Vec3(this.borderFloor.size.x / 2, 0.005, this.borderFloor.size.y / 2)),
+            // shape: new CANNON.Plane().wid,
             mass: 0
         })
         body.position.copy(this.borderFloor.position as any);
         this.borderFloor.body = body;
         this.world.addBody(body);
+    }
+    public rotation(x: number, y: number, z: number) {
+        this.borderFloor.mesh.rotation.y = degToRad(y)
+        this.borderFloor.mesh.rotation.x = degToRad(x - 90)
+        this.borderFloor.mesh.rotation.z = degToRad(z)
+        this.borderFloor.body.quaternion.copy(this.borderFloor.mesh.quaternion as any);
+
+        this.fence.mesh.rotation.x = degToRad(x)
+        this.fence.mesh.rotation.y = degToRad(y)
+        this.fence.mesh.rotation.z = degToRad(z)
+
+        this.floor.mesh.rotation.y = degToRad(y)
+        this.floor.mesh.rotation.x = degToRad(x - 90)
+        this.floor.mesh.rotation.z = degToRad(z)
+
     }
     async initFence() {
         this.ceilingPosition = new Vector3();

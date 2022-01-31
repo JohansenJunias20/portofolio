@@ -33,7 +33,7 @@ var temp = new THREE.Vector3();
 camera.getWorldDirection(temp)
 
 
-
+//#region SUN directional lights
 const SUN = new THREE.DirectionalLight(0xffffff, 0.5)
 camera.projectionMatrix;
 camera.modelViewMatrix;
@@ -51,6 +51,7 @@ SUN.shadow.camera.right = -sizeAreaShadow;
 SUN.shadow.mapSize.width = 700;
 SUN.shadow.mapSize.height = 700;
 scene.add(SUN)
+//#endregion
 
 const AMBIENT_LIGHT = new THREE.AmbientLight(0xffffff, 0.8);
 scene.add(AMBIENT_LIGHT)
@@ -198,7 +199,7 @@ softwares.init()
 const billboards = new Billboards(world, scene, camera)
 billboards.init()
 
-const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Vector3(0, 0.2, 0))
+const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Vector3(-50, 0.2, 50))
 digitRegocnition.init()
 //#endregion
 
@@ -210,14 +211,6 @@ document.onkeydown = (e) => {
     else if (e.key == "a") {
     }
     else if (e.key == "d") {
-    }
-    else if (e.key == "z") {
-        billboards.keys[0].onPopUpMouseHover();
-        return;
-    }
-    else if (e.key == "x") {
-        billboards.keys[0].onPopUpMouseNotHover();
-        return;
     }
     else {
         return
@@ -270,6 +263,13 @@ canvas.onclick = (e) => {
 const LOBBY_OFFSET_CAMERA = new Vector3(15, 35, 50);
 const KNOWLEDGE_OFFSET_CAMERA = new Vector3(15, 20, 35);
 const PORTOFOLIO_OFFSET_CAMERA = new Vector3(5, 40, 20);
+const PLAYGROUND_OFFSET_CAMERA = new Vector3(15, 35, 50);
+var alphaOffsetCamera_knowledge = 0;
+var alphaOffsetCamera_lobby = 0;
+var alphaOffsetCamera_portofolio = 0;
+var alphaOffsetCamera_playground = 0;
+var offsetChanged = false;
+
 var CURRENT_OFFSET_CAMERA = new Vector3().copy(LOBBY_OFFSET_CAMERA);
 camera.position.copy(character.position)
 camera.position.add(CURRENT_OFFSET_CAMERA)
@@ -401,11 +401,13 @@ function animate() {
     }
 
     //#endregion
+
+
     if (followCharacter) {
-        offsetChanged = false;
         if (character.position.z >= 100) {
             alphaOffsetCamera_portofolio = 0;
             alphaOffsetCamera_lobby = 0;
+            alphaOffsetCamera_playground = 0;
             //on knowledge position
             alphaOffsetCamera_knowledge += deltatime * 0.1;
             if (clamp(alphaOffsetCamera_knowledge, 0, 1) < 1) {
@@ -416,16 +418,29 @@ function animate() {
         else if (character.position.x >= 40) {
             alphaOffsetCamera_knowledge = 0;
             alphaOffsetCamera_lobby = 0;
-
+            alphaOffsetCamera_playground = 0;
             alphaOffsetCamera_portofolio += deltatime * 0.04;
             if (clamp(alphaOffsetCamera_portofolio, 0, 1) < 1) {
                 CURRENT_OFFSET_CAMERA = new Vector3().copy(CURRENT_OFFSET_CAMERA).lerp(PORTOFOLIO_OFFSET_CAMERA, alphaOffsetCamera_portofolio);
                 offsetChanged = true;
             }
         }
+        else if (character.position.x <= -40) {
+            //player on playground
+            alphaOffsetCamera_knowledge = 0;
+            alphaOffsetCamera_lobby = 0;
+            alphaOffsetCamera_portofolio = 0;
+
+            alphaOffsetCamera_playground += deltatime * 0.04;
+            if (clamp(alphaOffsetCamera_playground, 0, 1) < 1) {
+                CURRENT_OFFSET_CAMERA = new Vector3().copy(CURRENT_OFFSET_CAMERA).lerp(PLAYGROUND_OFFSET_CAMERA, alphaOffsetCamera_playground);
+                offsetChanged = true;
+            }
+        }
         else {
             //on knowledge lobby position
             alphaOffsetCamera_portofolio = 0;
+            alphaOffsetCamera_playground = 0;
             alphaOffsetCamera_knowledge = 0;
 
             alphaOffsetCamera_lobby += deltatime * 0.1;
@@ -470,10 +485,7 @@ function animate() {
     requestAnimationFrame(animate);
 
 }
-var alphaOffsetCamera_knowledge = 0;
-var alphaOffsetCamera_lobby = 0;
-var alphaOffsetCamera_portofolio = 0;
-var offsetChanged = false;
+
 animate();
 
 
