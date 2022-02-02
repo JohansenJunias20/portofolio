@@ -1,10 +1,18 @@
-import { Float32BufferAttribute, Group, Uint8ClampedBufferAttribute, Vector3 } from "three";
+import { Float32BufferAttribute, Group, Mesh, MeshPhongMaterial, Uint8ClampedBufferAttribute, Vector3 } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import * as CANNON from 'cannon';
 import * as THREE from "three";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import getVertices from "./utility/getVertices";
+interface IPhysicsObject3dConstructor {
+    world: CANNON.World,
+    scene: THREE.Scene,
+    position: Vector3,
+    movementSpeed?: number,
+    shapeType: "TRIMESH" | "BOX" | "SPHERE" | "CUSTOM",
+    mass: number, shape?: CANNON.Shape
+}
 export default class PhysicsObject3d {
     protected asset: {
         url: string;
@@ -20,10 +28,10 @@ export default class PhysicsObject3d {
     public scene: THREE.Scene;
     public movementSpeed: number;
     public body: CANNON.Body;
-    public shapeType: "BOX" | "SPHERE" | "CUSTOM" | "TRIMESH" ;
+    public shapeType: "BOX" | "SPHERE" | "CUSTOM" | "TRIMESH";
     private shape: CANNON.Shape | null;
     public readonly mass: number;
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 10, shapeType: "TRIMESH" | "BOX" | "SPHERE" | "CUSTOM" , mass: number, shape: null | CANNON.Shape = null) {
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 10, shapeType: "TRIMESH" | "BOX" | "SPHERE" | "CUSTOM", mass: number, shape: null | CANNON.Shape = null) {
         this.PhysicsWorld = world;
         this.scene = scene;
         this.initialized = false;
@@ -33,6 +41,7 @@ export default class PhysicsObject3d {
         this.shape = shape;
         this.mass = mass;
     }
+
     protected async init() {
         await this.loadAsset();
     }
@@ -53,19 +62,40 @@ export default class PhysicsObject3d {
             const fbx = await new Promise<THREE.Object3D>((res, rej) => {
                 const loader = new FBXLoader();
                 loader.load(this.asset.url, (f) => {
-                    f.traverse(c => {
-                        c.castShadow = this.asset.castShadow;
-                        if (this.asset.recieveShadow != undefined)
-                            c.receiveShadow = this.asset.recieveShadow;
+                    f.traverse((c: Mesh) => {
+                        if (c.isMesh) {
+
+                            c.castShadow = this.asset.castShadow;
+                            const oldMat: MeshPhongMaterial | MeshPhongMaterial[] = c.material;
+                            console
+                            if (Array.isArray(oldMat)) {
+                                oldMat.forEach((mat, index) => {
+                                    mat = new THREE.MeshLambertMaterial({
+                                        color: oldMat[index].color,
+                                        // map: oldMat.map,
+                                        //etc
+                                    });
+                                });
+                            }
+                            else
+                                c.material = new THREE.MeshLambertMaterial({
+                                    color: oldMat.color,
+                                    // map: oldMat.map,
+                                    //etc
+                                });
+                            console.log({ oldMat })
+                            if (this.asset.recieveShadow != undefined)
+                                c.receiveShadow = this.asset.recieveShadow;
+                        }
                         return c;
                     })
-
                     f.scale.x = this.asset.scale.x;
                     f.scale.y = this.asset.scale.y;
                     f.scale.z = this.asset.scale.z;
                     res(f);
                 })
             })
+            // console.log({ fbx: fbx.children.map(child => child.material) })
             this.scene.add(fbx);
             this.position.y += 5;
             this.mesh = fbx;
@@ -77,7 +107,7 @@ export default class PhysicsObject3d {
                 const indices = Object.keys(vertices).map(Number);
                 this.shape = new CANNON.Trimesh(vertices, indices);
             }
-         
+
             this.body =
                 new CANNON.Body({
                     mass: this.mass, material: { friction: 1, restitution: 0.3, id: 1, name: "test" },
@@ -98,12 +128,28 @@ export default class PhysicsObject3d {
                 var objLoader = new OBJLoader();
                 objLoader.setMaterials(mtl);
                 objLoader.load(ref.asset.url, function (object) {
-                    object.traverse(c => {
-                        if(c.isMesh){
+                    object.traverse((c: THREE.Mesh) => {
+                        if (c.isMesh) {
                             c.castShadow = ref.asset.castShadow;
+                            const oldMat: MeshPhongMaterial | MeshPhongMaterial[] = c.material;
+                            if (Array.isArray(oldMat)) {
+                                oldMat.forEach((mat, index) => {
+                                    mat = new THREE.MeshLambertMaterial({
+                                        color: oldMat[index].color,
+                                        // map: oldMat.map,
+                                        //etc
+                                    });
+                                });
+                            }
+                            else
+                                c.material = new THREE.MeshLambertMaterial({
+                                    color: oldMat.color,
+                                    // map: oldMat.map,
+                                    //etc
+                                });
                             // c.receiveShadow = ref.asset.recieveShadow;
                         }
-                        // return c;
+                        return c;
                     })
                     object.scale.copy(ref.asset.scale)
                     res(object)
@@ -120,7 +166,7 @@ export default class PhysicsObject3d {
             }
 
 
-     
+
             this.body =
                 new CANNON.Body({
                     mass: this.mass, material: { friction: 1, restitution: 1, id: 1, name: "test" },
@@ -136,7 +182,7 @@ export default class PhysicsObject3d {
     }
     private updatePhysics(deltatime: number) {
         this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
-        this.mesh.quaternion.copy(this.body.quaternion);
+        this.mesh.quaternion.copy(this.body.quaternion as any);
 
     }
 }
