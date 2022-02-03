@@ -4,3 +4,4 @@ public/dist
 private/*.go
 private/*.mod
 ws-server/visitor.json
+ssl/main/archive/*
