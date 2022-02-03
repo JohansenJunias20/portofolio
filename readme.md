@@ -1,4 +1,5 @@
 https://JohansenJunias20.github.io  
+Please install [Git Bash](https://git-scm.com/downloads)  
 ## Development
 Run webpack build watch and nodemon websocket
 ```sh
