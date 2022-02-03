@@ -5,13 +5,16 @@ const fs = require('fs');
 const production = process.env.PRODUCTION ? true : false;
 const ssl = production ? process.env.PROD_WS_SSL == "TRUE" ? true : false : process.env.DEV_WS_SSL == "TRUE" ? true : false;
 const domain = production ? process.env.PROD_WS_DOMAIN : process.env.DEV_WS_DOMAIN;
+const express = require('express');
+const app = express();
+app.use(express.json())
 const httpServer = ssl ? require("https").createServer({
     key: fs.readFileSync(`/etc/letsencrypt/archive/${domain}/privkey1.pem`),
     cert: fs.readFileSync(`/etc/letsencrypt/archive/${domain}/cert1.pem`)
-}, noteVisitor) :
-    require("http").createServer(noteVisitor)
+}, app) :
+    require("http").createServer(app)
     ;
-
+app.post('/*', noteVisitor);
 const io = require("socket.io")(httpServer, {
     cors: {
         origin: "*"
@@ -19,28 +22,15 @@ const io = require("socket.io")(httpServer, {
 });
 
 function noteVisitor(req, res) {
-    if (req.method != "POST") {
-        res.write("wrong method");
-        res.end();
-        return;
-    }
     console.log("someone made post request")
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    var body = '';
-    req.on('data', function (data) {
-        body += data
-        // console.log('Partial body: ' + body)
-    })
-    req.on('end', () => {
-        var visitor = []
-        body = JSON.parse(body);
-        if (fs.existsSync("./visitor.json"))
-            visitor = JSON.parse(fs.readFileSync('./visitor.json'))
-        visitor.push(body)
-        fs.writeFileSync('./visitor.json', visitor);
-        res.write("success");
-        res.end()
-    })
+    const body = req.body;
+    res.send({ "status": true });
+    var visitor = []
+    if (fs.existsSync("./visitors/visitor.json"))
+        visitor = JSON.parse(fs.readFileSync('./visitors/visitor.json'))
+    visitor.push(body)
+    fs.writeFileSync('./visitors/visitor.json', JSON.stringify(visitor));
+
 }
 const IDs = [];
 io.on("connection", (socket) => {
@@ -91,6 +81,6 @@ io.on("connection", (socket) => {
 //     console.log("test")
 // });
 httpServer.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
-    console.log("test")
+    console.log("test1")
 
 })
