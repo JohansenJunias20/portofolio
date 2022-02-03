@@ -30,4 +30,4 @@ jobs:
       - name: Run Server to Self Hosted Github Runner
         run: bash ./prod.sh
       - name: Wait docker
-        run: Sleep 30
+        run: sleep 30
