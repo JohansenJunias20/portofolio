@@ -16,5 +16,6 @@ echo "" >>ws-server/.env
 echo "PRODUCTION=TRUE" >>ws-server/.env
 # start socketio server
 docker-compose -f docker-compose.prod.yml up -d;
-
-# bash internal_start-turn.sh;
+bash internal_start-turn.sh;
+echo "done"
+exit 0
