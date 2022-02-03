@@ -17,7 +17,8 @@ import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
-    antialias: true
+    antialias: true,
+    alpha:true
 
 })
 console.log("%c This website inspired by Bruno Simon Web https://bruno-simon.com", 'background: #222; color: #bada55; font-size:20px; font-weight:bold;')
@@ -37,7 +38,7 @@ camera.getWorldDirection(temp)
 const SUN = new THREE.DirectionalLight(0xffffff, 0.5)
 camera.projectionMatrix;
 camera.modelViewMatrix;
-SUN.position.set(0, 200, 15)
+SUN.position.set(0, 100, 100)
 SUN.target.position.set(0, 0, 0);
 SUN.shadow.camera.visible = ENABLE_SHADOW;
 SUN.castShadow = ENABLE_SHADOW;
@@ -51,9 +52,11 @@ SUN.shadow.camera.right = -sizeAreaShadow;
 SUN.shadow.mapSize.width = 700;
 SUN.shadow.mapSize.height = 700;
 scene.add(SUN)
+const helper = new THREE.DirectionalLightHelper(SUN, 1);
+scene.add(helper);
 //#endregion
 
-const AMBIENT_LIGHT = new THREE.AmbientLight(0xffffff, 0.8);
+const AMBIENT_LIGHT = new THREE.AmbientLight(0xffffff, 0.75);
 scene.add(AMBIENT_LIGHT)
 
 
@@ -71,6 +74,7 @@ const groundBody = new CANNON.Body({ mass: 0, material: { friction: 1, restituti
 world.addBody(groundBody);
 
 const plane = new Plane(world, scene, SUN, new THREE.Vector3(0, 0, 0), sizeGround, "#c49a66", "#fffff");
+plane.init()
 // const geometry = new THREE.PlaneGeometry(sizeGround.x, sizeGround.z);
 // const material = new THREE.MeshToonMaterial({ color: "#c49a66", side: THREE.FrontSide });
 // const plane = new THREE.Mesh(geometry, material);
@@ -240,23 +244,23 @@ document.onkeyup = (e) => {
 
 canvas.onclick = (e) => {
     //
-    raycast.setFromCamera(mouse, camera);
-    const intersects = raycast.intersectObjects(scene.children);
-    for (let i = 0; i < billboards.keys.length; i++) {
-        const billboard = billboards.keys[i];
-        for (let j = 0; j < intersects.length; j++) {
-            const intersect = intersects[j];
-            if (intersect.object.uuid == billboard.PopUpObject.borderFloor.mesh.uuid) {
-                for (let k = 0; k < billboard.urlRef.length; k++) {
-                    const url = billboard.urlRef[k];
-                    window.open(url, "_blank")
+    // raycast.setFromCamera(mouse, camera);
+    // const intersects = raycast.intersectObjects(scene.children);
+    // for (let i = 0; i < billboards.keys.length; i++) {
+    //     const billboard = billboards.keys[i];
+    //     for (let j = 0; j < intersects.length; j++) {
+    //         const intersect = intersects[j];
+    //         if (intersect.object.uuid == billboard.PopUpObject.borderFloor.mesh.uuid) {
+    //             for (let k = 0; k < billboard.urlRef.length; k++) {
+    //                 const url = billboard.urlRef[k];
+    //                 window.open(url, "_blank")
 
-                }
-                return;
-            }
+    //             }
+    //             return;
+    //         }
 
-        }
-    }
+    //     }
+    // }
 
 }
 
@@ -397,9 +401,11 @@ function animate() {
         if (player.initialized) {
             player.update(deltatime);
         }
-
     }
 
+    if (plane.initialized) {
+        plane.update(deltatime);
+    }
     //#endregion
 
 
@@ -480,8 +486,8 @@ function animate() {
     if (connection && character.body && connection.id)
         connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
     renderer.render(scene, camera)
-    plane.setDepthTexture(SUN.shadow.map.texture);
-    plane.setWorldMatrix(SUN.matrixWorld);
+    // plane.setDepthTexture(SUN.shadow.map.texture);
+    // plane.setWorldMatrix(SUN.matrixWorld);
     requestAnimationFrame(animate);
 
 }

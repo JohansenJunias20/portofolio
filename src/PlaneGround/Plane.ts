@@ -16,7 +16,7 @@ export default class Plane {
     geometry: THREE.BufferGeometry
     constructor(world: CANNON.World, scene: THREE.Scene, dirLight: THREE.DirectionalLight, position: THREE.Vector3, size: { x: number, y: number, z: number }, color: string, shadowColor: string) {
         this.world = world;
-       
+
         this.scene = scene;
         this.position = position;
         this.size = size;
@@ -24,26 +24,42 @@ export default class Plane {
         const groundBody = new CANNON.Body({ mass: 0, material: { friction: 1, restitution: 0.1, id: 1, name: "test" }, shape: new CANNON.Box(new Vec3(size.x, 0.1, size.z)) });
         world.addBody(groundBody);
 
+        const screenSize = {
+            x: window.innerWidth,
+            y: window.innerHeight
+        }
+        this.initialized = false;
 
-        const geometry = new THREE.PlaneGeometry(size.x, size.z);
-        const length = 8;
-        const vertices = new Float32Array(length * 3)
-        const uvs = new Uint32Array(length * 2)
-        const indices = new Uint32Array(length * 6)
-        const { x, y, z } = size;
-        var dirLightDirection = new THREE.Vector3();
-        dirLight.getWorldDirection(dirLightDirection)
-        //#endregion
-        const material = new THREE.MeshToonMaterial({ color: "#c49a66", side: THREE.FrontSide });
-        this.material = material;
-
-        this.mesh = new THREE.Mesh(geometry, this.material);
-        this.mesh.rotation.x = (THREE.MathUtils.degToRad(-90))
-        this.mesh.receiveShadow = true;
-        scene.add(this.mesh)
     }
     material: THREE.ShaderMaterial;
     mesh: THREE.Mesh;
+    private createVertices(): Float32Array {
+        const vertices: number[] = [];
+        //left top
+        vertices[0] = -1;
+        vertices[1] = 1;
+        vertices[2] = 1;
+
+        //right top
+        vertices[3] = 1;
+        vertices[4] = 1;
+        vertices[5] = 1;
+
+        //left bottom
+        vertices[6] = -1;
+        vertices[7] = -1;
+        vertices[8] = 1;
+
+        //right bottom
+        vertices[9] = 1;
+        vertices[10] = -1;
+        vertices[11] = 1;
+
+        return new Float32Array(vertices);
+    }
+    private createIndices() {
+        return new Uint16Array([2, 3, 1, 2, 1, 0])
+    }
     setDepthTexture(textureDepth: THREE.Texture) {
         // this.material.uniforms.shadowMap.value = textureDepth;
         // this.material.needsUpdate = true;
@@ -52,8 +68,32 @@ export default class Plane {
         // this.material.uniforms.worldMatrix.value = worldMatrix;
         // this.material.needsUpdate = true;
     }
+    public async init() {
+        var geometry = new THREE.BufferGeometry();
+        const vertices = this.createVertices();
+        const indices = this.createIndices();
+        geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+        geometry.setIndex(new THREE.BufferAttribute(indices, 1, false));
+        //#endregion
+        const material = new THREE.ShaderMaterial({
+            vertexShader: await (await fetch("/assets/shaders/background.vert")).text(),
+            fragmentShader: await (await fetch("/assets/shaders/background.frag")).text(),
+            // side: THREE.FrontSide
+        });
+        this.material = material;
+        this.mesh = new THREE.Mesh(geometry, this.material);
+        this.mesh.frustumCulled = false;
+        // this.material.depthTest = false;
+        // this.mesh.rotation.x = (THREE.MathUtils.degToRad(-90))
+        // this.mesh.receiveShadow = true;
+        this.material.needsUpdate = true;
+        this.scene.add(this.mesh)
+        this.initialized = true;
+    }
+    initialized: boolean;
     update(deltatime: number) {
         //nothing to update
+        this.material.needsUpdate = true;
     }
 
 
