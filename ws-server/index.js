@@ -24,7 +24,7 @@ function noteVisitor(req, res) {
         res.end();
         return;
     }
-
+    console.log("someone made post request")
     res.writeHead(200, { 'Content-Type': 'application/json' });
     var body = '';
     req.on('data', function (data) {
