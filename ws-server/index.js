@@ -8,8 +8,8 @@ const domain = production ? process.env.PROD_WS_DOMAIN : process.env.DEV_WS_DOMA
 const httpServer = ssl ? require("https").createServer({
     key: fs.readFileSync(`/etc/letsencrypt/archive/${domain}/privkey1.pem`),
     cert: fs.readFileSync(`/etc/letsencrypt/archive/${domain}/cert1.pem`)
-}) :
-    require("http").createServer()
+}, noteVisitor) :
+    require("http").createServer(noteVisitor)
     ;
 
 const io = require("socket.io")(httpServer, {
@@ -18,7 +18,30 @@ const io = require("socket.io")(httpServer, {
     }
 });
 
+function noteVisitor(req, res) {
+    if (req.method != "POST") {
+        res.write("wrong method");
+        res.end();
+        return;
+    }
 
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    var body = '';
+    req.on('data', function (data) {
+        body += data
+        // console.log('Partial body: ' + body)
+    })
+    req.on('end', () => {
+        var visitor = []
+        body = JSON.parse(body);
+        if (fs.existsSync("./visitor.json"))
+            visitor = JSON.parse(fs.readFileSync('./visitor.json'))
+        visitor.push(body)
+        fs.writeFileSync('./visitor.json', visitor);
+        res.write("success");
+        res.end()
+    })
+}
 const IDs = [];
 io.on("connection", (socket) => {
     socket.on("offer", (e) => {
@@ -67,7 +90,7 @@ io.on("connection", (socket) => {
 // io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
 //     console.log("test")
 // });
-httpServer.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT,()=>{
+httpServer.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
     console.log("test")
 
 })
