@@ -18,7 +18,7 @@ jobs:
         run: bash ./build.sh -m PROD --use-docker
         continue-on-error: true
       - name: Clone deploy repo (johansenjunias20.github.io)
-        run: cd ../;ls;rm -r -f ./JohansenJunias.github.io;git clone https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git
+        run: cd ../;rm -r -f ./JohansenJunias.github.io/;ls;git clone https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git
       - name: Copy build files to deploy directory
         run: ls; cp -r -f public/* ../JohansenJunias20.github.io/
       - name: Set up identity before push to deploy server
