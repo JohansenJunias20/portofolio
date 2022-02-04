@@ -110,6 +110,6 @@ io.on("connection", (socket) => {
 //     console.log("test")
 // });
 httpServer.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
-    console.log("test1")
+    console.log("done, please use live server VSCode extension to serve public/index.html files");
 
 })
