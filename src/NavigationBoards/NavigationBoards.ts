@@ -33,7 +33,7 @@ export default class NavigationBoards {
                 default:
                     break;
             }
-            key.body.quaternion.copy(key.mesh.quaternion)
+            key.body.quaternion.copy(key.mesh.quaternion as any)
             key.mesh.receiveShadow = false
 
         }

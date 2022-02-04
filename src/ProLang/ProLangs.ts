@@ -25,7 +25,7 @@ export default class ProLangs {
             const key = this.keys[i];
             await key.init();
             key.mesh.rotateY(degToRad(-45));
-            key.body.quaternion.copy(key.mesh.quaternion)
+            key.body.quaternion.copy(key.mesh.quaternion as any)
             key.mesh.receiveShadow = false
         }
         this.initialized = true;

@@ -24,7 +24,7 @@ export default class Johansen {
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             await key.init();
-            key.body.quaternion.copy(key.mesh.quaternion)
+            key.body.quaternion.copy(key.mesh.quaternion as any)
             key.mesh.receiveShadow = false
             key.mesh.castShadow = true
         }

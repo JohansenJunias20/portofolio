@@ -25,7 +25,6 @@ export default class Character extends PhysicsObject3d {
     }
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 20) {
         super(world, scene, position, movementSpeed, "SPHERE", 2);
-        this.invertKey = false;
         this.isPress = {
             w: false,
             a: false,
@@ -78,16 +77,10 @@ export default class Character extends PhysicsObject3d {
     private isWalking: boolean;
     addResistance() {
         if (this.isPress.a == this.isPress.d) {
-            if (!this.invertKey)
-                this.body.velocity.x = 0;
-            else
-                this.body.velocity.z = 0;
+            this.body.velocity.x = 0;
         }
         if (this.isPress.w == this.isPress.s) {
-            if (!this.invertKey)
-                this.body.velocity.z = 0;
-            else
-                this.body.velocity.x = 0;
+            this.body.velocity.z = 0;
         }
 
         //whenever ball stop moving, decreasing velocity of rotation over time to near 0
@@ -107,7 +100,7 @@ export default class Character extends PhysicsObject3d {
         }
         var result = [];
 
-        if (Math.abs(this.invertKey ? this.body.velocity.x : this.body.velocity.z) <= this.movementSpeed) {
+        if (Math.abs(this.body.velocity.z) <= this.movementSpeed) {
             if (this.isPress.w && this.isPress.s) {
                 this.body.applyForce(new CANNON.Vec3(0, 0, 0), this.body.position);
 

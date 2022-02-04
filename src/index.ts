@@ -299,7 +299,6 @@ import DBs from './DB/DBs';
 import Frameworks from './Frameworks/Frameworks';
 import Softwares from './Softwares/Softwares';
 import Billboards from './Billboards/Billboards';
-import PopUps from './PopUps/PopUps';
 import Plane from './PlaneGround/Plane';
 import isintersect from './utility/isIntersect';
 import Connection from './Connection/Connection';

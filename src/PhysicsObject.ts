@@ -66,8 +66,7 @@ export default class PhysicsObject3d {
                         if (c.isMesh) {
 
                             c.castShadow = this.asset.castShadow;
-                            const oldMat: MeshPhongMaterial | MeshPhongMaterial[] = c.material;
-                            console
+                            const oldMat: any = c.material;
                             if (Array.isArray(oldMat)) {
                                 oldMat.forEach((mat, index) => {
                                     mat = new THREE.MeshLambertMaterial({
@@ -103,9 +102,10 @@ export default class PhysicsObject3d {
 
             new THREE.Box3().setFromObject(fbx).getSize(size);
             if (this.shapeType == "TRIMESH") {
-                const vertices = this.mesh.children[0].geometry.attributes.position.array;
+                const temp: THREE.Mesh = this.mesh.children[0] as THREE.Mesh;
+                const vertices = temp.geometry.attributes.position.array;
                 const indices = Object.keys(vertices).map(Number);
-                this.shape = new CANNON.Trimesh(vertices, indices);
+                this.shape = new CANNON.Trimesh(vertices as number[], indices);
             }
 
             this.body =
@@ -131,9 +131,9 @@ export default class PhysicsObject3d {
                     object.traverse((c: THREE.Mesh) => {
                         if (c.isMesh) {
                             c.castShadow = ref.asset.castShadow;
-                            const oldMat: MeshPhongMaterial | MeshPhongMaterial[] = c.material;
+                            const oldMat: MeshPhongMaterial | MeshPhongMaterial[] = c.material as MeshPhongMaterial | MeshPhongMaterial[];
                             if (Array.isArray(oldMat)) {
-                                oldMat.forEach((mat, index) => {
+                                oldMat.forEach((mat: THREE.MeshLambertMaterial | THREE.MeshPhongMaterial, index) => {
                                     mat = new THREE.MeshLambertMaterial({
                                         color: oldMat[index].color,
                                         // map: oldMat.map,
@@ -158,10 +158,12 @@ export default class PhysicsObject3d {
             this.mesh = object;
 
             if (this.shapeType == "TRIMESH") {
-                const vertices = this.mesh.children[0].geometry.attributes.position.array;
+                const temp: THREE.Mesh = this.mesh.children[0] as Mesh;
+                const vertices = temp.geometry.attributes.position.array;
                 const indices = Object.keys(vertices).map(Number);
-                this.shape = new CANNON.Trimesh(vertices, indices);
-                this.shape.setScale(new CANNON.Vec3(10, 10, 10))
+                this.shape = new CANNON.Trimesh(vertices as number[], indices);
+                const tempShape :any =  this.shape;
+                tempShape.setScale(new CANNON.Vec3(10, 10, 10) as any)
                 this.position.y += 5;
             }
 
