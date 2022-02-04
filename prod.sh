@@ -1,7 +1,7 @@
 #!/bin/bash
 export $(cat .env | xargs)
 chmod 777 ./private/main.exe
-sudo ./private/main.exe $PROD_WS_PORT
+./private/main.exe $PROD_WS_PORT
 
 # compile typescript to dist file
 bash ./build.sh -m PROD -d
