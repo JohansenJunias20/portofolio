@@ -3,6 +3,7 @@ const webpack = require('webpack');
 module.exports = (env) => {
   return {
     entry: './src/index.ts',
+    watch: true,
     module: {
       rules: [
         {

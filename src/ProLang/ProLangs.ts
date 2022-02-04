@@ -18,7 +18,6 @@ export default class ProLangs {
             new ProLang(world, scene, new Vector3(52.5, -5, 140), "cpp"),
             new ProLang(world, scene, new Vector3(52.5, -5, 160), "bash"),
         ];
-
     }
     public async init() {
         for (let i = 0; i < this.keys.length; i++) {

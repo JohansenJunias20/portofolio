@@ -82,7 +82,6 @@ export default class PhysicsObject3d {
                                     // map: oldMat.map,
                                     //etc
                                 });
-                            console.log({ oldMat })
                             if (this.asset.recieveShadow != undefined)
                                 c.receiveShadow = this.asset.recieveShadow;
                         }
@@ -120,6 +119,7 @@ export default class PhysicsObject3d {
             this.PhysicsWorld.addBody(this.body);
         }
         else {
+            alert("tr")
             const ref = this;
             const mtlLoader = new MTLLoader();
             const mtl = await mtlLoader.loadAsync(this.asset.mtl);
@@ -128,7 +128,7 @@ export default class PhysicsObject3d {
                 var objLoader = new OBJLoader();
                 objLoader.setMaterials(mtl);
                 objLoader.load(ref.asset.url, function (object) {
-                    object.traverse((c: THREE.Mesh) => {
+                    object.traverse(async (c: THREE.Mesh) => {
                         if (c.isMesh) {
                             c.castShadow = ref.asset.castShadow;
                             const oldMat: MeshPhongMaterial | MeshPhongMaterial[] = c.material as MeshPhongMaterial | MeshPhongMaterial[];
@@ -142,11 +142,26 @@ export default class PhysicsObject3d {
                                 });
                             }
                             else
-                                c.material = new THREE.MeshLambertMaterial({
-                                    color: oldMat.color,
-                                    // map: oldMat.map,
-                                    //etc
-                                });
+                                c.material = new THREE.ShaderMaterial({
+                                    uniforms: THREE.UniformsUtils.merge([
+                                        THREE.UniformsLib["common"],
+                                        THREE.UniformsLib["fog"],
+                                        THREE.UniformsLib["lights"],
+                                        THREE.UniformsLib["bumpmap"],
+                                        THREE.UniformsLib["displacementmap"],
+                                        THREE.UniformsLib["normalmap"],
+                                        // THREE.UniformsLib["],
+                                    ]),
+                                    
+                                    // defines:{'LAMBERT'}
+                                    vertexShader: await (await fetch("/assets/shaders/default.vert"))?.text(),
+                                    fragmentShader: await (await fetch("/assets/shaders/default.frag"))?.text()
+                                })
+                            // c.material = new THREE.MeshLambertMaterial({
+                            //     color: oldMat.color,
+                            //     // map: oldMat.map,
+                            //     //etc
+                            // });
                             // c.receiveShadow = ref.asset.recieveShadow;
                         }
                         return c;
@@ -162,7 +177,7 @@ export default class PhysicsObject3d {
                 const vertices = temp.geometry.attributes.position.array;
                 const indices = Object.keys(vertices).map(Number);
                 this.shape = new CANNON.Trimesh(vertices as number[], indices);
-                const tempShape :any =  this.shape;
+                const tempShape: any = this.shape;
                 tempShape.setScale(new CANNON.Vec3(10, 10, 10) as any)
                 this.position.y += 5;
             }

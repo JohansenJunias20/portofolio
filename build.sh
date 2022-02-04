@@ -62,6 +62,8 @@ TURN_MIN_PORT=${TURN_MIN_PORT//[^[:alnum:]]/}
 TURN_MAX_PORT=${TURN_MAX_PORT//[^[:alnum:]]/}
 TURN_MIN_PORT=${TURN_MIN_PORT//[^[:alnum:]]/}
 TURN_MAX_PORT=${TURN_MAX_PORT//[^[:alnum:]]/}
+TURN_USERNAME=${TURN_USERNAME//[^[:alnum:]]/}
+TURN_PASSWORD=${TURN_PASSWORD//[^[:alnum:]]/}
 
 PROD_WS_PORT=${PROD_WS_PORT//[^[:alnum:]]/}
 DEV_WS_PORT=${DEV_WS_PORT//[^[:alnum:]]/}
@@ -82,15 +84,15 @@ if [ "$DOCKER" == "true" ]; then
     echo "> COMPILING TYPESCRIPT..."
     if [ "$MODE" == "PROD" ]; then
         # build dist js
-        docker run -v "/$(pwd)/:/usr/src/app" customnode:latest \
-        npx webpack --config webpack.prod.js \
+        docker run -p 8080:8080 -v "/$(pwd)/:/usr/src/app" customnode:latest \
+        npx webpack-dev-server --config webpack.prod.js \
         --env=TURN_DOMAIN=$TURN_DOMAIN --env=WEBSOCKET_DOMAIN=$PROD_WS_DOMAIN \
         --env=TURN_USERNAME=$TURN_USERNAME --env=TURN_PASSWORD=$TURN_PASSWORD --env=WEBSOCKET_PORT=$PROD_WS_PORT \
         --env=TURN_PORT=$TURN_PORT --env=TURN_PORT_TLS=$TURN_PORT_TLS --env=TURN_MIN_PORT=$TURN_MIN_PORT --env=TURN_MAX_PORT=$TURN_MAX_PORT
     elif [ "$MODE" == "DEV" ]; then
         # build dist js
-        docker run -v "/$(pwd)/:/usr/src/app" customnode:latest \
-        npx webpack --watch --config webpack.dev.js \
+        docker run -p 8080:8080 -v "/$(pwd)/:/usr/src/app" customnode:latest \
+        npx webpack-dev-server --config webpack.dev.js \
         --env=TURN_DOMAIN=$TURN_DOMAIN --env=WEBSOCKET_DOMAIN=$DEV_WS_DOMAIN \
         --env=TURN_USERNAME=$TURN_USERNAME --env=TURN_PASSWORD=$TURN_PASSWORD \
         --env=TURN_PORT=$TURN_PORT --env=TURN_PORT_TLS=$TURN_PORT_TLS --env=TURN_MIN_PORT=$TURN_MIN_PORT --env=TURN_MAX_PORT=$TURN_MAX_PORT
@@ -104,7 +106,7 @@ else
     npm install -D webpack-cli
     if [ "$MODE" == "PROD" ]; then
         # build dist js
-        npx webpack --config webpack.prod.js  \
+        npx webpack-dev-server --config webpack.prod.js  \
         --env=TURN_DOMAIN=$TURN_DOMAIN --env=WEBSOCKET_DOMAIN=$PROD_WS_DOMAIN \
         --env=TURN_USERNAME=$TURN_USERNAME --env=TURN_PASSWORD=$TURN_PASSWORD --env=WEBSOCKET_PORT=$PROD_WS_PORT \
         --env=TURN_PORT=$TURN_PORT --env=TURN_PORT_TLS=$TURN_PORT_TLS --env=TURN_MIN_PORT=$TURN_MIN_PORT --env=TURN_MAX_PORT=$TURN_MAX_PORT
