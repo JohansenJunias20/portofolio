@@ -18,7 +18,9 @@ varying vec3 vIndirectFront;
 #include <shadowmap_pars_vertex>
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
+varying vec3 finalPos;
 void main() {
+	finalPos =( modelMatrix * vec4(position,1.)).xyz;
 	#include <uv_vertex>
 	#include <uv2_vertex>
 	#include <color_vertex>

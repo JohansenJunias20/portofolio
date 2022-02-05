@@ -32,7 +32,11 @@ vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 #include <specularmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
+varying vec3 finalPos;
 void main() {
+	if(finalPos.y<0.){
+		discard;
+	}
 	#include <clipping_planes_fragment>
 	vec4 diffuseColor = vec4( diffuse, opacity );
 	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );

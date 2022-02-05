@@ -32,42 +32,8 @@ export default class PopUp {
             this.modal = urlRef as Modal;
 
         //#region shader language for fence
-        this.vert =
-            ` 
-            varying vec3 modelPos;
-            void main(){
-                vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-                modelPos = position.xyz;
-                gl_Position = projectionMatrix * mvPosition;
-            }
-        `;
-        this.frag = `
-        uniform float move;
-        uniform vec3 originPos;
-        uniform vec3 size;
-        uniform float borderWidth;
-        uniform float opacity;
-        varying vec3 modelPos;
-
-        void main() {
-            float fenceAlpha;
-                fenceAlpha = mod(modelPos.x + modelPos.y + modelPos.z + move ,1.0);
-
-            float y = modelPos.y -originPos.y;
-            fenceAlpha = step(fenceAlpha, 0.5);
-
-
-            float borderBawah = step(y,  borderWidth + size.y/2.0 * (- 1.0));
-            float borderAtas = step(size.y/2.0  - borderWidth,y);
-
-            float finalBorder = max(borderBawah, borderAtas);
-            float finalAlpha = max(fenceAlpha, finalBorder);
-           
-            gl_FragColor = vec4(vec3(1.0),finalAlpha * opacity);
-
-        }
-        `
-
+        this.vert = '';
+        this.frag = '';
         //#endregion
         this.scene = scene;
         this.position = position;
@@ -231,10 +197,15 @@ export default class PopUp {
         return material;
     }
     async init() {
+        await this.getShaders();
         await this.initFence();
         await this.initFloor()
         await this.initBorderFloor();
         this.initialized = true;
+    }
+    private async getShaders() {
+        this.vert = await (await fetch("/assets/shaders/popup.vert")).text();
+        this.frag = await (await fetch("/assets/shaders/popup.frag")).text();
     }
     fence: {
         material: THREE.ShaderMaterial;
@@ -263,6 +234,16 @@ export default class PopUp {
         this.alphaAnimationUp += 0.05;
         this.alphaAnimationUp = clamp(this.alphaAnimationUp, 0, 1)
         this.fence.mesh.position.copy(this.fence.mesh.position.lerp(this.ceilingPosition, this.alphaAnimationUp));
+        if (Array.isArray(this.fence.mesh.material)) {
+            for (let i = 0; i < this.fence.mesh.material.length; i++) {
+                const element = this.fence.mesh.material[i];
+                element.needsUpdate = true;
+            }
+        }
+        else {
+            this.fence.mesh.material.needsUpdate = true;
+            // this.fence.mesh.geometry.attributes.position.needsUpdate = true;
+        }
         this.alphaAnimationDown = 0;
     }
     alphaAnimationUp = 0;

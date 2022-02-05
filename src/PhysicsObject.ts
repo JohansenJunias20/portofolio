@@ -1,4 +1,4 @@
-import { Float32BufferAttribute, Group, Mesh, MeshPhongMaterial, Uint8ClampedBufferAttribute, Vector3 } from "three";
+import { Float32BufferAttribute, Group, Mesh, MeshLambertMaterial, MeshPhongMaterial, ShaderMaterial, Uint8ClampedBufferAttribute, Vector3 } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import * as CANNON from 'cannon';
 import * as THREE from "three";
@@ -56,32 +56,32 @@ export default class PhysicsObject3d {
     }
     private async loadAsset() {
         var size = new THREE.Vector3();
-
+        const ref = this;
         if (this.asset.url.indexOf(".fbx") > -1) {
 
             const fbx = await new Promise<THREE.Object3D>((res, rej) => {
                 const loader = new FBXLoader();
                 loader.load(this.asset.url, (f) => {
-                    f.traverse((c: Mesh) => {
+                    f.traverse(async (c: Mesh) => {
                         if (c.isMesh) {
 
                             c.castShadow = this.asset.castShadow;
                             const oldMat: any = c.material;
                             if (Array.isArray(oldMat)) {
-                                oldMat.forEach((mat, index) => {
-                                    mat = new THREE.MeshLambertMaterial({
-                                        color: oldMat[index].color,
-                                        // map: oldMat.map,
-                                        //etc
-                                    });
-                                });
+                                for (let i = 0; i < oldMat.length; i++) {
+                                    var element: any = oldMat[i];
+                                    element = await ref.customShader(element.color);
+                                }
+                                // oldMat.forEach((mat, index) => {
+                                //     mat = new THREE.MeshLambertMaterial({
+                                //         color: oldMat[index].color,
+                                //         // map: oldMat.map,
+                                //         //etc
+                                //     });
+                                // });
                             }
                             else
-                                c.material = new THREE.MeshLambertMaterial({
-                                    color: oldMat.color,
-                                    // map: oldMat.map,
-                                    //etc
-                                });
+                                c.material = await ref.customShader(oldMat.color);
                             if (this.asset.recieveShadow != undefined)
                                 c.receiveShadow = this.asset.recieveShadow;
                         }
@@ -132,33 +132,20 @@ export default class PhysicsObject3d {
                             c.castShadow = ref.asset.castShadow;
                             const oldMat: MeshPhongMaterial | MeshPhongMaterial[] = c.material as MeshPhongMaterial | MeshPhongMaterial[];
                             if (Array.isArray(oldMat)) {
-                                oldMat.forEach((mat: THREE.MeshLambertMaterial | THREE.MeshPhongMaterial, index) => {
-                                    mat = new THREE.MeshLambertMaterial({
-                                        color: oldMat[index].color,
-                                        // map: oldMat.map,
-                                        //etc
-                                    });
-                                });
+                                for (let i = 0; i < oldMat.length; i++) {
+                                    var element: MeshPhongMaterial | ShaderMaterial = oldMat[i];
+                                    element = await ref.customShader(element.color);
+                                }
+                                // oldMat.forEach(asyn(mat: THREE.MeshLambertMaterial | THREE.MeshPhongMaterial, index) => {
+                                //     mat = new THREE.MeshLambertMaterial({
+                                //         color: oldMat[index].color,
+                                //         // map: oldMat.map,
+                                //         //etc
+                                //     });
+                                // });
                             }
                             else {
-                                c.material = new THREE.ShaderMaterial({
-                                    uniforms: {
-                                        ...THREE.UniformsLib["common"],
-                                        ...THREE.UniformsLib["fog"],
-                                        ...THREE.UniformsLib["lights"],
-                                        ...THREE.UniformsLib["bumpmap"],
-                                        ...THREE.UniformsLib["displacementmap"],
-                                        ...THREE.UniformsLib["normalmap"],
-                                        // THREE.UniformsLib["],
-                                        diffuse: {
-                                            value: oldMat.color
-                                        }
-                                    },
-                                    lights: true,
-                                    // defines:{'LAMBERT'}
-                                    vertexShader: await (await fetch("/assets/shaders/default.vert"))?.text(),
-                                    fragmentShader: await (await fetch("/assets/shaders/default.frag"))?.text()
-                                })
+                                c.material = await ref.customShader(oldMat.color)
                             }
                             // c.material = new THREE.MeshLambertMaterial({
                             //     color: oldMat.color,
@@ -203,6 +190,26 @@ export default class PhysicsObject3d {
     private updatePhysics(deltatime: number) {
         this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
         this.mesh.quaternion.copy(this.body.quaternion as any);
+
+    }
+    private async customShader(color: THREE.ColorRepresentation) {
+        return new THREE.ShaderMaterial({
+            uniforms: {
+                ...THREE.UniformsLib["common"],
+                ...THREE.UniformsLib["fog"],
+                ...THREE.UniformsLib["lights"],
+                ...THREE.UniformsLib["bumpmap"],
+                ...THREE.UniformsLib["displacementmap"],
+                ...THREE.UniformsLib["normalmap"],
+                diffuse: {
+                    value: color
+                }
+            },
+            lights: true,
+            // defines:{'LAMBERT'}
+            vertexShader: await (await fetch("/assets/shaders/default.vert"))?.text(),
+            fragmentShader: await (await fetch("/assets/shaders/default.frag"))?.text()
+        })
 
     }
 }
