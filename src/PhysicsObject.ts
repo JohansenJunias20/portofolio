@@ -119,7 +119,6 @@ export default class PhysicsObject3d {
             this.PhysicsWorld.addBody(this.body);
         }
         else {
-            alert("tr")
             const ref = this;
             const mtlLoader = new MTLLoader();
             const mtl = await mtlLoader.loadAsync(this.asset.mtl);
@@ -141,22 +140,26 @@ export default class PhysicsObject3d {
                                     });
                                 });
                             }
-                            else
+                            else {
                                 c.material = new THREE.ShaderMaterial({
-                                    uniforms: THREE.UniformsUtils.merge([
-                                        THREE.UniformsLib["common"],
-                                        THREE.UniformsLib["fog"],
-                                        THREE.UniformsLib["lights"],
-                                        THREE.UniformsLib["bumpmap"],
-                                        THREE.UniformsLib["displacementmap"],
-                                        THREE.UniformsLib["normalmap"],
+                                    uniforms: {
+                                        ...THREE.UniformsLib["common"],
+                                        ...THREE.UniformsLib["fog"],
+                                        ...THREE.UniformsLib["lights"],
+                                        ...THREE.UniformsLib["bumpmap"],
+                                        ...THREE.UniformsLib["displacementmap"],
+                                        ...THREE.UniformsLib["normalmap"],
                                         // THREE.UniformsLib["],
-                                    ]),
-                                    
+                                        diffuse: {
+                                            value: oldMat.color
+                                        }
+                                    },
+                                    lights: true,
                                     // defines:{'LAMBERT'}
                                     vertexShader: await (await fetch("/assets/shaders/default.vert"))?.text(),
                                     fragmentShader: await (await fetch("/assets/shaders/default.frag"))?.text()
                                 })
+                            }
                             // c.material = new THREE.MeshLambertMaterial({
                             //     color: oldMat.color,
                             //     // map: oldMat.map,
