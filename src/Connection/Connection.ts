@@ -24,6 +24,7 @@ export default class Connection {
     pending_candidates: Array<RTCIceCandidateInit>;
     constructor() {
         const ref = this;
+        return;
         this.ready = false;
         this.remotePeers = {}
         this.DataChannels = {};

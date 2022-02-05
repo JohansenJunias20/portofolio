@@ -1,10 +1,11 @@
-import { Float32BufferAttribute, Group, Mesh, MeshLambertMaterial, MeshPhongMaterial, ShaderMaterial, Uint8ClampedBufferAttribute, Vector3 } from "three";
+import { Float32BufferAttribute, Group, Mesh, MeshLambertMaterial, MeshPhongMaterial, ShaderMaterial, TextureLoader, Uint8ClampedBufferAttribute, Vector3 } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import * as CANNON from 'cannon';
 import * as THREE from "three";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import getVertices from "./utility/getVertices";
+import { degToRad } from "three/src/math/MathUtils";
 interface IPhysicsObject3dConstructor {
     world: CANNON.World,
     scene: THREE.Scene,
@@ -19,6 +20,10 @@ export default class PhysicsObject3d {
         scale: THREE.Vector3;
         recieveShadow?: boolean;
         castShadow: boolean;
+        floorShadow?: {
+            textureUrl: string;
+            modelUrl: string;
+        };
         mtl?: string
     }
     protected PhysicsWorld: CANNON.World;
@@ -185,7 +190,61 @@ export default class PhysicsObject3d {
             this.PhysicsWorld.addBody(this.body);
             this.scene.add(object);
         }
+
+        //#region load floorShadow
+        if (this.asset.floorShadow) {
+            await this.loadFloorShadow();
+        }
+        //#endregion
         this.initialized = true;
+    }
+    private async loadFloorShadowModel(material: THREE.ShaderMaterial) {
+        const ref = this;
+        const object = await new Promise<Group>((res, rej) => {
+            var objLoader = new OBJLoader();
+            objLoader.load(ref.asset.floorShadow.modelUrl, function (object) {
+                object.traverse(async (c: THREE.Mesh) => {
+                    if (c.isMesh) {
+                    }
+                    c.material = material;
+                    return c;
+                })
+                object.scale.copy(new Vector3(11, 11, 11))
+                res(object)
+            });
+        });
+        // var box = new THREE.Box3().setFromObject(this.mesh);
+        // var size = new THREE.Vector3();
+        // box.getSize(size);
+        // const geom = new THREE.PlaneBufferGeometry(size.x, size.z);
+        // const object = new THREE.Mesh(geom, material);
+        console.log({ scale: ref.asset.scale })
+        // object.scale.copy(ref.asset.scale);
+        object.position.copy(this.position);
+        // object.position.copy(new Vector3(0, 0, 0));
+        object.position.y = 0;
+        // object.rotateX(degToRad(-90))
+        return object;
+
+    }
+    private async loadFloorShadow() {
+        // alert(`loading floor shadow ${this.asset.floorShadow.textureUrl}`)
+            console.log({textureUrl:this.asset.floorShadow.textureUrl})
+            const texture = await new TextureLoader().loadAsync(this.asset.floorShadow.textureUrl);
+      
+        const material = new ShaderMaterial({
+            vertexShader: await (await fetch(`/assets/shaders/floorShadow.vert`)).text(),
+            fragmentShader: await (await fetch(`/assets/shaders/floorShadow.frag`)).text(),
+            uniforms: {
+                textureMap: {
+                    value: texture
+                }
+            },
+            transparent: true
+        })
+        const model = await this.loadFloorShadowModel(material);
+        this.scene.add(model);
+
     }
     private updatePhysics(deltatime: number) {
         this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));

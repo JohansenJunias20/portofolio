@@ -12,6 +12,10 @@ export default class Statue extends PhysicsObject3d {
         castShadow: false,
         recieveShadow: false,
         url: ``,
+        floorShadow: {
+            textureUrl: "",
+            modelUrl: "",
+        },
         scale: new THREE.Vector3(0.07, 0.07, 0.07)
     }
     public readonly text: "waving" | "dab" | "style" | "clapping";
@@ -19,6 +23,10 @@ export default class Statue extends PhysicsObject3d {
         super(world, scene, position, 0, "BOX", 0);
         this.text = text;
         this.asset.url = `/assets/environment/Lobby/Statues/statue_${text}.fbx`;
+        this.asset.floorShadow = {
+            textureUrl: "/assets/environment/Lobby/Statues/floorShadow.png",
+            modelUrl: "/assets/environment/Lobby/Statues/floorShadow.obj"
+        }
     }
     public async init() {
         await super.init()

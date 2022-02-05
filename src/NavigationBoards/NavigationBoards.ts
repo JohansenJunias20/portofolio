@@ -19,6 +19,7 @@ export default class NavigationBoards {
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             await key.init();
+            continue;
             switch (key.text) {
                 case "knowledge":
                     key.mesh.rotateY(degToRad(-95));
