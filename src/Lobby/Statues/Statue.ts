@@ -15,6 +15,7 @@ export default class Statue extends PhysicsObject3d {
         floorShadow: {
             textureUrl: "",
             modelUrl: "",
+            scale: new THREE.Vector3()
         },
         scale: new THREE.Vector3(0.07, 0.07, 0.07)
     }
@@ -25,7 +26,8 @@ export default class Statue extends PhysicsObject3d {
         this.asset.url = `/assets/environment/Lobby/Statues/statue_${text}.fbx`;
         this.asset.floorShadow = {
             textureUrl: "/assets/environment/Lobby/Statues/floorShadow.png",
-            modelUrl: "/assets/environment/Lobby/Statues/floorShadow.obj"
+            modelUrl: "/assets/environment/Lobby/Statues/floorShadow.obj",
+            scale: new THREE.Vector3(11.05, 0, 11.05),
         }
     }
     public async init() {

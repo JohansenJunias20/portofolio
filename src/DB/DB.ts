@@ -16,7 +16,13 @@ export default class DB extends PhysicsObject3d {
         recieveShadow: false,
         url: ``,
         mtl: ``,
-        scale: new THREE.Vector3(10, 10, 10)
+        scale: new THREE.Vector3(10, 10, 10),
+        floorShadow: {
+            textureUrl: "/assets/environment/knowledge/floorShadow.png",
+            modelUrl: "/assets/floorShadow.obj",
+            scale: new Vector3(6, 0, 6),
+            offset: new Vector3(),
+        }
     }
     public readonly text: "redis" | "mysql" | "firebird" | "mongo"
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "redis" | "mysql" | "firebird" | "mongo") {

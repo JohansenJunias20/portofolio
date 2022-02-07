@@ -23,6 +23,8 @@ export default class PhysicsObject3d {
         floorShadow?: {
             textureUrl: string;
             modelUrl: string;
+            scale?: THREE.Vector3
+            offset?: THREE.Vector3
         };
         mtl?: string
     }
@@ -202,14 +204,14 @@ export default class PhysicsObject3d {
         const ref = this;
         const object = await new Promise<Group>((res, rej) => {
             var objLoader = new OBJLoader();
-            objLoader.load(ref.asset.floorShadow.modelUrl, function (object) {
+            objLoader.load(ref.asset.floorShadow.modelUrl == "" ? ref.asset.floorShadow.modelUrl : "/assets/floorShadow.obj", function (object) {
                 object.traverse(async (c: THREE.Mesh) => {
                     if (c.isMesh) {
                     }
                     c.material = material;
                     return c;
                 })
-                object.scale.copy(new Vector3(11, 11, 11))
+                object.scale.copy(ref.asset.floorShadow.scale ? ref.asset.floorShadow.scale : new Vector3(11, 0, 11))
                 res(object)
             });
         });
@@ -221,6 +223,7 @@ export default class PhysicsObject3d {
         console.log({ scale: ref.asset.scale })
         // object.scale.copy(ref.asset.scale);
         object.position.copy(this.position);
+        object.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
         // object.position.copy(new Vector3(0, 0, 0));
         object.position.y = 0;
         // object.rotateX(degToRad(-90))
@@ -229,10 +232,11 @@ export default class PhysicsObject3d {
     }
     private async loadFloorShadow() {
         // alert(`loading floor shadow ${this.asset.floorShadow.textureUrl}`)
-            console.log({textureUrl:this.asset.floorShadow.textureUrl})
-            const texture = await new TextureLoader().loadAsync(this.asset.floorShadow.textureUrl);
-      
+        console.log({ textureUrl: this.asset.floorShadow.textureUrl })
+        const texture = await new TextureLoader().loadAsync(this.asset.floorShadow.textureUrl);
+
         const material = new ShaderMaterial({
+            depthWrite: false,
             vertexShader: await (await fetch(`/assets/shaders/floorShadow.vert`)).text(),
             fragmentShader: await (await fetch(`/assets/shaders/floorShadow.frag`)).text(),
             uniforms: {

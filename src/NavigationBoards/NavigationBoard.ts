@@ -16,6 +16,8 @@ export default class NavigationBoard extends PhysicsObject3d {
         floorShadow?: {
             textureUrl: string;
             modelUrl: string;
+            scale: THREE.Vector3;
+            offset?: THREE.Vector3;
         }
     }
     public readonly text: "knowledge" | "project" | "playground" | "d";
@@ -28,10 +30,14 @@ export default class NavigationBoard extends PhysicsObject3d {
             castShadow: false,
             recieveShadow: false,
             scale: new THREE.Vector3(0.07, 0.07, 0.07),
-            floorShadow: text == "knowledge" && {
-                textureUrl: `/assets/environment/navigation/floorShadow_${text}.png`,
-                modelUrl: `/assets/floorShadow.obj`,
-            }
+            floorShadow:
+                // text == "knowledge" &&
+                {
+                    textureUrl: `/assets/environment/navigation/floorShadow_${text}.png`,
+                    modelUrl: `/assets/floorShadow.obj`,
+                    scale: new THREE.Vector3(2, 0, 2),
+                    // offset: new THREE.Vector3(-0.2, 0, -0.3)
+                }
         }
     }
     public async init() {

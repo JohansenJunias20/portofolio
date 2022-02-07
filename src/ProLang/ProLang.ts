@@ -16,7 +16,13 @@ export default class ProLang extends PhysicsObject3d {
         recieveShadow: true,
         url: ``,
         mtl: ``,
-        scale: new THREE.Vector3(10, 10, 10)
+        scale: new THREE.Vector3(10, 10, 10),
+        floorShadow: {
+            textureUrl: "/assets/environment/knowledge/floorShadow.png",
+            modelUrl: "/assets/floorShadow.obj",
+            scale: new Vector3(6, 0, 6),
+            offset: new Vector3(),
+        }
     }
     public readonly text: "js" | "ts" | "golang" | "cs" | "python" | "html" | "css" | "php" | "cpp" | "bash";
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "js" | "ts" | "golang" | "cs" | "python" | "html" | "css" | "php" | "cpp" | "bash") {

@@ -264,7 +264,7 @@ canvas.onclick = (e) => {
 
 }
 
-const LOBBY_OFFSET_CAMERA = new Vector3(15, 35, 50);
+const LOBBY_OFFSET_CAMERA = new Vector3(25, 35, 30);
 const KNOWLEDGE_OFFSET_CAMERA = new Vector3(15, 20, 35);
 const PORTOFOLIO_OFFSET_CAMERA = new Vector3(5, 40, 20);
 const PLAYGROUND_OFFSET_CAMERA = new Vector3(15, 35, 50);

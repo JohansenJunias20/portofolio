@@ -10,26 +10,26 @@ export default class Trees {
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         this.keys = [
-            new Tree(world, scene, new Vector3(-15, -5, 10), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1))),
-            new Tree(world, scene, new Vector3(-25, -5, 85), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), 25),
-            new Tree(world, scene, new Vector3(20, -5, 15), 2, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), 25),
+            new Tree(world, scene, new Vector3(-15, -4, 10), 0, new CANNON.Box(new CANNON.Vec3(1, 5, 1))),
+            // new Tree(world, scene, new Vector3(-25, -5, 85), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), 25),
+            // new Tree(world, scene, new Vector3(20, -5, 15), 2, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), 25),
 
-            new Tree(world, scene, new Vector3(-50, -5, 20), 3, new CANNON.Box(new CANNON.Vec3(0.75, 5, 0.75)), new THREE.Vector3(0.075, 0.075, 0.075), 19),
-            new Tree(world, scene, new Vector3(75, -5, 30), 1, new CANNON.Box(new CANNON.Vec3(1.5, 5, 1.5)), new THREE.Vector3(0.15, 0.15, 0.15), 90),
-            new Tree(world, scene, new Vector3(-40, -5, 175), 2, new CANNON.Box(new CANNON.Vec3(1, 5, 3)), new THREE.Vector3(0.1, 0.1, 0.1), 120),
+            // new Tree(world, scene, new Vector3(-50, -5, 20), 3, new CANNON.Box(new CANNON.Vec3(0.75, 5, 0.75)), new THREE.Vector3(0.075, 0.075, 0.075), 19),
+            // new Tree(world, scene, new Vector3(75, -5, 30), 1, new CANNON.Box(new CANNON.Vec3(1.5, 5, 1.5)), new THREE.Vector3(0.15, 0.15, 0.15), 90),
+            // new Tree(world, scene, new Vector3(-40, -5, 175), 2, new CANNON.Box(new CANNON.Vec3(1, 5, 3)), new THREE.Vector3(0.1, 0.1, 0.1), 120),
 
-            new Tree(world, scene, new Vector3(-10, -5, 80), 3, new CANNON.Box(new CANNON.Vec3(0.75, 5, 0.75)), new THREE.Vector3(0.075, 0.075, 0.075), 75),
-            new Tree(world, scene, new Vector3(-70, -5, 100), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.15, 0.15, 0.15), 30),
-            new Tree(world, scene, new Vector3(40, -5, 60), 2, new CANNON.Box(new CANNON.Vec3(0.5, 4, 0.5)), new THREE.Vector3(0.1, 0.1, 0.1), 180),
+            // new Tree(world, scene, new Vector3(-10, -5, 80), 3, new CANNON.Box(new CANNON.Vec3(0.75, 5, 0.75)), new THREE.Vector3(0.075, 0.075, 0.075), 75),
+            // new Tree(world, scene, new Vector3(-70, -5, 100), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.15, 0.15, 0.15), 30),
+            // new Tree(world, scene, new Vector3(40, -5, 60), 2, new CANNON.Box(new CANNON.Vec3(0.5, 4, 0.5)), new THREE.Vector3(0.1, 0.1, 0.1), 180),
 
-            new Tree(world, scene, new Vector3(-15, -5, 129), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), -120),
-            new Tree(world, scene, new Vector3(30, -5, 155), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), -90),
-            new Tree(world, scene, new Vector3(40, -5, 130), 2, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), -45),
+            // new Tree(world, scene, new Vector3(-15, -5, 129), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), -120),
+            // new Tree(world, scene, new Vector3(30, -5, 155), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), -90),
+            // new Tree(world, scene, new Vector3(40, -5, 130), 2, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), -45),
 
-            
-            new Tree(world, scene, new Vector3(-60, -5, 120), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), 120),
-            new Tree(world, scene, new Vector3(-90, -5, 170), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), 90),
-            new Tree(world, scene, new Vector3(-120, -5, 110), 2, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), 45),
+
+            // new Tree(world, scene, new Vector3(-60, -5, 120), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), 120),
+            // new Tree(world, scene, new Vector3(-90, -5, 170), 1, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), 90),
+            // new Tree(world, scene, new Vector3(-120, -5, 110), 2, new CANNON.Box(new CANNON.Vec3(1, 5, 1)), new THREE.Vector3(0.1, 0.1, 0.1), 45),
         ];
 
     }
@@ -37,7 +37,7 @@ export default class Trees {
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             await key.init();
-            key.mesh.rotateY(degToRad(-45));
+            // key.mesh.rotateY(degToRad(-45));
             key.body.quaternion.copy(key.mesh.quaternion as any)
             key.mesh.receiveShadow = true
             key.mesh.castShadow = true

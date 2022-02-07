@@ -16,16 +16,31 @@ export default class ProLang extends PhysicsObject3d {
         recieveShadow: false,
         url: ``,
         mtl: ``,
-        scale: new THREE.Vector3(0.15, 0.15, 0.15)
+        scale: new THREE.Vector3(0.15, 0.15, 0.15),
+        floorShadow: {
+            textureUrl: "",
+            modelUrl: "",
+            scale: new Vector3(0),
+            offset: new Vector3(),
+        }
     }
     rotationDeg = 0;
-    public readonly type: 1 | 2 | 3;
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, type: 1 | 2 | 3, shape: null | CANNON.Shape = null, scale = new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg = 0) {
+    public readonly type:  1 | 2 | 3;
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, type:  1 | 2 | 3, shape: null | CANNON.Shape = null, scale = new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg = 0) {
         super(world, scene, position, 0, "CUSTOM", 0, shape);
         this.type = type;
         this.rotationDeg = rotationDeg;
         this.asset.scale = scale;
         this.asset.url = `/assets/environment/trees/tree${type}.fbx`;
+        this.asset.floorShadow = {
+            textureUrl: `/assets/environment/trees/floorShadow_${type}_deg${rotationDeg}.png`,
+            modelUrl: "/assets/floorShadow.obj",
+            scale: new THREE.Vector3(6.5, 0, 6.5),
+            offset:new THREE.Vector3()
+        }
+        // this.asset.floorShadow.textureUrl = `/assets/environment/trees/floorShadow_${type}_deg${rotationDeg}.png`;
+        // this.asset.floorShadow.modelUrl = ``;
+        // this.asset.floorShadow.scale = new Vector3(10, 0, 10);
     }
     public async init() {
         await super.init()
