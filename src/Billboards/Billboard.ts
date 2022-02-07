@@ -152,7 +152,6 @@ export default class Billboard {
         }
         for (let i = 0; i < this.urlRef.length; i++) {
             const url = this.urlRef[i];
-            console.log({ url })
             const popUp = new PopUp(this.PhysicsWorld, this.scene, this.camera, new Vector3(this.position.x + (i * (popUpSize.x + 2)), 0.25, planeDescText.position.z + sizePlaneDescText.y / 2 + 5),
                 popUpSize, 0.3, `${this.floorText}`, url);
             await popUp.init();

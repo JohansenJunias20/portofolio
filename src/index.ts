@@ -21,7 +21,7 @@ const renderer = new THREE.WebGLRenderer({
     alpha:true
 
 })
-console.log("%c This website inspired by Bruno Simon Web https://bruno-simon.com", 'background: #222; color: #bada55; font-size:20px; font-weight:bold;')
+// console.log("%c This website inspired by Bruno Simon Web https://bruno-simon.com", 'background: #222; color: #bada55; font-size:20px; font-weight:bold;')
 declare var production: boolean; // from webpack config file.
 
 renderer.setPixelRatio(window.devicePixelRatio)
@@ -183,7 +183,7 @@ const roadStones = new RoadStones(scene)
 roadStones.init()
 
 const johansen = new Johansen(world, scene)
-johansen.init()
+// johansen.init()
 
 const prolang = new ProLangs(world, scene)
 prolang.init()
