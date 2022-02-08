@@ -19,7 +19,7 @@ interface IParameter {
     scale: THREE.Vector3,
     rotationDeg: 0 | 45 | 75,
 }
-export default class ProLang extends PhysicsObject3d {
+export default class Tree extends PhysicsObject3d {
     asset = {
         castShadow: true,
         recieveShadow: false,
@@ -27,10 +27,12 @@ export default class ProLang extends PhysicsObject3d {
         mtl: ``,
         scale: new THREE.Vector3(0.15, 0.15, 0.15),
         floorShadow: {
-            textureUrl: "" ,
+            textureUrl: "",
             modelUrl: "",
             scale: new Vector3(0),
             offset: new Vector3(),
+            Mesh: new THREE.Group(),
+            preload: true
         }
     }
     rotationDeg = 0;
@@ -61,7 +63,9 @@ export default class ProLang extends PhysicsObject3d {
             textureUrl: ``, // because trees not using url string but instead use three.Texture Object.
             modelUrl: "/assets/floorShadow.obj",
             scale: new THREE.Vector3(44 * parameters.scale.x, 0, 44 * parameters.scale.z),
-            offset: new THREE.Vector3()
+            offset: new THREE.Vector3(),
+            Mesh: new THREE.Group(),
+            preload: true,
         }
         // this.asset.floorShadow.textureUrl = `/assets/environment/trees/floorShadow_${type}_deg${rotationDeg}.png`;
         // this.asset.floorShadow.modelUrl = ``;

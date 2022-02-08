@@ -73,7 +73,6 @@ export default class Knowledge {
                 res(object)
             });
         });
-        console.log({ object })
 
         this.floorModel = object;
     }
