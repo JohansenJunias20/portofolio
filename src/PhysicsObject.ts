@@ -21,7 +21,7 @@ export default class PhysicsObject3d {
         recieveShadow?: boolean;
         castShadow: boolean;
         floorShadow?: {
-            textureUrl: string;
+            textureUrl: string | THREE.Texture;
             modelUrl: string;
             scale?: THREE.Vector3
             offset?: THREE.Vector3
@@ -233,7 +233,13 @@ export default class PhysicsObject3d {
     private async loadFloorShadow() {
         // alert(`loading floor shadow ${this.asset.floorShadow.textureUrl}`)
         console.log({ textureUrl: this.asset.floorShadow.textureUrl })
-        const texture = await new TextureLoader().loadAsync(this.asset.floorShadow.textureUrl);
+        var texture: THREE.Texture;
+        if (typeof this.asset.floorShadow.textureUrl === 'string' || this.asset.floorShadow.textureUrl instanceof String)
+            texture = await new TextureLoader().loadAsync(this.asset.floorShadow.textureUrl as string);
+        else {
+            texture = this.asset.floorShadow.textureUrl;
+        }
+
 
         const material = new ShaderMaterial({
             depthWrite: false,

@@ -18,7 +18,7 @@ import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true,
-    alpha:true
+    alpha: true
 
 })
 // console.log("%c This website inspired by Bruno Simon Web https://bruno-simon.com", 'background: #222; color: #bada55; font-size:20px; font-weight:bold;')
@@ -215,6 +215,11 @@ document.onkeydown = (e) => {
     else if (e.key == "a") {
     }
     else if (e.key == "d") {
+    }
+    else if (e.key == "z") {
+        //for placing trees purposes.
+        console.log(`${character.position.x.toFixed(0)}, -5, ${character.position.z.toFixed(0)}`);
+        return;
     }
     else {
         return

@@ -17,7 +17,7 @@ interface IParameter {
     type: 1 | 2 | 3,
     shape: CANNON.Box,
     scale: THREE.Vector3,
-    rotationDeg: number
+    rotationDeg: 0 | 45 | 75,
 }
 export default class ProLang extends PhysicsObject3d {
     asset = {
@@ -27,7 +27,7 @@ export default class ProLang extends PhysicsObject3d {
         mtl: ``,
         scale: new THREE.Vector3(0.15, 0.15, 0.15),
         floorShadow: {
-            textureUrl: "",
+            textureUrl: "" ,
             modelUrl: "",
             scale: new Vector3(0),
             offset: new Vector3(),
@@ -58,7 +58,7 @@ export default class ProLang extends PhysicsObject3d {
         this.asset.scale = parameters.scale;
         this.asset.url = `/assets/environment/trees/tree${parameters.type}.fbx`;
         this.asset.floorShadow = {
-            textureUrl: `/assets/environment/trees/floorShadow_${parameters.type}_deg${parameters.rotationDeg}.png`,
+            textureUrl: ``, // because trees not using url string but instead use three.Texture Object.
             modelUrl: "/assets/floorShadow.obj",
             scale: new THREE.Vector3(44 * parameters.scale.x, 0, 44 * parameters.scale.z),
             offset: new THREE.Vector3()
