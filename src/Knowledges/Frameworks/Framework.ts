@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { Group, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { clamp } from 'three/src/math/MathUtils';
-import PhysicsObject3d from '../PhysicsObject';
+import PhysicsObject3d from '../../PhysicsObject';
 
 interface AnimationCharacter {
     walk: THREE.AnimationAction;
@@ -22,6 +22,8 @@ export default class Framework extends PhysicsObject3d {
             modelUrl: "/assets/floorShadow.obj",
             scale: new Vector3(6, 0, 6),
             offset: new Vector3(),
+            preload: true,
+            Mesh: new THREE.Group()
         }
     }
     public readonly text: "react" | "tensorflow" | "laravel" | "expo" | "electron" | "tailwind" | "three"

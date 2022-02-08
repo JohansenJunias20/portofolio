@@ -5,12 +5,12 @@ import * as THREE from 'three';
 import { Group, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { clamp } from 'three/src/math/MathUtils';
-import PhysicsObject3d from '../PhysicsObject';
+import PhysicsObject3d from '../../PhysicsObject';
 
 interface AnimationCharacter {
     walk: THREE.AnimationAction;
 }
-export default class Software extends PhysicsObject3d {
+export default class DB extends PhysicsObject3d {
     asset = {
         castShadow: true,
         recieveShadow: false,
@@ -22,14 +22,16 @@ export default class Software extends PhysicsObject3d {
             modelUrl: "/assets/floorShadow.obj",
             scale: new Vector3(6, 0, 6),
             offset: new Vector3(),
+            preload: true,
+            Mesh: new THREE.Group()
         }
     }
-    public readonly text: "blender" | "ue" | "adobe"
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "blender" | "ue" | "adobe") {
+    public readonly text: "redis" | "mysql" | "firebird" | "mongo"
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "redis" | "mysql" | "firebird" | "mongo") {
         super(world, scene, position, 0, "TRIMESH", 0);
         this.text = text;
-        this.asset.url = `/assets/environment/knowledge/Software/${text}.obj`;
-        this.asset.mtl = `/assets/environment/knowledge/Software/${text}.mtl`;
+        this.asset.url = `/assets/environment/knowledge/DB/${text}.obj`;
+        this.asset.mtl = `/assets/environment/knowledge/DB/${text}.mtl`;
     }
     public async init() {
         await super.init()

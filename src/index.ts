@@ -1,20 +1,14 @@
 import { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import { AmbientLight, CameraHelper, Clock, Raycaster, TorusBufferGeometry, TrianglesDrawModes, Vector3, WebGLRenderer } from 'three';
+import { Clock, Raycaster, Vector3 } from 'three';
 import Character from './Character';
 import * as CANNON from 'cannon';
-import Key from './Hotkeys/Key';
 import Hotkeys from './Hotkeys/Hotkeys';
 const ENABLE_SHADOW = true;
 const canvas: HTMLCanvasElement = document.querySelector("#bg");
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
 console.log("v1.1")
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
-import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
-import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true,
@@ -52,8 +46,8 @@ SUN.shadow.camera.right = -sizeAreaShadow;
 SUN.shadow.mapSize.width = 700;
 SUN.shadow.mapSize.height = 700;
 scene.add(SUN)
-const helper = new THREE.DirectionalLightHelper(SUN, 1);
-scene.add(helper);
+// const helper = new THREE.DirectionalLightHelper(SUN, 1);
+// scene.add(helper);
 //#endregion
 
 const AMBIENT_LIGHT = new THREE.AmbientLight(0xffffff, 0.75);
@@ -75,16 +69,6 @@ world.addBody(groundBody);
 
 const plane = new Plane(world, scene, SUN, new THREE.Vector3(0, 0, 0), sizeGround, "#c49a66", "#fffff");
 plane.init()
-// const geometry = new THREE.PlaneGeometry(sizeGround.x, sizeGround.z);
-// const material = new THREE.MeshToonMaterial({ color: "#c49a66", side: THREE.FrontSide });
-// const plane = new THREE.Mesh(geometry, material);
-// plane.rotation.x = (THREE.MathUtils.degToRad(-90))
-// plane.receiveShadow = true;
-// plane.position.set(0,0,0)
-// scene.add(plane);
-
-// lobby.init();
-
 
 var followCharacter = true;
 var leftMouseDown = false;
@@ -165,46 +149,27 @@ import NavigationBoards from './NavigationBoards/NavigationBoards';
 import Lobby from './Lobby/Lobby';
 import RoadStones from './Lobby/RoadStones/RoadStones';
 import Johansen from './johansen/johansen';
-import ProLangs from './ProLang/ProLangs';
+import ProLangs from './Knowledges/ProLang/ProLangs';
 //#region 3D OBJECTS
 const HOTKEYSPOSITION = new Vector3(-15, 1, 0);
 
 const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
-hotkeys.init();
 
 const navigationBoards = new NavigationBoards(world, scene);
-navigationBoards.init();
 
 const lobby = new Lobby(world, scene);
-lobby.init();
 const character = new Character(world, scene, new Vector3(0, 0, -5));
-character.init();
 const roadStones = new RoadStones(scene)
-roadStones.init()
 
 const johansen = new Johansen(world, scene)
-// johansen.init()
-
-const prolang = new ProLangs(world, scene)
-prolang.init()
 
 const trees = new Trees(world, scene)
-trees.init()
 
-const dbs = new DBs(world, scene)
-dbs.init()
-
-const frameworks = new Frameworks(world, scene)
-frameworks.init()
-
-const softwares = new Softwares(world, scene)
-softwares.init()
+const knowledge = new Knowledge(world, scene);
 
 const billboards = new Billboards(world, scene, camera)
-billboards.init()
 
 const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Vector3(-50, 0.2, 50))
-digitRegocnition.init()
 //#endregion
 
 document.onkeydown = (e) => {
@@ -282,57 +247,23 @@ var offsetChanged = false;
 var CURRENT_OFFSET_CAMERA = new Vector3().copy(LOBBY_OFFSET_CAMERA);
 camera.position.copy(character.position)
 camera.position.add(CURRENT_OFFSET_CAMERA)
-// const controls = new OrbitControls(camera, renderer.domElement);
-// controls.enableZoom = false;
-// controls.enablePan = false;
-// controls.enableRotate = false;
-// controls.mouseButtons = {
-//     LEFT: THREE.MOUSE.RIGHT,
-//     RIGHT: THREE.MOUSE.LEFT,
-//     MIDDLE: THREE.MOUSE.MIDDLE,
-// }
-// controls.target.copy(character.position)
 camera.lookAt(character.position)
 var deltatime = 0;
 var alpha = 0;
-// var cameraInitialized = false;
 const clock = new Clock()
-// var allowControlCamera = false;
-import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass';
+
 import Trees from './Trees/Trees';
-import DBs from './DB/DBs';
-import Frameworks from './Frameworks/Frameworks';
-import Softwares from './Softwares/Softwares';
+import DBs from './Knowledges/DB/DBs';
+import Frameworks from './Knowledges/Frameworks/Frameworks';
+import Softwares from './Knowledges/Softwares/Softwares';
 import Billboards from './Billboards/Billboards';
 import Plane from './PlaneGround/Plane';
-import isintersect from './utility/isIntersect';
 import Connection from './Connection/Connection';
 import DigitRecognition from './Playgrounds/DigitRegocnition';
+import Loading from './Loading/Loading';
+import Knowledge from './Knowledges/Knowledges';
 
-// const bokehPass = new BokehPass(scene, camera, {
-//     focus: 60,
-//     aperture: 0.00001,
-//     maxblur: 0.1,
 
-//     width: window.innerWidth,
-//     height: window.innerHeight
-// });
-console.log({ distance: new Vector3().copy(character.position).distanceTo(camera.position) });
-// console.log({ uniform: bokehPass.uniforms })
-// bokehPass.uniforms.aperture.value = 4 * 0.00001;
-const renderPass = new RenderPass(scene, camera);
-
-// const fxaaPass = new ShaderPass(FXAAShader);
-// const pixelRatio = window.devicePixelRatio;
-// fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * pixelRatio);
-// fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * pixelRatio);
-
-// renderer.physicallyCorrectLights = true;
-// const composer2 = new EffectComposer(renderer);
-// composer2.setSize(window.innerWidth, window.innerHeight)
-// composer2.addPass(renderPass);
-// composer2.addPass(fxaaPass);
-// composer2.addPass(bokehPass);
 interface IHash<T> {
     [key: string]: T
 }
@@ -376,20 +307,9 @@ function animate() {
         johansen.update(deltatime)
     }
 
-    if (prolang.initialized) {
-        prolang.update(deltatime)
-    }
 
-    if (dbs.initialized) {
-        dbs.update(deltatime)
-    }
-
-    if (frameworks.initialized) {
-        frameworks.update(deltatime)
-    }
-
-    if (softwares.initialized) {
-        softwares.update(deltatime)
+    if (knowledge.initialized) {
+        knowledge.update(deltatime)
     }
 
     if (billboards.initialized) {
@@ -489,7 +409,8 @@ function animate() {
 
     if (connection && character.body && connection.id)
         connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
-    renderer.render(scene, camera)
+    if (initialized)
+        renderer.render(scene, camera)
     // plane.setDepthTexture(SUN.shadow.map.texture);
     // plane.setWorldMatrix(SUN.matrixWorld);
     requestAnimationFrame(animate);
@@ -527,3 +448,33 @@ connection.onnewplayer = async (id: string) => {
     otherPlayers[id].body.mass = 0;//not affected to gravity
 }
 
+var initialized = false;
+const loading = new Loading();
+async function init() {
+    loading.setText("Loading Environment");
+    await hotkeys.init();
+    loading.addProgress(2);
+    await navigationBoards.init();
+    loading.addProgress(5);
+    await lobby.init();
+    loading.addProgress(10);
+    await roadStones.init()
+    loading.addProgress(3);
+    loading.setText("Loading Character");
+    await character.init();
+    loading.addProgress(2);
+    await johansen.init()
+    loading.addProgress(5);
+    loading.setText("Loading Knowledges");
+    await knowledge.init(loading);
+    await trees.init()
+    loading.addProgress(15);
+    loading.setText("Loading Billboards");
+    await billboards.init()
+    loading.addProgress(15);
+    loading.setText("Loading Playgrounds");
+    await digitRegocnition.init()
+    loading.addProgress(3);
+    initialized = true;
+}
+init();
