@@ -84,7 +84,7 @@ if [ "$DOCKER" == "true" ]; then
     echo "> COMPILING TYPESCRIPT..."
     if [ "$MODE" == "PROD" ]; then
         # build dist js
-        docker run -p 8080:8080 -v "/$(pwd)/:/usr/src/app" customnode:latest \
+        docker run -p 8081:8080 -v "/$(pwd)/:/usr/src/app" customnode:latest \
         npx webpack-dev-server --config webpack.prod.js \
         --env=TURN_DOMAIN=$TURN_DOMAIN --env=WEBSOCKET_DOMAIN=$PROD_WS_DOMAIN \
         --env=TURN_USERNAME=$TURN_USERNAME --env=TURN_PASSWORD=$TURN_PASSWORD --env=WEBSOCKET_PORT=$PROD_WS_PORT \
