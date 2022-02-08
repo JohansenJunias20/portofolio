@@ -1,23 +1,25 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
-import Framework from "./Framework";
+import DB from "./DB";
 
 
-export default class Frameworks {
-    keys: Array<Framework>;
+export default class DBs {
+    keys: Array<DB>;
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         this.keys = [
-            new Framework(world, scene, new Vector3(17.5, -5, 100), "react"),
-            new Framework(world, scene, new Vector3(17.5, -5, 120), "tensorflow"),
-            new Framework(world, scene, new Vector3(17.5, -5, 140), "electron"),
+            new DB(world, scene, new Vector3(-17.5, -5, 100), "redis"),
+            new DB(world, scene, new Vector3(-17.5, -5, 120), "mongo"),
+            new DB(world, scene, new Vector3(-17.5, -5, 140), "mysql"),
         ];
 
     }
-    public async init() {
+    public async init(floorModel: THREE.Group) {
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
+            key.asset.floorShadow.preload = true;
+            key.asset.floorShadow.Mesh = floorModel;
             await key.init();
             key.mesh.rotateY(degToRad(-45));
             key.body.quaternion.copy(key.mesh.quaternion as any)

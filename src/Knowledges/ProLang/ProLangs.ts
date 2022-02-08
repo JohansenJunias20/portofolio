@@ -19,9 +19,11 @@ export default class ProLangs {
             new ProLang(world, scene, new Vector3(52.5, -5, 160), "bash"),
         ];
     }
-    public async init() {
+    public async init(floorModel: THREE.Group) {
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
+            key.asset.floorShadow.preload = true;
+            key.asset.floorShadow.Mesh = floorModel;
             await key.init();
             key.mesh.rotateY(degToRad(-45));
             key.body.quaternion.copy(key.mesh.quaternion as any)
@@ -35,4 +37,5 @@ export default class ProLangs {
             key.update(deltatime);
         })
     }
+
 }

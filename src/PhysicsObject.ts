@@ -24,7 +24,9 @@ export default class PhysicsObject3d {
             textureUrl: string | THREE.Texture;
             modelUrl: string;
             scale?: THREE.Vector3
-            offset?: THREE.Vector3
+            offset?: THREE.Vector3;
+            Mesh?: THREE.Mesh | THREE.Group; // ada valuenya bila preload = true karena mesh sudah diload
+            preload?: boolean // artinya model shadow sudah selesai diload jadi tidak perlu this.loadfloorshadow() lagi saat init dipanggil
         };
         mtl?: string
     }
@@ -195,7 +197,17 @@ export default class PhysicsObject3d {
 
         //#region load floorShadow
         if (this.asset.floorShadow) {
-            await this.loadFloorShadow();
+            if (this.asset.floorShadow.preload) {
+                this.asset.floorShadow.Mesh.position.copy(this.position);
+                this.asset.floorShadow.Mesh.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
+                this.asset.floorShadow.Mesh.position.y = 0;
+                console.log({position:this.asset.floorShadow.Mesh.position})
+                this.scene.add(this.asset.floorShadow.Mesh.clone()); // di clone karena floorshadow pada tiap knowledge harus mesh yg berbeda bila sama maka hanya akan ke render 1
+                // console.log("this is using own mesh floorshadow")
+            }
+            else
+                await this.loadFloorShadow();
+
         }
         //#endregion
         this.initialized = true;
@@ -215,24 +227,14 @@ export default class PhysicsObject3d {
                 res(object)
             });
         });
-        // var box = new THREE.Box3().setFromObject(this.mesh);
-        // var size = new THREE.Vector3();
-        // box.getSize(size);
-        // const geom = new THREE.PlaneBufferGeometry(size.x, size.z);
-        // const object = new THREE.Mesh(geom, material);
-        console.log({ scale: ref.asset.scale })
-        // object.scale.copy(ref.asset.scale);
+
         object.position.copy(this.position);
         object.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
-        // object.position.copy(new Vector3(0, 0, 0));
         object.position.y = 0;
-        // object.rotateX(degToRad(-90))
         return object;
 
     }
     private async loadFloorShadow() {
-        // alert(`loading floor shadow ${this.asset.floorShadow.textureUrl}`)
-        console.log({ textureUrl: this.asset.floorShadow.textureUrl })
         var texture: THREE.Texture;
         if (typeof this.asset.floorShadow.textureUrl === 'string' || this.asset.floorShadow.textureUrl instanceof String)
             texture = await new TextureLoader().loadAsync(this.asset.floorShadow.textureUrl as string);
