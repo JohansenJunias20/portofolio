@@ -1,8 +1,9 @@
 import * as THREE from "three";
-import { TextureLoader, Vector3 } from "three";
+import { Group, ShaderMaterial, TextureLoader, Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
 import Tree from "./Tree";
 import * as CANNON from 'cannon';
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 
 
 export default class Trees {
@@ -43,14 +44,18 @@ export default class Trees {
             new Tree({ world, scene, type: 3, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.12, 0.12, 0.12), rotationDeg: 75, position: new THREE.Vector3(-34, -5, 61) }),
             new Tree({ world, scene, type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.13, 0.13, 0.13), rotationDeg: 75, position: new THREE.Vector3(38, -5, -14) }),
         ];
+        this.shadowModel = []
 
     }
     public async init() {
         await this.loadShadowTextures();
+        await this.loadShadowModel();
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
-            const shadowTexture = this.shadowTexture.find(_ => _.name == `floorShadow_${key.type}_deg${key.rotationDeg}`)
-            key.asset.floorShadow.textureUrl = shadowTexture.texture as any;
+            const { model } = this.shadowModel.find(_ => _.name == `floorShadow_${key.type}_deg${key.rotationDeg}`)
+            model.scale.copy(new THREE.Vector3(44 * key.asset.scale.x, 0, 44 * key.asset.scale.z))
+            key.asset.floorShadow.Mesh = model;
+            key.asset.floorShadow.preload = true;
             await key.init();
             key.body.quaternion.copy(key.mesh.quaternion as any)
             key.mesh.receiveShadow = true
@@ -60,7 +65,7 @@ export default class Trees {
 
     }
     private async loadShadowTextures() {
-        var name: textureNames = "";
+        var name: entityNames = "";
         name = "floorShadow_1_deg0";
         this.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
         name = "floorShadow_1_deg45";
@@ -80,10 +85,50 @@ export default class Trees {
         name = "floorShadow_3_deg75";
         this.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
     }
+    private async loadShadowModel() {
+
+        for (let i = 0; i < this.shadowTexture.length; i++) {
+            const { texture, name } = this.shadowTexture[i];
+            const material = new ShaderMaterial({
+                depthWrite: false,
+                vertexShader: await (await fetch(`/assets/shaders/floorShadow.vert`)).text(),
+                fragmentShader: await (await fetch(`/assets/shaders/floorShadow.frag`)).text(),
+                uniforms: {
+                    textureMap: {
+                        value: texture
+                    }
+                },
+                transparent: true
+            })
+
+            const ref = this;
+            const object = await new Promise<Group>((res, rej) => {
+                var objLoader = new OBJLoader();
+                objLoader.load("/assets/floorShadow.obj", function (object) {
+                    object.traverse(async (c: THREE.Mesh) => {
+                        if (c.isMesh) {
+                        }
+                        c.material = material;
+                        return c;
+                    })
+                    // object.scale.copy()
+                    res(object)
+                });
+            });
+            ref.shadowModel.push({ model: object, name: name });
+        }
+
+
+
+    }
     shadowTexture: {
-        name: textureNames,
+        name: entityNames,
         texture: THREE.Texture
     }[]
+    shadowModel: {
+        name: entityNames
+        model: THREE.Group
+    }[];
     update(deltatime: number) {
         this.keys.forEach(key => {
             key.update(deltatime);
@@ -94,4 +139,4 @@ export default class Trees {
 type degrees = 0 | 45 | 75;
 type types = 1 | 2 | 3;
 
-type textureNames = `floorShadow_${types}_deg${degrees}` | "";
+type entityNames = `floorShadow_${types}_deg${degrees}` | "";

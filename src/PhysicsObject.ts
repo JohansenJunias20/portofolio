@@ -201,7 +201,7 @@ export default class PhysicsObject3d {
                 this.asset.floorShadow.Mesh.position.copy(this.position);
                 this.asset.floorShadow.Mesh.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
                 this.asset.floorShadow.Mesh.position.y = 0;
-                console.log({position:this.asset.floorShadow.Mesh.position})
+                console.log({ position: this.asset.floorShadow.Mesh.position })
                 this.scene.add(this.asset.floorShadow.Mesh.clone()); // di clone karena floorshadow pada tiap knowledge harus mesh yg berbeda bila sama maka hanya akan ke render 1
                 // console.log("this is using own mesh floorshadow")
             }

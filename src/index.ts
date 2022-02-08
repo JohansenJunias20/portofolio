@@ -463,7 +463,7 @@ async function init() {
     loading.setText("Loading Character");
     await character.init();
     loading.addProgress(2);
-    await johansen.init()
+    // await johansen.init()
     loading.addProgress(5);
     loading.setText("Loading Knowledges");
     await knowledge.init(loading);

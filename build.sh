@@ -112,7 +112,7 @@ else
         --env=TURN_PORT=$TURN_PORT --env=TURN_PORT_TLS=$TURN_PORT_TLS --env=TURN_MIN_PORT=$TURN_MIN_PORT --env=TURN_MAX_PORT=$TURN_MAX_PORT
     elif [ "$MODE" == "DEV" ]; then
         # build dist js
-        npx webpack --watch --config webpack.dev.js \
+        webpack --watch --config webpack.dev.js \
         --env=TURN_DOMAIN=$TURN_DOMAIN --env=WEBSOCKET_DOMAIN=$DEV_WS_DOMAIN \
         --env=TURN_USERNAME=$TURN_USERNAME --env=TURN_PASSWORD=$TURN_PASSWORD --env=WEBSOCKET_PORT=$DEV_WS_PORT \
         --env=TURN_PORT=$TURN_PORT --env=TURN_PORT_TLS=$TURN_PORT_TLS --env=TURN_MIN_PORT=$TURN_MIN_PORT --env=TURN_MAX_PORT=$TURN_MAX_PORT
