@@ -52,8 +52,8 @@ SUN.shadow.camera.right = -sizeAreaShadow;
 SUN.shadow.mapSize.width = 700;
 SUN.shadow.mapSize.height = 700;
 scene.add(SUN)
-const helper = new THREE.DirectionalLightHelper(SUN, 1);
-scene.add(helper);
+// const helper = new THREE.DirectionalLightHelper(SUN, 1);
+// scene.add(helper);
 //#endregion
 
 const AMBIENT_LIGHT = new THREE.AmbientLight(0xffffff, 0.75);
@@ -170,41 +170,28 @@ import ProLangs from './ProLang/ProLangs';
 const HOTKEYSPOSITION = new Vector3(-15, 1, 0);
 
 const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
-hotkeys.init();
 
 const navigationBoards = new NavigationBoards(world, scene);
-navigationBoards.init();
 
 const lobby = new Lobby(world, scene);
-lobby.init();
 const character = new Character(world, scene, new Vector3(0, 0, -5));
-character.init();
 const roadStones = new RoadStones(scene)
-roadStones.init()
 
 const johansen = new Johansen(world, scene)
-// johansen.init()
 
 const prolang = new ProLangs(world, scene)
-prolang.init()
 
 const trees = new Trees(world, scene)
-trees.init()
 
 const dbs = new DBs(world, scene)
-dbs.init()
 
 const frameworks = new Frameworks(world, scene)
-frameworks.init()
 
 const softwares = new Softwares(world, scene)
-softwares.init()
 
 const billboards = new Billboards(world, scene, camera)
-billboards.init()
 
 const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Vector3(-50, 0.2, 50))
-digitRegocnition.init()
 //#endregion
 
 document.onkeydown = (e) => {
@@ -308,6 +295,7 @@ import Plane from './PlaneGround/Plane';
 import isintersect from './utility/isIntersect';
 import Connection from './Connection/Connection';
 import DigitRecognition from './Playgrounds/DigitRegocnition';
+import Loading from './Loading/Loading';
 
 // const bokehPass = new BokehPass(scene, camera, {
 //     focus: 60,
@@ -489,7 +477,8 @@ function animate() {
 
     if (connection && character.body && connection.id)
         connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
-    renderer.render(scene, camera)
+    if (initialized)
+        renderer.render(scene, camera)
     // plane.setDepthTexture(SUN.shadow.map.texture);
     // plane.setWorldMatrix(SUN.matrixWorld);
     requestAnimationFrame(animate);
@@ -527,3 +516,40 @@ connection.onnewplayer = async (id: string) => {
     otherPlayers[id].body.mass = 0;//not affected to gravity
 }
 
+var initialized = false;
+const loading = new Loading();
+async function init() {
+    loading.setText("Loading Environment");
+    await hotkeys.init();
+    loading.addProgress(2);
+    await navigationBoards.init();
+    loading.addProgress(5);
+    await lobby.init();
+    loading.addProgress(10);
+    await roadStones.init()
+    loading.addProgress(3);
+    loading.setText("Loading Character");
+    await character.init();
+    loading.addProgress(2);
+    await johansen.init()
+    loading.addProgress(5);
+    loading.setText("Loading Knowledges");
+    await prolang.init()
+    loading.addProgress(10);
+    await trees.init()
+    loading.addProgress(15);
+    await dbs.init()
+    loading.addProgress(10);
+    await frameworks.init()
+    loading.addProgress(10);
+    await softwares.init()
+    loading.addProgress(10);
+    loading.setText("Loading Billboards");
+    await billboards.init()
+    loading.addProgress(15);
+    loading.setText("Loading Playgrounds");
+    await digitRegocnition.init()
+    loading.addProgress(3);
+    initialized = true;
+}
+init();
