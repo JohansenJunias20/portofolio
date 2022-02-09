@@ -1,6 +1,7 @@
 uniform vec3 diffuse;
 uniform vec3 emissive;
 uniform float opacity;
+uniform float _opacity;
 varying vec3 vLightFront;
 varying vec3 vIndirectFront;
 #ifdef DOUBLE_SIDED
@@ -67,9 +68,11 @@ void main() {
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;
 	#include <envmap_fragment>
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+	// gl_FragColor = vec4( outgoingLight, opacity );
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>
+	gl_FragColor = vec4(gl_FragColor.xyz,_opacity);
 }

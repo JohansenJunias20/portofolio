@@ -1,11 +1,15 @@
 import { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import { Clock, Raycaster, Vector3 } from 'three';
+import { Clock, Group, Material, Mesh, MeshPhongMaterial, Raycaster, Shader, ShaderMaterial, Vector3 } from 'three';
 import Character from './Character';
 import * as CANNON from 'cannon';
 import Hotkeys from './Hotkeys/Hotkeys';
 const ENABLE_SHADOW = true;
 const canvas: HTMLCanvasElement = document.querySelector("#bg");
+canvas.style.width = `${innerWidth}px`;
+canvas.style.height = `${innerHeight}px`;
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
 console.log("v1.1")
@@ -144,7 +148,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 // renderer.shadowMap = true;
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { clamp } from 'three/src/math/MathUtils';
+import { clamp, degToRad } from 'three/src/math/MathUtils';
 import NavigationBoards from './NavigationBoards/NavigationBoards';
 import Lobby from './Lobby/Lobby';
 import RoadStones from './Lobby/RoadStones/RoadStones';
@@ -173,6 +177,7 @@ const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Ve
 //#endregion
 
 document.onkeydown = (e) => {
+    console.log(".")
     if (e.key == "w") {
     }
     else if (e.key == "s") {
@@ -184,6 +189,10 @@ document.onkeydown = (e) => {
     else if (e.key == "z") {
         //for placing trees purposes.
         console.log(`${character.position.x.toFixed(0)}, -5, ${character.position.z.toFixed(0)}`);
+        return;
+    }
+    else if (e.key == "g") {
+
         return;
     }
     else {
@@ -212,27 +221,38 @@ document.onkeyup = (e) => {
 }
 
 
-canvas.onclick = (e) => {
-    //
+canvas.onmousedown = (e) => {
+    // const raycast = new Raycaster();
     // raycast.setFromCamera(mouse, camera);
-    // const intersects = raycast.intersectObjects(scene.children);
-    // for (let i = 0; i < billboards.keys.length; i++) {
-    //     const billboard = billboards.keys[i];
-    //     for (let j = 0; j < intersects.length; j++) {
-    //         const intersect = intersects[j];
-    //         if (intersect.object.uuid == billboard.PopUpObject.borderFloor.mesh.uuid) {
-    //             for (let k = 0; k < billboard.urlRef.length; k++) {
-    //                 const url = billboard.urlRef[k];
-    //                 window.open(url, "_blank")
+    // const intsCenterScreen = raycast.intersectObjects(scene.children);
+    // if (intsCenterScreen.length != 0) {
+    //     for (let i = 0; i < intsCenterScreen.length; i++) {
+    //         const obj = intsCenterScreen[i];
+    //         if (character.mesh.children[0].uuid != obj.object.uuid) {
+    //             const mesh: Mesh = obj.object as any;
+    //             if (Array.isArray(mesh.material)) {
+    //                 const material = mesh.material[0];
+    //                 var val = (material as ShaderMaterial).uniforms?._opacity?.value;
+    //                 // if (!val) continue;
+    //                 val -= 4 * deltatime;
+    //                 const opacity = clamp(val, 0.2, 1);
+    //                 setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
 
+
+    //                 continue;
     //             }
-    //             return;
+    //             var val = (mesh.material as ShaderMaterial).uniforms?._opacity?.value;
+    //             // if (!val) continue;
+    //             val -= 4 * deltatime;
+    //             const opacity = clamp(val, 0.2, 1);
+    //             setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
     //         }
 
     //     }
     // }
 
 }
+
 
 const LOBBY_OFFSET_CAMERA = new Vector3(25, 35, 30);
 const KNOWLEDGE_OFFSET_CAMERA = new Vector3(15, 20, 35);
@@ -253,23 +273,28 @@ var alpha = 0;
 const clock = new Clock()
 
 import Trees from './Trees/Trees';
-import DBs from './Knowledges/DB/DBs';
-import Frameworks from './Knowledges/Frameworks/Frameworks';
-import Softwares from './Knowledges/Softwares/Softwares';
 import Billboards from './Billboards/Billboards';
 import Plane from './PlaneGround/Plane';
 import Connection from './Connection/Connection';
 import DigitRecognition from './Playgrounds/DigitRegocnition';
 import Loading from './Loading/Loading';
 import Knowledge from './Knowledges/Knowledges';
+import setOpacity from './utility/setOpacity';
 
 
 interface IHash<T> {
     [key: string]: T
 }
 const otherPlayers: IHash<Character> = {};
-
-
+window.onresize = (e) => {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.innerWidth / window.innerHeight)
+}
+var cameraPos = new THREE.Vector3();
+var cameraDir = new THREE.Vector3();
+const raycast2 = new THREE.Raycaster();
 function animate() {
     deltatime = clock.getDelta()
     // if (deltatime < 0.2)
@@ -277,8 +302,43 @@ function animate() {
     // else return
 
     raycast.setFromCamera(mouse, camera);
-    // checking intersect mouse with objects
     const intersects = raycast.intersectObjects(scene.children);
+
+    // checking intersect mouse with objects
+    if (character.initialized && loading.isFull && initialized && startHides) {
+        camera.getWorldPosition(cameraPos)
+        camera.getWorldDirection(cameraDir)
+        raycast2.set(cameraPos, cameraDir);
+        const intsCenterScreen = raycast2.intersectObjects(scene.children);
+        if (intsCenterScreen.length != 0) {
+            for (let i = 0; i < intsCenterScreen.length; i++) {
+                const obj = intsCenterScreen[i];
+                if (character.mesh.children[0].uuid != obj.object.uuid) {
+                    const mesh: Mesh = obj.object as any;
+                    if (Array.isArray(mesh.material)) { // bila 1 mesh terdiri dari beberapa material, biasanya .obj file
+                        const material: ShaderMaterial = mesh.material[0] as ShaderMaterial;
+                        var val = material.uniforms?._opacity?.value;
+                        // if (!val) continue;
+                        val -= 6 * deltatime;
+                        const opacity = clamp(val, 0.2, 1);
+                        setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
+
+
+                        continue;
+                    }
+
+
+                    var val = (mesh.material as ShaderMaterial).uniforms?._opacity?.value;
+
+                    val -= 6 * deltatime;
+                    const opacity = clamp(val, 0.2, 1);
+                    setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
+                }
+
+            }
+        }
+    }
+
     document.body.style.cursor = "default";
 
     //#region update mesh & body
@@ -442,7 +502,6 @@ connection.onrecieve = (e) => {
     // console.log("onrecieve...")
 }
 connection.onnewplayer = async (id: string) => {
-    console.log("new player...")
     otherPlayers[id] = (new Character(world, scene, new Vector3(0, 150, 0), 0));
     await otherPlayers[id].init();
     otherPlayers[id].body.mass = 0;//not affected to gravity
@@ -476,5 +535,9 @@ async function init() {
     await digitRegocnition.init()
     loading.addProgress(3);
     initialized = true;
+    setTimeout(() => {
+        startHides = true;
+    }, 3000);
 }
+var startHides = false;
 init();

@@ -5,7 +5,8 @@ import * as THREE from "three";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import getVertices from "./utility/getVertices";
-import { degToRad } from "three/src/math/MathUtils";
+import { clamp, degToRad } from "three/src/math/MathUtils";
+import setOpacity from "./utility/setOpacity";
 interface IPhysicsObject3dConstructor {
     world: CANNON.World,
     scene: THREE.Scene,
@@ -57,6 +58,7 @@ export default class PhysicsObject3d {
     public update(deltatime: number) {
         this.walk(deltatime);
         this.mesh.position.copy(this.position);
+        this.resetOpacity(deltatime);
 
         this.updatePhysics(deltatime);
     }
@@ -70,10 +72,10 @@ export default class PhysicsObject3d {
 
             const fbx = await new Promise<THREE.Object3D>((res, rej) => {
                 const loader = new FBXLoader();
-                loader.load(this.asset.url, (f) => {
-                    f.traverse(async (c: Mesh) => {
+                loader.load(this.asset.url, async (f) => {
+                    for (let i = 0; i < f.children.length; i++) {
+                        const c: Mesh = f.children[i] as any;
                         if (c.isMesh) {
-
                             c.castShadow = this.asset.castShadow;
                             const oldMat: any = c.material;
                             if (Array.isArray(oldMat)) {
@@ -81,28 +83,20 @@ export default class PhysicsObject3d {
                                     var element: any = oldMat[i];
                                     element = await ref.customShader(element.color);
                                 }
-                                // oldMat.forEach((mat, index) => {
-                                //     mat = new THREE.MeshLambertMaterial({
-                                //         color: oldMat[index].color,
-                                //         // map: oldMat.map,
-                                //         //etc
-                                //     });
-                                // });
                             }
                             else
                                 c.material = await ref.customShader(oldMat.color);
                             if (this.asset.recieveShadow != undefined)
                                 c.receiveShadow = this.asset.recieveShadow;
                         }
-                        return c;
-                    })
+                    }
+
                     f.scale.x = this.asset.scale.x;
                     f.scale.y = this.asset.scale.y;
                     f.scale.z = this.asset.scale.z;
                     res(f);
                 })
             })
-            // console.log({ fbx: fbx.children.map(child => child.material) })
             this.scene.add(fbx);
             this.position.y += 5;
             this.mesh = fbx;
@@ -135,36 +129,24 @@ export default class PhysicsObject3d {
 
                 var objLoader = new OBJLoader();
                 objLoader.setMaterials(mtl);
-                objLoader.load(ref.asset.url, function (object) {
-                    object.traverse(async (c: THREE.Mesh) => {
+                objLoader.load(ref.asset.url, async function (object) {
+                    for (let i = 0; i < object.children.length; i++) {
+                        const c: Mesh = object.children[i] as any;
                         if (c.isMesh) {
                             c.castShadow = ref.asset.castShadow;
-                            const oldMat: MeshPhongMaterial | MeshPhongMaterial[] = c.material as MeshPhongMaterial | MeshPhongMaterial[];
-                            if (Array.isArray(oldMat)) {
-                                for (let i = 0; i < oldMat.length; i++) {
-                                    var element: MeshPhongMaterial | ShaderMaterial = oldMat[i];
-                                    element = await ref.customShader(element.color);
+                            if (Array.isArray(c.material)) {
+                                for (let i = 0; i < c.material.length; i++) {
+                                    c.material[i] = (await ref.customShader((c as any).material[i].color)) as any;
                                 }
-                                // oldMat.forEach(asyn(mat: THREE.MeshLambertMaterial | THREE.MeshPhongMaterial, index) => {
-                                //     mat = new THREE.MeshLambertMaterial({
-                                //         color: oldMat[index].color,
-                                //         // map: oldMat.map,
-                                //         //etc
-                                //     });
-                                // });
+
                             }
                             else {
-                                c.material = await ref.customShader(oldMat.color)
+                                c.material = await ref.customShader((c.material as MeshPhongMaterial).color)
                             }
-                            // c.material = new THREE.MeshLambertMaterial({
-                            //     color: oldMat.color,
-                            //     // map: oldMat.map,
-                            //     //etc
-                            // });
-                            // c.receiveShadow = ref.asset.recieveShadow;
+
                         }
-                        return c;
-                    })
+                    }
+
                     object.scale.copy(ref.asset.scale)
                     res(object)
                 });
@@ -201,9 +183,8 @@ export default class PhysicsObject3d {
                 this.asset.floorShadow.Mesh.position.copy(this.position);
                 this.asset.floorShadow.Mesh.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
                 this.asset.floorShadow.Mesh.position.y = 0;
-                console.log({ position: this.asset.floorShadow.Mesh.position })
-                this.scene.add(this.asset.floorShadow.Mesh.clone()); // di clone karena floorshadow pada tiap knowledge harus mesh yg berbeda bila sama maka hanya akan ke render 1
-                // console.log("this is using own mesh floorshadow")
+                const newfloorShadow = this.asset.floorShadow.Mesh.clone();
+                this.mesh.children.push(newfloorShadow);
             }
             else
                 await this.loadFloorShadow();
@@ -250,18 +231,40 @@ export default class PhysicsObject3d {
             uniforms: {
                 textureMap: {
                     value: texture
+                },
+                _opacity: {
+                    value: 1
                 }
             },
             transparent: true
         })
         const model = await this.loadFloorShadowModel(material);
-        this.scene.add(model);
+        this.mesh.children.push(model);
+        // this.scene.add(model);
 
     }
     private updatePhysics(deltatime: number) {
         this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
         this.mesh.quaternion.copy(this.body.quaternion as any);
 
+    }
+    private resetOpacity(deltatime: number) {
+        // return
+        const meshChild = (this.mesh.children.find(({ type }) => type == "Mesh") as THREE.Mesh) as any;
+        if (Array.isArray(meshChild.material)) {
+            if (meshChild.material[0].uniforms?.hasOwnProperty('_opacity')) {
+                const opacity = meshChild.material[0].uniforms._opacity.value;
+                setOpacity(this.mesh as THREE.Group, this.scene.uuid,
+                    clamp(opacity ? parseFloat(opacity) + (1.5 * deltatime) : 1, 0.2, 1));
+            }
+        }
+        else {
+            if (meshChild.material.uniforms?.hasOwnProperty('_opacity')) {
+                const opacity = meshChild.material.uniforms._opacity.value;
+                setOpacity(this.mesh as THREE.Group, this.scene.uuid,
+                    clamp(opacity ? parseFloat(opacity) + (1.5 * deltatime) : 1, 0.2, 1));
+            }
+        }
     }
     private async customShader(color: THREE.ColorRepresentation) {
         return new THREE.ShaderMaterial({
@@ -274,9 +277,13 @@ export default class PhysicsObject3d {
                 ...THREE.UniformsLib["normalmap"],
                 diffuse: {
                     value: color
+                },
+                _opacity: {
+                    value: 1
                 }
             },
             lights: true,
+            transparent: true,
             // defines:{'LAMBERT'}
             vertexShader: await (await fetch("/assets/shaders/default.vert"))?.text(),
             fragmentShader: await (await fetch("/assets/shaders/default.frag"))?.text()

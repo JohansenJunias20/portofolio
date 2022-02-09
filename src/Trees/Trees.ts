@@ -96,7 +96,11 @@ export default class Trees {
                 uniforms: {
                     textureMap: {
                         value: texture
+                    },
+                    _opacity: {
+                        value: 1
                     }
+
                 },
                 transparent: true
             })
