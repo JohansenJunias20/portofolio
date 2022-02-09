@@ -6,10 +6,15 @@ module.exports = (env) => {
     module: {
       rules: [
         {
+          test: /\.(glsl|vert|frag)$/,
+          loader: 'ts-shader-loader'
+        },
+
+        {
           test: /\.tsx?$/,
           use: 'ts-loader',
           exclude: /node_modules/,
-        },
+        }
       ],
     },
     plugins: [

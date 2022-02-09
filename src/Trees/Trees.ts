@@ -5,6 +5,8 @@ import Tree from "./Tree";
 import * as CANNON from 'cannon';
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 
+import shadowVert from '../../public/assets/shaders/floorShadow.vert';
+import shadowFrag from '../../public/assets/shaders/floorShadow.frag';
 
 export default class Trees {
     keys: Array<Tree>;
@@ -91,8 +93,8 @@ export default class Trees {
             const { texture, name } = this.shadowTexture[i];
             const material = new ShaderMaterial({
                 depthWrite: false,
-                vertexShader: await (await fetch(`/assets/shaders/floorShadow.vert`)).text(),
-                fragmentShader: await (await fetch(`/assets/shaders/floorShadow.frag`)).text(),
+                vertexShader: shadowVert,
+                fragmentShader: shadowFrag,
                 uniforms: {
                     textureMap: {
                         value: texture

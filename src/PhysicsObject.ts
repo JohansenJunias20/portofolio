@@ -4,7 +4,6 @@ import * as CANNON from 'cannon';
 import * as THREE from "three";
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
-import getVertices from "./utility/getVertices";
 import { clamp, degToRad } from "three/src/math/MathUtils";
 import setOpacity from "./utility/setOpacity";
 interface IPhysicsObject3dConstructor {
@@ -15,6 +14,13 @@ interface IPhysicsObject3dConstructor {
     shapeType: "TRIMESH" | "BOX" | "SPHERE" | "CUSTOM",
     mass: number, shape?: CANNON.Shape
 }
+
+import defaultFrag from '../public/assets/shaders/default.frag';
+import defaultVert from '../public/assets/shaders/default.vert';
+import shadowVert from '../public/assets/shaders/floorShadow.vert';
+import shadowFrag from '../public/assets/shaders/floorShadow.frag';
+//please load default custom shader here (only once)
+
 export default class PhysicsObject3d {
     protected asset: {
         url: string;
@@ -72,7 +78,7 @@ export default class PhysicsObject3d {
 
             const fbx = await new Promise<THREE.Object3D>((res, rej) => {
                 const loader = new FBXLoader();
-                loader.load(this.asset.url, async (f) => {
+                loader.load(this.asset.url, (f) => {
                     for (let i = 0; i < f.children.length; i++) {
                         const c: Mesh = f.children[i] as any;
                         if (c.isMesh) {
@@ -81,11 +87,11 @@ export default class PhysicsObject3d {
                             if (Array.isArray(oldMat)) {
                                 for (let i = 0; i < oldMat.length; i++) {
                                     var element: any = oldMat[i];
-                                    element = await ref.customShader(element.color);
+                                    element = ref.customShader(element.color);
                                 }
                             }
                             else
-                                c.material = await ref.customShader(oldMat.color);
+                                c.material = ref.customShader(oldMat.color);
                             if (this.asset.recieveShadow != undefined)
                                 c.receiveShadow = this.asset.recieveShadow;
                         }
@@ -226,8 +232,8 @@ export default class PhysicsObject3d {
 
         const material = new ShaderMaterial({
             depthWrite: false,
-            vertexShader: await (await fetch(`/assets/shaders/floorShadow.vert`)).text(),
-            fragmentShader: await (await fetch(`/assets/shaders/floorShadow.frag`)).text(),
+            vertexShader: shadowVert,
+            fragmentShader: shadowFrag,
             uniforms: {
                 textureMap: {
                     value: texture
@@ -266,7 +272,7 @@ export default class PhysicsObject3d {
             }
         }
     }
-    private async customShader(color: THREE.ColorRepresentation) {
+    private customShader(color: THREE.ColorRepresentation) {
         return new THREE.ShaderMaterial({
             uniforms: {
                 ...THREE.UniformsLib["common"],
@@ -285,8 +291,8 @@ export default class PhysicsObject3d {
             lights: true,
             transparent: true,
             // defines:{'LAMBERT'}
-            vertexShader: await (await fetch("/assets/shaders/default.vert"))?.text(),
-            fragmentShader: await (await fetch("/assets/shaders/default.frag"))?.text()
+            vertexShader: defaultVert,
+            fragmentShader: defaultFrag
         })
 
     }

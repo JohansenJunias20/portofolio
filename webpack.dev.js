@@ -3,14 +3,19 @@ const webpack = require('webpack');
 module.exports = (env) => {
   return {
     entry: './src/index.ts',
-    watch: true,
+    // watch: true,
     module: {
       rules: [
+        {
+          test: /\.(glsl|vert|frag)$/,
+          loader: 'ts-shader-loader'
+        },
+
         {
           test: /\.tsx?$/,
           use: 'ts-loader',
           exclude: /node_modules/,
-        },
+        }
       ],
     },
     plugins: [

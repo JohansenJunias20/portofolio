@@ -19,6 +19,7 @@
   "homepage": "https://github.com/JohansenJunias20/portofolio#readme",
   "devDependencies": {
     "ts-loader": "^9.2.6",
+    "ts-shader-loader": "^1.0.6",
     "typescript": "^4.5.3",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.4"
@@ -28,6 +29,7 @@
     "@types/three": "^0.135.0",
     "cannon": "^0.6.2",
     "cannon-es": "^0.18.0",
+    "glslify-loader": "^2.0.0",
     "socket.io-client": "^4.4.1",
     "three": "^0.135.0",
     "webpack": "^5.65.0"
