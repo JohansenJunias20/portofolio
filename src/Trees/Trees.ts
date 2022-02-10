@@ -7,6 +7,7 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 
 import shadowVert from '../../public/assets/shaders/floorShadow.vert';
 import shadowFrag from '../../public/assets/shaders/floorShadow.frag';
+import loadOBJ from "../utility/loadOBJ";
 
 export default class Trees {
     keys: Array<Tree>;
@@ -108,19 +109,7 @@ export default class Trees {
             })
 
             const ref = this;
-            const object = await new Promise<Group>((res, rej) => {
-                var objLoader = new OBJLoader();
-                objLoader.load("/assets/floorShadow.obj", function (object) {
-                    object.traverse(async (c: THREE.Mesh) => {
-                        if (c.isMesh) {
-                        }
-                        c.material = material;
-                        return c;
-                    })
-                    // object.scale.copy()
-                    res(object)
-                });
-            });
+            const object = await loadOBJ("/assets/floorShadow.obj", material);
             ref.shadowModel.push({ model: object, name: name });
         }
 
