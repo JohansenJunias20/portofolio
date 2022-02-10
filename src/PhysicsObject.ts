@@ -27,7 +27,7 @@ import isOBJ from "./utility/isOBJ";
 //please load default custom shader here (only once)
 
 export default class PhysicsObject3d {
-    protected asset: {
+    public asset: {
         url: string;
         scale: THREE.Vector3;
         recieveShadow?: boolean;
@@ -79,7 +79,6 @@ export default class PhysicsObject3d {
     }
     private async loadAsset() {
         var size = new THREE.Vector3();
-
         const { url, scale, mtl } = this.asset;
         const object = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale));
         this.position.y += 5;
@@ -87,12 +86,14 @@ export default class PhysicsObject3d {
         if (this.shapeType == "TRIMESH") {
             const temp: THREE.Mesh = this.mesh.children[0] as Mesh;
             this.shape = createBody(temp);
-            if (isOBJ(url))
-                (this.shape as any).setScale(new CANNON.Vec3(10, 10, 10) as any)
         }
+        if (isOBJ(url))
+            (this.shape as any).setScale(new CANNON.Vec3(10, 10, 10) as any)
+        if (this.shapeType == "BOX")
+            new THREE.Box3().setFromObject(object).getSize(size);
 
         this.body = new CANNON.Body({
-            mass: this.mass, material: { friction: 1, restitution: 1, id: 1, name: "test" },
+            mass: this.mass, material: { friction: 1, restitution: 0, id: 1, name: "test" },
             shape: this.shapeType == "CUSTOM" ?
                 this.shape :
                 this.shapeType == "BOX" ?
@@ -103,16 +104,19 @@ export default class PhysicsObject3d {
         });
         this.body.position.set(this.position.x, this.position.y, this.position.z);
         this.PhysicsWorld.addBody(this.body);
-        this.scene.add(object);
+        this.scene.add(this.mesh);
 
         //#region load floorShadow
         if (this.asset.floorShadow) {
             if (this.asset.floorShadow.preload) {
-                this.asset.floorShadow.Mesh.position.copy(this.position);
-                this.asset.floorShadow.Mesh.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
-                this.asset.floorShadow.Mesh.position.y = 0;
+                // await this.loadFloorShadow();
+
                 const newfloorShadow = this.asset.floorShadow.Mesh.clone();
-                this.mesh.children.push(newfloorShadow);
+                newfloorShadow.position.copy(this.position);
+                newfloorShadow.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
+                newfloorShadow.position.y = 0;
+                this.mesh.children.push(newfloorShadow)
+                // this.mesh.children.push(newfloorShadow);
             }
             else
                 await this.loadFloorShadow();
@@ -129,7 +133,22 @@ export default class PhysicsObject3d {
             this.initialized = true;
             return;
         }
-        this.mesh.children.push(...this.asset.additionalMesh);
+    
+        if (!this.text) {
+            this.initialized = true;
+            return;
+        }
+        if (this.text != "ts" && this.text != "golang") {
+            this.initialized = true;
+            return;
+        }
+        // this.asset.additionalMesh[0].position.set(0, 0, 0);
+        // this.mesh.children.push(this.asset.additionalMesh[0]);
+        // this.asset.additionalMesh[0].position.copy(this.position);
+        // console.log({ addmesh: this.asset.additionalMesh[0] })
+        // this.asset.additionalMesh[0].scale.copy(object.scale);
+        this.mesh.add(...this.asset.additionalMesh)
+
         this.initialized = true;
 
     }

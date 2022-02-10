@@ -77,6 +77,8 @@ plane.init()
 var followCharacter = true;
 var leftMouseDown = false;
 canvas.onmousedown = (e) => {
+
+
     if (e.which == 1) {
 
 
@@ -187,11 +189,15 @@ document.onkeydown = (e) => {
     }
     else if (e.key == "z") {
         //for placing trees purposes.
-        console.log(`${character.position.x.toFixed(0)}, -5, ${character.position.z.toFixed(0)}`);
+        debug = !debug;
+        // console.log(`${character.position.x.toFixed(0)}, -5, ${character.position.z.toFixed(0)}`);
         return;
     }
     else if (e.key == "g") {
-
+        const raycast3 = new Raycaster();
+        raycast3.setFromCamera(mouse, camera);
+        var intersects = raycast3.intersectObjects(scene.children)
+        console.log(intersects)
         return;
     }
     else {
@@ -279,7 +285,7 @@ import DigitRecognition from './Playgrounds/DigitRegocnition';
 import Loading from './Loading/Loading';
 import Knowledge from './Knowledges/Knowledges';
 import setOpacity from './utility/setOpacity';
-
+var debug = false;
 
 interface IHash<T> {
     [key: string]: T
@@ -331,6 +337,14 @@ function animate() {
 
                     val -= 6 * deltatime;
                     const opacity = clamp(val, 0.2, 1);
+                    if (debug) {
+                        console.log(mesh.parent);
+                    }
+                    // if (mesh.parent.name == "" && mesh.parent.type == "Group" && mesh.parent.children.length == 3 && mesh.parent.children[2].name == "Circle_Circle.001") {
+                    //     console.log(opacity)
+                    //     console.log(mesh)
+                    //     // throw "err"
+                    // }
                     setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
                 }
 

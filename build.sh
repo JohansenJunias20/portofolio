@@ -74,7 +74,7 @@ if [ "$DOCKER" == "true" ]; then
     # load dotenv file to variables
     echo "> INSTALLING DEPENDENCIES..."
     # installing dependencies
-    docker run -v "/$(pwd)/:/usr/src/app" customnode:latest npm install
+    docker run -v "/$(pwd)/:/usr/src/app" customnode:latest npm ci
     docker run -v "/$(pwd)/:/usr/src/app" customnode:latest npm install -D webpack-cli
 
     # give access so docker can write files to public.

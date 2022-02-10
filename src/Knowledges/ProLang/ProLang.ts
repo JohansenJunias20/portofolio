@@ -25,12 +25,12 @@ export default class ProLang extends PhysicsObject3d {
             preload: true,
             Mesh: new THREE.Group()
         },
-        // additionalMesh: [new THREE.Mesh()]
+        additionalMesh: [new THREE.Mesh()]
     }
     public readonly text: "js" | "ts" | "golang" | "cs" | "python" | "html" | "css" | "php" | "cpp" | "bash";
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "js" | "ts" | "golang" | "cs" | "python" | "html" | "css" | "php" | "cpp" | "bash") {
-        // super(world, scene, position, 0, "CUSTOM", 0,new CANNON.Shape());
-        super(world, scene, position, 0, "TRIMESH", 0);
+        super(world, scene, position, 0, text == "ts" || text == "golang" ? "CUSTOM" : "TRIMESH", 0, new CANNON.Shape());
+        // super(world, scene, position, 0, "TRIMESH", 0);
         this.text = text;
         this.asset.url = `/assets/environment/knowledge/ProLang/${text}.obj`;
         this.asset.mtl = `/assets/environment/knowledge/ProLang/${text}.mtl`;
