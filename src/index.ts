@@ -177,7 +177,6 @@ const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Ve
 //#endregion
 
 document.onkeydown = (e) => {
-    console.log(".")
     if (e.key == "w") {
     }
     else if (e.key == "s") {

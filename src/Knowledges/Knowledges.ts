@@ -2,11 +2,11 @@ import * as THREE from "three"
 import { Group, ShaderMaterial, TextureLoader, Vector3 } from "three"
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader"
 import Loading from "../Loading/Loading"
+import createBody from "../utility/createBody"
 import DBs from "./DB/DBs"
 import Frameworks from "./Frameworks/Frameworks"
 import ProLangs from "./ProLang/ProLangs"
 import Softwares from "./Softwares/Softwares"
-
 
 export default class Knowledge {
     prolang: ProLangs
@@ -25,6 +25,11 @@ export default class Knowledge {
     async init(loading: Loading) {
         await this.loadShadowTexture();
         await this.loadShadowModel();
+        // const circlePlate: THREE.Mesh = await this.loadCirclePlate();
+        this.prolang.keys.forEach(key => {
+            // key.asset.additionalMesh[0] = circlePlate.clone();
+            // key.shape = createBody(circlePlate);
+        })
         await this.prolang.init(this.floorModel)
         loading.addProgress(10);
         await this.dbs.init(this.floorModel)
@@ -75,6 +80,9 @@ export default class Knowledge {
         });
 
         this.floorModel = object;
+    }
+    async loadCirclePlate() {
+
     }
     async loadShadowTexture() {
         this.floorShadow = await new TextureLoader().loadAsync("/assets/environment/knowledge/floorShadow.png");

@@ -19,6 +19,11 @@ import defaultFrag from '../public/assets/shaders/default.frag';
 import defaultVert from '../public/assets/shaders/default.vert';
 import shadowVert from '../public/assets/shaders/floorShadow.vert';
 import shadowFrag from '../public/assets/shaders/floorShadow.frag';
+import createBody from "./utility/createBody";
+import loadFBX from "./utility/loadFBX";
+import loadOBJ from "./utility/loadOBJ";
+import isFBX from "./utility/isFBX";
+import isOBJ from "./utility/isOBJ";
 //please load default custom shader here (only once)
 
 export default class PhysicsObject3d {
@@ -35,6 +40,7 @@ export default class PhysicsObject3d {
             Mesh?: THREE.Mesh | THREE.Group; // ada valuenya bila preload = true karena mesh sudah diload
             preload?: boolean // artinya model shadow sudah selesai diload jadi tidak perlu this.loadfloorshadow() lagi saat init dipanggil
         };
+        additionalMesh?: THREE.Mesh[],
         mtl?: string
     }
     protected PhysicsWorld: CANNON.World;
@@ -45,7 +51,7 @@ export default class PhysicsObject3d {
     public movementSpeed: number;
     public body: CANNON.Body;
     public shapeType: "BOX" | "SPHERE" | "CUSTOM" | "TRIMESH";
-    private shape: CANNON.Shape | null;
+    public shape: CANNON.Shape | null;
     public readonly mass: number;
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 10, shapeType: "TRIMESH" | "BOX" | "SPHERE" | "CUSTOM", mass: number, shape: null | CANNON.Shape = null) {
         this.PhysicsWorld = world;
@@ -73,115 +79,31 @@ export default class PhysicsObject3d {
     }
     private async loadAsset() {
         var size = new THREE.Vector3();
-        const ref = this;
-        if (this.asset.url.indexOf(".fbx") > -1) {
 
-            const fbx = await new Promise<THREE.Object3D>((res, rej) => {
-                const loader = new FBXLoader();
-                loader.load(this.asset.url, (f) => {
-                    for (let i = 0; i < f.children.length; i++) {
-                        const c: Mesh = f.children[i] as any;
-                        if (c.isMesh) {
-                            c.castShadow = this.asset.castShadow;
-                            const oldMat: any = c.material;
-                            if (Array.isArray(oldMat)) {
-                                for (let i = 0; i < oldMat.length; i++) {
-                                    var element: any = oldMat[i];
-                                    element = ref.customShader(element.color);
-                                }
-                            }
-                            else
-                                c.material = ref.customShader(oldMat.color);
-                            if (this.asset.recieveShadow != undefined)
-                                c.receiveShadow = this.asset.recieveShadow;
-                        }
-                    }
-
-                    f.scale.x = this.asset.scale.x;
-                    f.scale.y = this.asset.scale.y;
-                    f.scale.z = this.asset.scale.z;
-                    res(f);
-                })
-            })
-            this.scene.add(fbx);
-            this.position.y += 5;
-            this.mesh = fbx;
-
-
-            new THREE.Box3().setFromObject(fbx).getSize(size);
-            if (this.shapeType == "TRIMESH") {
-                const temp: THREE.Mesh = this.mesh.children[0] as THREE.Mesh;
-                const vertices = temp.geometry.attributes.position.array;
-                const indices = Object.keys(vertices).map(Number);
-                this.shape = new CANNON.Trimesh(vertices as number[], indices);
-            }
-
-            this.body =
-                new CANNON.Body({
-                    mass: this.mass, material: { friction: 1, restitution: 0.3, id: 1, name: "test" },
-                    shape: this.shapeType == "CUSTOM" ? this.shape :
-                        this.shapeType == "BOX" ? new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) :
-                            this.shapeType == "TRIMESH" ? this.shape :
-                                new CANNON.Sphere(1)
-                });
-            this.body.position.set(this.position.x, this.position.y, this.position.z);
-            this.PhysicsWorld.addBody(this.body);
+        const { url, scale, mtl } = this.asset;
+        const object = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale));
+        this.position.y += 5;
+        this.mesh = object;
+        if (this.shapeType == "TRIMESH") {
+            const temp: THREE.Mesh = this.mesh.children[0] as Mesh;
+            this.shape = createBody(temp);
+            if (isOBJ(url))
+                (this.shape as any).setScale(new CANNON.Vec3(10, 10, 10) as any)
         }
-        else {
-            const ref = this;
-            const mtlLoader = new MTLLoader();
-            const mtl = await mtlLoader.loadAsync(this.asset.mtl);
-            const object = await new Promise<Group>((res, rej) => {
 
-                var objLoader = new OBJLoader();
-                objLoader.setMaterials(mtl);
-                objLoader.load(ref.asset.url, async function (object) {
-                    for (let i = 0; i < object.children.length; i++) {
-                        const c: Mesh = object.children[i] as any;
-                        if (c.isMesh) {
-                            c.castShadow = ref.asset.castShadow;
-                            if (Array.isArray(c.material)) {
-                                for (let i = 0; i < c.material.length; i++) {
-                                    c.material[i] = (await ref.customShader((c as any).material[i].color)) as any;
-                                }
-
-                            }
-                            else {
-                                c.material = await ref.customShader((c.material as MeshPhongMaterial).color)
-                            }
-
-                        }
-                    }
-
-                    object.scale.copy(ref.asset.scale)
-                    res(object)
-                });
-            });
-            this.mesh = object;
-
-            if (this.shapeType == "TRIMESH") {
-                const temp: THREE.Mesh = this.mesh.children[0] as Mesh;
-                const vertices = temp.geometry.attributes.position.array;
-                const indices = Object.keys(vertices).map(Number);
-                this.shape = new CANNON.Trimesh(vertices as number[], indices);
-                const tempShape: any = this.shape;
-                tempShape.setScale(new CANNON.Vec3(10, 10, 10) as any)
-                this.position.y += 5;
-            }
-
-
-
-            this.body =
-                new CANNON.Body({
-                    mass: this.mass, material: { friction: 1, restitution: 1, id: 1, name: "test" },
-                    shape: this.shapeType == "CUSTOM" ? this.shape :
-                        this.shapeType == "BOX" ? new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) :
-                            this.shapeType == "TRIMESH" ? this.shape : new CANNON.Sphere(1)
-                });
-            this.body.position.set(this.position.x, this.position.y, this.position.z);
-            this.PhysicsWorld.addBody(this.body);
-            this.scene.add(object);
-        }
+        this.body = new CANNON.Body({
+            mass: this.mass, material: { friction: 1, restitution: 1, id: 1, name: "test" },
+            shape: this.shapeType == "CUSTOM" ?
+                this.shape :
+                this.shapeType == "BOX" ?
+                    new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) :
+                    this.shapeType == "TRIMESH" ?
+                        this.shape :
+                        new CANNON.Sphere(1)
+        });
+        this.body.position.set(this.position.x, this.position.y, this.position.z);
+        this.PhysicsWorld.addBody(this.body);
+        this.scene.add(object);
 
         //#region load floorShadow
         if (this.asset.floorShadow) {
@@ -197,7 +119,19 @@ export default class PhysicsObject3d {
 
         }
         //#endregion
+
+        //adding additional mesh if available
+        if (!this.asset.additionalMesh) {
+            this.initialized = true;
+            return;
+        }
+        if (this.asset.additionalMesh.length == 0) {
+            this.initialized = true;
+            return;
+        }
+        this.mesh.children.push(...this.asset.additionalMesh);
         this.initialized = true;
+
     }
     private async loadFloorShadowModel(material: THREE.ShaderMaterial) {
         const ref = this;

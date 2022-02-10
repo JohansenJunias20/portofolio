@@ -28,6 +28,7 @@ export default class Software extends PhysicsObject3d {
     }
     public readonly text: "blender" | "ue" | "adobe"
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "blender" | "ue" | "adobe") {
+        // super(world, scene, position, 0, "CUSTOM", 0, new CANNON.Shape());
         super(world, scene, position, 0, "TRIMESH", 0);
         this.text = text;
         this.asset.url = `/assets/environment/knowledge/Software/${text}.obj`;
