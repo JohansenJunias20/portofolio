@@ -134,14 +134,14 @@ export default class PhysicsObject3d {
             return;
         }
     
-        if (!this.text) {
-            this.initialized = true;
-            return;
-        }
-        if (this.text != "ts" && this.text != "golang") {
-            this.initialized = true;
-            return;
-        }
+        // if (!this.text) {
+        //     this.initialized = true;
+        //     return;
+        // }
+        // if (this.text != "ts" && this.text != "golang") {
+        //     this.initialized = true;
+        //     return;
+        // }
         // this.asset.additionalMesh[0].position.set(0, 0, 0);
         // this.mesh.children.push(this.asset.additionalMesh[0]);
         // this.asset.additionalMesh[0].position.copy(this.position);

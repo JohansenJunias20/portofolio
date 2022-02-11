@@ -539,6 +539,7 @@ async function init() {
     loading.addProgress(5);
     loading.setText("Loading Knowledges");
     await knowledge.init(loading);
+    loading.setText("Loading Trees");
     await trees.init()
     loading.addProgress(15);
     loading.setText("Loading Billboards");

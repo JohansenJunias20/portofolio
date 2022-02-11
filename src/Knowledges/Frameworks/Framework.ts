@@ -24,12 +24,13 @@ export default class Framework extends PhysicsObject3d {
             offset: new Vector3(),
             preload: true,
             Mesh: new THREE.Group()
-        }
+        },
+        additionalMesh: [new THREE.Mesh()]
     }
     public readonly text: "react" | "tensorflow" | "laravel" | "expo" | "electron" | "tailwind" | "three"
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "react" | "tensorflow" | "laravel" | "expo" | "electron" | "tailwind" | "three") {
-        super(world, scene, position, 0, "TRIMESH", 0);
-        // super(world, scene, position, 0, "CUSTOM", 0, new CANNON.Shape());
+        // super(world, scene, position, 0, "TRIMESH", 0);
+        super(world, scene, position, 0, "CUSTOM", 0, new CANNON.Shape());
         this.text = text;
         this.asset.url = `/assets/environment/knowledge/Framework/${text}.obj`;
         this.asset.mtl = `/assets/environment/knowledge/Framework/${text}.mtl`;

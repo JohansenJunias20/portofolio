@@ -24,12 +24,13 @@ export default class Software extends PhysicsObject3d {
             offset: new Vector3(),
             preload: true,
             Mesh: new THREE.Group()
-        }
+        },
+        additionalMesh: [new THREE.Mesh()]
     }
     public readonly text: "blender" | "ue" | "adobe"
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "blender" | "ue" | "adobe") {
-        // super(world, scene, position, 0, "CUSTOM", 0, new CANNON.Shape());
-        super(world, scene, position, 0, "TRIMESH", 0);
+        super(world, scene, position, 0, "CUSTOM", 0, new CANNON.Shape());
+        // super(world, scene, position, 0, "TRIMESH", 0);
         this.text = text;
         this.asset.url = `/assets/environment/knowledge/Software/${text}.obj`;
         this.asset.mtl = `/assets/environment/knowledge/Software/${text}.mtl`;

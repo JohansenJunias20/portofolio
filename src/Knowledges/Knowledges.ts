@@ -1,6 +1,6 @@
 import { Vec3 } from "cannon"
 import * as THREE from "three"
-import { Group, ShaderMaterial, TextureLoader, Vector3 } from "three"
+import { Group, Material, ShaderMaterial, TextureLoader, Vector3 } from "three"
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader"
 import Loading from "../Loading/Loading"
 import createBody from "../utility/createBody"
@@ -29,15 +29,13 @@ export default class Knowledge {
     async init(loading: Loading) {
         await this.loadShadowTexture();
         await this.loadShadowModel();
-
+        const circlePlate: THREE.Mesh = await this.loadCirclePlate()
         // circlePlate.scale.set(10, 10, 10);
         // console.log({ circlePlate })
 
         for (let i = 0; i < this.prolang.keys.length; i++) {
-            const key = this.prolang.keys[i];
-            if (key.text != "golang" && key.text != "ts") continue;
-
-            const newCirclePlane = await this.loadCirclePlate(); // ternyata mesh.clone() itu menggunakan reference material yang sama
+            const newCirclePlane = circlePlate.clone(); // ternyata mesh.clone() itu menggunakan reference material yang sama
+            newCirclePlane.material = (circlePlate.material as Material).clone();
             this.prolang.keys[i].asset.additionalMesh[0] = newCirclePlane;
 
 
@@ -45,24 +43,41 @@ export default class Knowledge {
             this.prolang.keys[i].shape = createBody(newCirclePlane);
             (this.prolang.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
         }
-        // this.prolang.keys.forEach(key => {
-        //     if (key.text != "golang" && key.text != "ts") return;
 
-        //     const newCirclePlane = circlePlate.clone(true);
-        //     key.asset.additionalMesh[0] = newCirclePlane;
-
-
-
-        //     key.shape = createBody(newCirclePlane);
-        //     (key.shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
-        //     // key.mesh = new THREE.Mesh();
-        // })
         await this.prolang.init(this.floorModel)
         loading.addProgress(10);
+
+        for (let i = 0; i < this.dbs.keys.length; i++) {
+            const newCirclePlane = circlePlate.clone(); // ternyata mesh.clone() itu menggunakan reference material yang sama
+            newCirclePlane.material = (circlePlate.material as Material).clone();
+            this.dbs.keys[i].asset.additionalMesh[0] = newCirclePlane;
+
+            this.dbs.keys[i].shape = createBody(newCirclePlane);
+            (this.dbs.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
+        }
         await this.dbs.init(this.floorModel)
+
         loading.addProgress(10);
+
+        for (let i = 0; i < this.softwares.keys.length; i++) {
+            const newCirclePlane = circlePlate.clone(); // ternyata mesh.clone() itu menggunakan reference material yang sama
+            newCirclePlane.material = (circlePlate.material as Material).clone();
+            this.softwares.keys[i].asset.additionalMesh[0] = newCirclePlane;
+
+            this.softwares.keys[i].shape = createBody(newCirclePlane);
+            (this.softwares.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
+        }
         await this.softwares.init(this.floorModel)
         loading.addProgress(10);
+
+        for (let i = 0; i < this.frameworks.keys.length; i++) {
+            const newCirclePlane = circlePlate.clone(); // ternyata mesh.clone() itu menggunakan reference material yang sama
+            newCirclePlane.material = (circlePlate.material as Material).clone();
+            this.frameworks.keys[i].asset.additionalMesh[0] = newCirclePlane;
+
+            this.frameworks.keys[i].shape = createBody(newCirclePlane);
+            (this.frameworks.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
+        }
         await this.frameworks.init(this.floorModel)
         loading.addProgress(10);
 
