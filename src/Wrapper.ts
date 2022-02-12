@@ -16,6 +16,7 @@ export default class Wrapper<T extends PhysicsObject3d | MeshOnlyObject3d>{ //ka
     constructor(keys: Array<T> = []) {
         this.keys = keys;
         this.initialized = false;
+        this.counter = 0;
     }
     public async init(loading: Loading | null = null, onEachInitialized: (key: T) => void = null) {
         const ref = this;
@@ -35,9 +36,10 @@ export default class Wrapper<T extends PhysicsObject3d | MeshOnlyObject3d>{ //ka
         })
     }
     public onKeysInitialized: () => void;
+    public counter: number;
     protected isAllInitialized() {
-        const initialized = this.keys.filter(key => key.initialized).length;
-        if (initialized == this.keys.length) {
+        const initialized = this.keys.filter(key => key.initialized == true).length;
+        if (initialized == this.keys.length || this.counter == this.keys.length) {
             this.initialized = true;
             if (this.onKeysInitialized)
                 this.onKeysInitialized();

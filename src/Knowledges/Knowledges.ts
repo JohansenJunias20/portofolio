@@ -44,8 +44,7 @@ export default class Knowledge {
             (this.prolang.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
         }
 
-        await this.prolang.init(this.floorModel)
-        loading.addProgress(10);
+
 
         for (let i = 0; i < this.dbs.keys.length; i++) {
             const newCirclePlane = circlePlate.clone(); // ternyata mesh.clone() itu menggunakan reference material yang sama
@@ -55,9 +54,7 @@ export default class Knowledge {
             this.dbs.keys[i].shape = createBody(newCirclePlane);
             (this.dbs.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
         }
-        await this.dbs.init(this.floorModel)
 
-        loading.addProgress(10);
 
         for (let i = 0; i < this.softwares.keys.length; i++) {
             const newCirclePlane = circlePlate.clone(); // ternyata mesh.clone() itu menggunakan reference material yang sama
@@ -67,8 +64,7 @@ export default class Knowledge {
             this.softwares.keys[i].shape = createBody(newCirclePlane);
             (this.softwares.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
         }
-        await this.softwares.init(this.floorModel)
-        loading.addProgress(10);
+
 
         for (let i = 0; i < this.frameworks.keys.length; i++) {
             const newCirclePlane = circlePlate.clone(); // ternyata mesh.clone() itu menggunakan reference material yang sama
@@ -78,9 +74,13 @@ export default class Knowledge {
             this.frameworks.keys[i].shape = createBody(newCirclePlane);
             (this.frameworks.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
         }
-        await this.frameworks.init(this.floorModel)
-        loading.addProgress(10);
-
+        var promises: Promise<void>[] = []
+        promises.push(this.dbs.init(this.floorModel))
+        promises.push(this.softwares.init(this.floorModel))
+        promises.push(this.prolang.init(this.floorModel))
+        promises.push(this.frameworks.init(this.floorModel))
+        await Promise.all(promises);
+        loading.addProgress(40);
         this.initialized = true;
     }
     initialized: boolean;

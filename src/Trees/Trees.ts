@@ -52,6 +52,47 @@ export default class Trees extends Wrapper<Tree> {
     }
     public async init() {
         const ref = this;
+        await this.loadShadowTextures();
+        await this.loadShadowModel();
+        var promises = [];
+        ref.initialized = false;
+        for (let i = 0; i < ref.keys.length; i++) {
+            const key = ref.keys[i];
+            const { model } = ref.shadowModel.find(_ => _.name == `floorShadow_${key.type}_deg${key.rotationDeg}`)
+            model.scale.copy(new THREE.Vector3(44 * key.asset.scale.x, 0, 44 * key.asset.scale.z))
+            key.asset.floorShadow.Mesh = model;
+            key.asset.floorShadow.preload = true;
+            promises.push(key.init())
+            // key.init().then(() => {
+            //     ref.counter++;
+            //     console.log(`${ref.counter} finished`)
+            //     // console.log(ref.initialized)
+            //     key.body.quaternion.copy(key.mesh.quaternion as any)
+            //     if (super.isAllInitialized()) {
+            //         ref.initialized = true;
+            //         key.body.quaternion.copy(key.mesh.quaternion as any)
+            //         key.mesh.receiveShadow = true
+            //         key.mesh.castShadow = true
+            //         alert("RESOLVE")
+            //         res()
+            //     }
+
+            // });
+
+        }
+        var result = await Promise.all(promises)
+        console.log({ result });
+        for (let i = 0; i < this.keys.length; i++) {
+            const key = this.keys[i];
+            key.body.quaternion.copy(key.mesh.quaternion as any)
+            key.mesh.receiveShadow = true
+            key.mesh.castShadow = true
+        }
+        this.initialized = true;
+        console.log({ keys: this.keys.map(_ => _.initialized) })
+
+
+        return;
         return new Promise<void>(async (res, rej) => {
             await ref.loadShadowTextures();
             await ref.loadShadowModel();
