@@ -20,6 +20,17 @@ export default class Wrapper<T extends PhysicsObject3d | MeshOnlyObject3d>{ //ka
     }
     public async init(loading: Loading | null = null, onEachInitialized: (key: T) => void = null) {
         const ref = this;
+        var promises = [];
+        for (let i = 0; i < this.keys.length; i++) {
+            const keys = this.keys[i];
+            promises.push(keys.init(loading));
+        }
+        // promises = this.keys.map(keys => keys.init);
+        await Promise.all(promises);
+        this.initialized = true;
+        if (this.onKeysInitialized)
+            this.onKeysInitialized();
+        return;
         return new Promise<void>((res, rej) => {
 
             for (let i = 0; i < ref.keys.length; i++) {
