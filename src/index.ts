@@ -12,7 +12,7 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
-console.log("v1.2");
+console.log("v1.3");
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true,
@@ -80,8 +80,6 @@ canvas.onmousedown = (e) => {
 
 
     if (e.which == 1) {
-
-
 
         // if (controls.enablePan)
         if (followCharacter) {
@@ -541,13 +539,13 @@ async function init() {
     character.init().then(() => {
         loading.addProgress(2);
     });
-    johansen.init().then(() => {
-        loading.addProgress(5);
+    // johansen.init().then(() => {
+    //     loading.addProgress(5);
 
-    })
+    // })
     loading.setText("Loading Knowledges");
     knowledge.init(loading).then(() => {
-
+        loading.addProgress(5);
     });
     loading.setText("Loading Trees");
     trees.init().then(() => {
@@ -565,7 +563,6 @@ async function init() {
 }
 loading.onfull = () => {
     initialized = true;
-    console.log("onfull")
     // setTimeout(() => {
     //     startHides = true;
     // }, 3000);
