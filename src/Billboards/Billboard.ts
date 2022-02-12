@@ -9,6 +9,7 @@ import { clamp, degToRad } from 'three/src/math/MathUtils';
 import PopUp from '../PopUps/PopUp';
 
 export default class Billboard {
+    public isBillboard:boolean;
     private asset: {
         url: string;
         scale: THREE.Vector3;
@@ -44,6 +45,7 @@ export default class Billboard {
         this.PopUpObjects = [];
         this.mass = 0;
         this.PhysicsWorld = world;
+        this.isBillboard = true; // untuk memberi tahu Wrapper bahwa instance adalah dari Billboard Class
 
         this.Yrotation = rotation;
         this.asset = {

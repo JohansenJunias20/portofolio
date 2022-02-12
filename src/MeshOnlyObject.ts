@@ -2,6 +2,7 @@ import { Group, Vector3 } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import * as CANNON from 'cannon';
 import * as THREE from "three";
+import Loading from "./Loading/Loading";
 
 //default parent for Mesh Only Object (without physics & collision on it)
 export default class MeshOnlyObject3d {
@@ -20,7 +21,7 @@ export default class MeshOnlyObject3d {
         this.initialized = false;
         this.position = position;
     }
-    protected async init() {
+    public async init(loading: Loading) {
         await this.loadAsset();
     }
     public update(deltatime: number) {
@@ -49,5 +50,5 @@ export default class MeshOnlyObject3d {
 
         this.initialized = true;
     }
- 
+
 }

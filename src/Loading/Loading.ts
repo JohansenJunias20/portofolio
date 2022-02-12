@@ -43,9 +43,9 @@ export default class Loading {
             const ref = this;
             if (this.onfull)
                 this.onfull();
-            setTimeout(() => {
-                ref.hide()
-            }, 500);
+            ref.hide()
+            // setTimeout(() => {
+            // }, 500);
         }
     }
 }

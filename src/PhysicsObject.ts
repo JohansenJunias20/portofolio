@@ -64,7 +64,7 @@ export default class PhysicsObject3d {
         this.mass = mass;
     }
 
-    protected async init() {
+    public async init() {
         await this.loadAsset();
     }
     public update(deltatime: number) {
@@ -133,7 +133,7 @@ export default class PhysicsObject3d {
             this.initialized = true;
             return;
         }
-    
+
         // if (!this.text) {
         //     this.initialized = true;
         //     return;

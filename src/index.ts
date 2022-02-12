@@ -386,7 +386,7 @@ function animate() {
     }
 
     if (billboards.initialized) {
-        billboards.update(deltatime, character.body, intersects) // give intersects because contain popup mesh
+        billboards.updateBillboard(deltatime, character.body, intersects) // give intersects because contain popup mesh
     }
 
     if (digitRegocnition.initialized) {
@@ -566,9 +566,9 @@ async function init() {
 loading.onfull = () => {
     initialized = true;
     console.log("onfull")
-    setTimeout(() => {
-        startHides = true;
-    }, 3000);
+    // setTimeout(() => {
+    //     startHides = true;
+    // }, 3000);
 }
 var startHides = false;
 init();

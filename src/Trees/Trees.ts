@@ -8,11 +8,11 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import shadowVert from '../../public/assets/shaders/floorShadow.vert';
 import shadowFrag from '../../public/assets/shaders/floorShadow.frag';
 import loadOBJ from "../utility/loadOBJ";
+import Wrapper from "../Wrapper";
 
-export default class Trees {
-    keys: Array<Tree>;
-    initialized: boolean;
+export default class Trees extends Wrapper<Tree> {
     constructor(world: CANNON.World, scene: THREE.Scene) {
+        super()
         this.shadowTexture = []
         this.keys = [
             new Tree({ world, scene, position: new Vector3(89, -5, 101), type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg: 0 }),
@@ -51,20 +51,28 @@ export default class Trees {
 
     }
     public async init() {
-        await this.loadShadowTextures();
-        await this.loadShadowModel();
-        for (let i = 0; i < this.keys.length; i++) {
-            const key = this.keys[i];
-            const { model } = this.shadowModel.find(_ => _.name == `floorShadow_${key.type}_deg${key.rotationDeg}`)
-            model.scale.copy(new THREE.Vector3(44 * key.asset.scale.x, 0, 44 * key.asset.scale.z))
-            key.asset.floorShadow.Mesh = model;
-            key.asset.floorShadow.preload = true;
-            await key.init();
-            key.body.quaternion.copy(key.mesh.quaternion as any)
-            key.mesh.receiveShadow = true
-            key.mesh.castShadow = true
-        }
-        this.initialized = true;
+        const ref = this;
+        return new Promise<void>(async (res, rej) => {
+            await ref.loadShadowTextures();
+            await ref.loadShadowModel();
+            for (let i = 0; i < ref.keys.length; i++) {
+                const key = ref.keys[i];
+                const { model } = ref.shadowModel.find(_ => _.name == `floorShadow_${key.type}_deg${key.rotationDeg}`)
+                model.scale.copy(new THREE.Vector3(44 * key.asset.scale.x, 0, 44 * key.asset.scale.z))
+                key.asset.floorShadow.Mesh = model;
+                key.asset.floorShadow.preload = true;
+                key.init().then(() => {
+                    key.body.quaternion.copy(key.mesh.quaternion as any)
+                    if (super.isAllInitialized()) {
+                        ref.initialized = true;
+                        res()
+                    }
+
+                });
+                // key.mesh.receiveShadow = true
+                // key.mesh.castShadow = true
+            }
+        })
 
     }
     private async loadShadowTextures() {
@@ -124,11 +132,6 @@ export default class Trees {
         name: entityNames
         model: THREE.Group
     }[];
-    update(deltatime: number) {
-        this.keys.forEach(key => {
-            key.update(deltatime);
-        })
-    }
 }
 
 type degrees = 0 | 45 | 75;
