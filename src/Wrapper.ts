@@ -1,7 +1,8 @@
 
-//Wrapper class adalah parent class dari class yang berperan sebagai wrapper dari kumpulan list/array objects dari 
+//Wrapper class adalah parent class dari class yang berperan sebagai wrapper yaitu kumpulan list/array objects dari 
 //children classnya physics3dObject atau MeshOnlyObject3d
 //contoh class yang punya parent Wrapper: NavigationBoards, Dbs, Statues, Playgrounds
+//Wrapper juga bisa berperan sebagai parent dari sebuah class sebagai wrapper dari kumpulan list/array Wrapper.
 
 import Billboard from "./Billboards/Billboard";
 import Loading from "./Loading/Loading";

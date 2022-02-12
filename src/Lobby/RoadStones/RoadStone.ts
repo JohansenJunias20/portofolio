@@ -17,12 +17,6 @@ export default class RoadStone extends MeshOnlyObject3d {
     constructor(scene: THREE.Scene, position: Vector3) {
         super(scene, position);
     }
-    public async init() {
-        await super.init()
-    }
-    public update(deltatime: number) {
-        super.update(deltatime);
-    }
 
 
 }
