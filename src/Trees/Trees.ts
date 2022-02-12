@@ -52,9 +52,11 @@ export default class Trees extends Wrapper<Tree> {
     }
     public async init() {
         const ref = this;
+        var promises = [];
         await this.loadShadowTextures();
         await this.loadShadowModel();
-        var promises = [];
+
+        promises = [];
         ref.initialized = false;
         for (let i = 0; i < ref.keys.length; i++) {
             const key = ref.keys[i];
@@ -118,24 +120,47 @@ export default class Trees extends Wrapper<Tree> {
     }
     private async loadShadowTextures() {
         var name: entityNames = "";
-        name = "floorShadow_1_deg0";
-        this.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        name = "floorShadow_1_deg45";
-        this.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        name = "floorShadow_1_deg75";
-        this.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        name = "floorShadow_2_deg0";
-        this.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        name = "floorShadow_2_deg45";
-        this.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        name = "floorShadow_2_deg75";
-        this.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        name = "floorShadow_3_deg0";
-        this.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        name = "floorShadow_3_deg45";
-        this.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        name = "floorShadow_3_deg75";
-        this.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
+        const ref = this;
+        var promises = [];
+
+        promises.push((async () => {
+            name = "floorShadow_1_deg0";
+            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
+        })())
+        promises.push((async () => {
+            name = "floorShadow_1_deg45";
+            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
+        })())
+        promises.push((async () => {
+            name = "floorShadow_1_deg75";
+            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
+        })())
+        promises.push((async () => {
+            name = "floorShadow_2_deg0";
+            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
+        })())
+        promises.push((async () => {
+            name = "floorShadow_2_deg45";
+            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
+        })())
+        promises.push((async () => {
+            name = "floorShadow_2_deg75";
+            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
+        })())
+        promises.push((async () => {
+            name = "floorShadow_3_deg0";
+            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
+        })())
+        promises.push((async () => {
+            name = "floorShadow_3_deg45";
+            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
+        })())
+        promises.push((async () => {
+            name = "floorShadow_3_deg75";
+            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
+        })())
+        await Promise.all(promises)
+        console.log({ shadow: ref.shadowTexture })
     }
     private async loadShadowModel() {
 

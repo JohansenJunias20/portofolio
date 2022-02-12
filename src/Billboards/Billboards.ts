@@ -17,10 +17,7 @@ export default class Billboards extends Wrapper<any> {
 
     }
     public async init() {
-        for (let i = 0; i < this.keys.length; i++) {
-            const key = this.keys[i];
-            await key.init();
-        }
+        super.init();
         this.initialized = true;
 
     }
