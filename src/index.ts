@@ -524,31 +524,48 @@ var initialized = false;
 const loading = new Loading();
 async function init() {
     loading.setText("Loading Environment");
-    await hotkeys.init();
-    loading.addProgress(2);
-    await navigationBoards.init();
-    loading.addProgress(5);
-    await lobby.init();
-    loading.addProgress(10);
-    await roadStones.init()
-    loading.addProgress(3);
+    hotkeys.init().then(() => {
+        loading.addProgress(2);
+
+    });
+    navigationBoards.init().then(() => {
+        loading.addProgress(5);
+    });
+    lobby.init().then(() => {
+        loading.addProgress(10);
+    });
+    roadStones.init().then(() => {
+        loading.addProgress(3);
+    })
     loading.setText("Loading Character");
-    await character.init();
-    loading.addProgress(2);
-    // await johansen.init()
-    loading.addProgress(5);
+    character.init().then(() => {
+        loading.addProgress(2);
+    });
+    johansen.init().then(() => {
+        loading.addProgress(5);
+
+    })
     loading.setText("Loading Knowledges");
-    await knowledge.init(loading);
+    knowledge.init(loading).then(() => {
+
+    });
     loading.setText("Loading Trees");
-    await trees.init()
-    loading.addProgress(15);
+    trees.init().then(() => {
+        loading.addProgress(15);
+    })
     loading.setText("Loading Billboards");
-    await billboards.init()
-    loading.addProgress(15);
+    billboards.init().then(() => {
+        loading.addProgress(15);
+    })
     loading.setText("Loading Playgrounds");
-    await digitRegocnition.init()
-    loading.addProgress(3);
+    digitRegocnition.init().then(() => {
+        loading.addProgress(3);
+    })
+
+}
+loading.onfull = () => {
     initialized = true;
+    console.log("onfull")
     setTimeout(() => {
         startHides = true;
     }, 3000);

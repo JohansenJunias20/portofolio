@@ -12,6 +12,7 @@ export default class Loading {
     private DOMtext: HTMLElement;
     private DOMbar: HTMLElement;
     private progress: number;
+    onfull: () => void;
     isFull() {
         return this.progress == 100;
     }
@@ -38,8 +39,10 @@ export default class Loading {
         this.DOMtext.innerHTML = text;
     }
     private check() {
-        if (this.progress == 100) {
+        if (this.isFull()) {
             const ref = this;
+            if (this.onfull)
+                this.onfull();
             setTimeout(() => {
                 ref.hide()
             }, 500);
