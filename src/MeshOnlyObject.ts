@@ -24,10 +24,13 @@ export default class MeshOnlyObject3d {
     public async init(loading: Loading) {
         await this.loadAsset();
     }
+    public prepare() {
+        // await this.loadAsset();
+    }
     public update(deltatime: number) {
         this.mesh.position.copy(this.position);
     }
-    private async loadAsset() {
+    public async loadAsset() {
         const fbx = await new Promise<Group>((res, rej) => {
             const loader = new FBXLoader();
             loader.load(this.asset.url, (f) => {

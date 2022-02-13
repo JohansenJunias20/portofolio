@@ -478,12 +478,10 @@ function animate() {
 
 
 
-    if (connection && character.body && connection.id)
-        connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
+    // if (connection && character.body && connection.id)
+    //     connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
     if (initialized)
         renderer.render(scene, camera)
-    // plane.setDepthTexture(SUN.shadow.map.texture);
-    // plane.setWorldMatrix(SUN.matrixWorld);
     requestAnimationFrame(animate);
 
 }
@@ -491,32 +489,31 @@ function animate() {
 animate();
 
 
-const connection = new Connection();
+// const connection = new Connection();
 const joinButton: HTMLButtonElement = document.querySelector('#join');
 joinButton.onclick = () => {
-    connection.connect();
+    // connection.connect();
 }
-connection.onrecieve = (e) => {
-    // console.log(e.data)
-    const message = JSON.parse(e.data);
-    switch (message.channel) {
-        case "transform":
-            message.id = message.id.toString();
-            for (var key in otherPlayers) {
-            }
-            otherPlayers[message.id].body.position.copy(message.position);
-            otherPlayers[message.id].body.quaternion.copy(message.quaternion);
-            break;
-        default:
-            break;
-    }
-    // console.log("onrecieve...")
-}
-connection.onnewplayer = async (id: string) => {
-    otherPlayers[id] = (new Character(world, scene, new Vector3(0, 150, 0), 0));
-    await otherPlayers[id].init();
-    otherPlayers[id].body.mass = 0;//not affected to gravity
-}
+// connection.onrecieve = (e) => {
+//     // console.log(e.data)
+//     const message = JSON.parse(e.data);
+//     switch (message.channel) {
+//         case "transform":
+//             message.id = message.id.toString();
+//             for (var key in otherPlayers) {
+//             }
+//             otherPlayers[message.id].body.position.copy(message.position);
+//             otherPlayers[message.id].body.quaternion.copy(message.quaternion);
+//             break;
+//         default:
+//             break;
+//     }
+// }
+// connection.onnewplayer = async (id: string) => {
+//     otherPlayers[id] = (new Character(world, scene, new Vector3(0, 150, 0), 0));
+//     await otherPlayers[id].init();
+//     otherPlayers[id].body.mass = 0;//not affected to gravity
+// }
 
 var initialized = false;
 const loading = new Loading();

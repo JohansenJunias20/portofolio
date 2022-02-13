@@ -1,29 +1,23 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
+import Wrapper from "../../Wrapper";
 import Software from "./Software";
 
 
-export default class Softwares {
+export default class Softwares extends Wrapper<Software> {
     keys: Array<Software>;
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
+        super()
         this.keys = [
             new Software(world, scene, new Vector3(52.5, -5, 100), "blender"),
             new Software(world, scene, new Vector3(52.5, -5, 120), "ue"),
         ];
 
     }
-    public async init(floorModel: THREE.Group) {
-        var promises = [];
-        for (let i = 0; i < this.keys.length; i++) {
-            const key = this.keys[i];
-            key.asset.floorShadow.preload = true;
-            key.asset.floorShadow.Mesh = floorModel;
-            promises.push(key.init())
-
-        }
-        await Promise.all(promises);
+    public prepare() {
+        super.prepare();
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             key.mesh.rotateY(degToRad(-45));
@@ -32,11 +26,5 @@ export default class Softwares {
         }
         this.initialized = true;
         return;
-
-    }
-    update(deltatime: number) {
-        this.keys.forEach(key => {
-            key.update(deltatime);
-        })
     }
 }

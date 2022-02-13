@@ -5,35 +5,61 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import customShader from "./customShader";
 
 export default async function loadOBJ(objUrl: string, _mtl: string | THREE.ShaderMaterial, scale: THREE.Vector3 = new THREE.Vector3(1, 1, 1), castShadow: boolean = false) {
-
-    const object = await new Promise<Group>(async (res, rej) => {
+    // to do: load dulu semua dengan promise.all baru init
+    if (typeof _mtl === 'string') {
+        var promises: Array<Promise<any>> = [];
+        var mtl: MTLLoader.MaterialCreator;
+        const mtlLoader = new MTLLoader();
         var objLoader = new OBJLoader();
-        if (typeof _mtl === 'string') { //if _mtl is shadermaterial, material's objloader no need to be set.
-            const mtlLoader = new MTLLoader();
-            const mtl = await mtlLoader.loadAsync(_mtl);
+        promises.push((async () => {
+            mtl = await mtlLoader.loadAsync(_mtl);
             objLoader.setMaterials(mtl);
-        }
-        objLoader.load(objUrl, async function (object) {
-            for (let i = 0; i < object.children.length; i++) {
-                const c: Mesh = object.children[i] as any;
-                if (c.isMesh) {
-                    c.castShadow = castShadow;
-                    if (Array.isArray(c.material)) {
-                        for (let i = 0; i < c.material.length; i++) {
-                            c.material[i] = typeof _mtl === 'string' ? (await customShader((c as any).material[i].color)) as any : _mtl;
+
+        })())
+        var object: THREE.Group;
+        promises.push(new Promise<void>((res, rej) => {
+            objLoader.load(objUrl, function (_object) {
+                _object.traverse((c: THREE.Mesh) => {
+                    if (c.isMesh) {
+                        c.castShadow = castShadow;
+                        c.material = customShader((c.material as MeshPhongMaterial).color);
+                    }
+                    // return c;
+                })
+                object = _object;
+                res()
+            });
+        }))
+        await Promise.all(promises);
+        object.scale.set(scale.x, scale.y, scale.z)
+        return object;
+    }
+    else {
+        const object = await new Promise<Group>(async (res, rej) => {
+            var objLoader = new OBJLoader();
+
+            objLoader.load(objUrl, function (object) {
+                for (let i = 0; i < object.children.length; i++) {
+                    const c: Mesh = object.children[i] as any;
+                    if (c.isMesh) {
+                        c.castShadow = castShadow;
+                        if (Array.isArray(c.material)) {
+                            for (let i = 0; i < c.material.length; i++) {
+                                c.material[i] = _mtl;
+                            }
+
+                        }
+                        else {
+                            c.material = _mtl;
                         }
 
                     }
-                    else {
-                        c.material = typeof _mtl === 'string' ? await customShader((c.material as MeshPhongMaterial).color) : _mtl;
-                    }
-
                 }
-            }
 
-            object.scale.copy(scale)
-            res(object)
+                object.scale.copy(scale)
+                res(object)
+            });
         });
-    });
-    return object;
+        return object;
+    }
 }

@@ -53,8 +53,11 @@ export default class Trees extends Wrapper<Tree> {
     public async init() {
         const ref = this;
         var promises = [];
-        await this.loadShadowTextures();
-        await this.loadShadowModel();
+        promises.push(this.loadShadowTextures());
+        promises.push(this.loadShadowModel());
+        await Promise.all(promises);
+        await this.initShadowModel();
+        // todo: jadikan 1 dgn promise All utk semua loadnya kemudian baru di init
 
         promises = [];
         ref.initialized = false;
@@ -95,28 +98,20 @@ export default class Trees extends Wrapper<Tree> {
 
 
         return;
-        return new Promise<void>(async (res, rej) => {
-            await ref.loadShadowTextures();
-            await ref.loadShadowModel();
-            for (let i = 0; i < ref.keys.length; i++) {
-                const key = ref.keys[i];
-                const { model } = ref.shadowModel.find(_ => _.name == `floorShadow_${key.type}_deg${key.rotationDeg}`)
-                model.scale.copy(new THREE.Vector3(44 * key.asset.scale.x, 0, 44 * key.asset.scale.z))
-                key.asset.floorShadow.Mesh = model;
-                key.asset.floorShadow.preload = true;
-                key.init().then(() => {
-                    key.body.quaternion.copy(key.mesh.quaternion as any)
-                    if (super.isAllInitialized()) {
-                        ref.initialized = true;
-                        res()
-                    }
 
-                });
-                // key.mesh.receiveShadow = true
-                // key.mesh.castShadow = true
-            }
-        })
+    }
+    private initShadowModel() {
+        const model = this.loadedShadowModel;
+        for (let i = 0; i < this.shadowTexture.length; i++) {
+            const { texture, name } = this.shadowTexture[i];
+            model.children.forEach((c: THREE.Mesh) => {
+                if ((c as THREE.Mesh).isMesh) {
+                    (c.material as ShaderMaterial).uniforms.textureMap.value = texture;
+                }
+            })
 
+            this.shadowModel.push({ model, name });
+        }
     }
     private async loadShadowTextures() {
         var name: entityNames = "";
@@ -163,33 +158,27 @@ export default class Trees extends Wrapper<Tree> {
         console.log({ shadow: ref.shadowTexture })
     }
     private async loadShadowModel() {
-
-        for (let i = 0; i < this.shadowTexture.length; i++) {
-            const { texture, name } = this.shadowTexture[i];
-            const material = new ShaderMaterial({
-                depthWrite: false,
-                vertexShader: shadowVert,
-                fragmentShader: shadowFrag,
-                uniforms: {
-                    textureMap: {
-                        value: texture
-                    },
-                    _opacity: {
-                        value: 1
-                    }
-
+        const material = new ShaderMaterial({
+            depthWrite: false,
+            vertexShader: shadowVert,
+            fragmentShader: shadowFrag,
+            uniforms: {
+                textureMap: {
+                    value: null
                 },
-                transparent: true
-            })
+                _opacity: {
+                    value: 1
+                }
 
-            const ref = this;
-            const object = await loadOBJ("/assets/floorShadow.obj", material);
-            ref.shadowModel.push({ model: object, name: name });
-        }
+            },
+            transparent: true
+        })
 
-
+        const object = await loadOBJ("/assets/floorShadow.obj", material);
+        this.loadedShadowModel = object;
 
     }
+    loadedShadowModel: THREE.Group;
     shadowTexture: {
         name: entityNames,
         texture: THREE.Texture

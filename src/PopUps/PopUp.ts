@@ -1,10 +1,11 @@
 import * as THREE from "three";
-import { Raycaster, ShaderMaterial, Vector2, Vector3 } from "three";
+import { AlwaysStencilFunc, Raycaster, ShaderMaterial, Vector2, Vector3 } from "three";
 import { clamp, degToRad } from "three/src/math/MathUtils";
 import * as CANNON from "cannon";
 import isintersect from "../utility/isIntersect";
 import Modal from "../Modal";
-
+import vertShader from "../../public/assets/shaders/popup.vert"
+import fragShader from "../../public/assets/shaders/popup.frag"
 
 export default class PopUp {
     vert: string;
@@ -21,8 +22,7 @@ export default class PopUp {
     urlRef: string;
     modal: Modal | undefined;
     private floorText: "download" | "open"
-    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera,
-        position: THREE.Vector3, size: { x: number, y: number, z: number },
+    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, size: { x: number, y: number, z: number },
         borderWidth: number = 0.1, floorText: "download" | "open" = "download", urlRef: string | Modal = "#") {
         this.world = world;
         this.floorText = floorText;
@@ -36,25 +36,25 @@ export default class PopUp {
         this.frag = '';
         //#endregion
         this.scene = scene;
-        this.position = position;
+        this.position = new Vector3(1);
         this.size = size;
         this.fence = {
             material: new THREE.ShaderMaterial(),
             mesh: new THREE.Mesh(),
             maxYanimation: 0,
             borderWidth: borderWidth,
-            position: new Vector3().copy(position).sub(new Vector3(0, size.y / 2, 0)),
-            originalPosition: new Vector3().copy(position).sub(new Vector3(0, size.y / 2, 0))
+            position: new Vector3(1),
+            originalPosition: new Vector3(1)
         }
         this.floor = {
             size: new Vector2(size.x, size.z),
             mesh: new THREE.Mesh(),
-            position: position
+            position: new Vector3(1)
         }
         this.borderFloor = {
             size: new Vector2(size.x, size.z),
             mesh: new THREE.Mesh(),
-            position: position,
+            position: new Vector3(1),
             urlTexture: `/assets/environment/portofolio/border floor.png`,
             body: new CANNON.Body()
         }
@@ -196,16 +196,35 @@ export default class PopUp {
         });
         return material;
     }
+    setPosition(position: THREE.Vector3) {
+        this.position = position;
+
+        this.fence.position.copy(new Vector3().copy(position).sub(new Vector3(0, this.size.y / 2, 0)));
+        this.fence.mesh.position.copy(this.fence.position);
+        this.fence.originalPosition.copy(new Vector3().copy(position).sub(new Vector3(0, this.size.y / 2, 0)));
+        this.floor.position.copy(position);
+        this.floor.mesh.position.copy(this.floor.position);
+        this.borderFloor.position.copy(position);
+        this.borderFloor.mesh.position.copy(this.borderFloor.position);
+        this.borderFloor.body.position.copy(this.borderFloor.position as any);
+
+        this.ceilingPosition = new Vector3();
+        this.ceilingPosition = this.ceilingPosition.copy(this.fence.originalPosition).add(new Vector3(0, 3, 0));
+    }
     async init() {
-        await this.getShaders();
-        await this.initFence();
-        await this.initFloor()
-        await this.initBorderFloor();
+        this.getShaders();
+        this.initFence();
+        var promises = []
+        promises.push(this.initFloor())
+        promises.push(this.initBorderFloor())
+        await Promise.all(promises)
+        // todo: ini pakai promise All. load resources dulu semua baru init
         this.initialized = true;
     }
-    private async getShaders() {
-        this.vert = await (await fetch("/assets/shaders/popup.vert")).text();
-        this.frag = await (await fetch("/assets/shaders/popup.frag")).text();
+    private getShaders() {
+        this.vert = vertShader;
+        // pakai import module
+        this.frag = fragShader;
     }
     fence: {
         material: THREE.ShaderMaterial;
@@ -309,6 +328,7 @@ export default class PopUp {
         this.borderFloor.mesh = meshBorderFloor;
         this.borderFloor.mesh = meshBorderFloor;
         this.scene.add(meshBorderFloor)
+        console.log({ size: new CANNON.Vec3(this.borderFloor.size.x / 2, 0.005, this.borderFloor.size.y / 2) })
 
         const body = new CANNON.Body({
             shape: new CANNON.Box(new CANNON.Vec3(this.borderFloor.size.x / 2, 0.005, this.borderFloor.size.y / 2)),
@@ -334,7 +354,7 @@ export default class PopUp {
         this.floor.mesh.rotation.z = degToRad(z)
 
     }
-    async initFence() {
+    initFence() {
         this.ceilingPosition = new Vector3();
         this.ceilingPosition = this.ceilingPosition.copy(this.fence.originalPosition).add(new Vector3(0, 3, 0));
 

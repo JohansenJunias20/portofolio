@@ -1,13 +1,15 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
+import Wrapper from "../../Wrapper";
 import DB from "./DB";
 
 
-export default class DBs {
+export default class DBs extends Wrapper<DB> {
     keys: Array<DB>;
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
+        super()
         this.keys = [
             new DB(world, scene, new Vector3(-17.5, -5, 100), "redis"),
             new DB(world, scene, new Vector3(-17.5, -5, 120), "mongo"),
@@ -15,16 +17,8 @@ export default class DBs {
         ];
 
     }
-    public async init(floorModel: THREE.Group) {
-        var promises = [];
-        for (let i = 0; i < this.keys.length; i++) {
-            const key = this.keys[i];
-            key.asset.floorShadow.preload = true;
-            key.asset.floorShadow.Mesh = floorModel;
-            promises.push(key.init())
-
-        }
-        await Promise.all(promises);
+    public prepare() {
+        super.prepare();
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             key.mesh.rotateY(degToRad(-45));
@@ -33,11 +27,5 @@ export default class DBs {
         }
         this.initialized = true;
         return;
-
-    }
-    update(deltatime: number) {
-        this.keys.forEach(key => {
-            key.update(deltatime);
-        })
     }
 }

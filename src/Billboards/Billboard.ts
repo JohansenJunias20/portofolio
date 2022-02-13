@@ -2,14 +2,15 @@
 
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
-import { Color, Group, PositionalAudio, Raycaster, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
+import { Color, Group, MeshPhongMaterial, PositionalAudio, Raycaster, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { clamp, degToRad } from 'three/src/math/MathUtils';
 import PopUp from '../PopUps/PopUp';
+import customShader from '../utility/customShader';
 
 export default class Billboard {
-    public isBillboard:boolean;
+    public isBillboard: boolean;
     private asset: {
         url: string;
         scale: THREE.Vector3;
@@ -66,37 +67,61 @@ export default class Billboard {
     camera: THREE.PerspectiveCamera;
     private async loadAsset() {
         var size = new THREE.Vector3();
-
+        var promises: Array<Promise<any>> = [];
         const ref = this;
+        var mtl: MTLLoader.MaterialCreator;
         const mtlLoader = new MTLLoader();
-        const mtl = await mtlLoader.loadAsync(this.asset.mtl);
-        const object = await new Promise<Group>((res, rej) => {
-
-            var objLoader = new OBJLoader();
+        var objLoader = new OBJLoader();
+        promises.push((async () => {
+            mtl = await mtlLoader.loadAsync(this.asset.mtl);
             objLoader.setMaterials(mtl);
-            objLoader.load(ref.asset.url, function (object) {
-                object.traverse((c: THREE.Mesh) => {
+
+        })())
+        var object: THREE.Group;
+        promises.push(new Promise<void>((res, rej) => {
+            objLoader.load(ref.asset.url, function (_object) {
+                _object.traverse((c: THREE.Mesh) => {
                     if (c.isMesh) {
                         c.castShadow = ref.asset.castShadow;
-                        // c.receiveShadow = ref.asset.recieveShadow;
+                        c.material = customShader((c.material as MeshPhongMaterial).color);
                     }
                     // return c;
                 })
-                object.scale.set(10 * ref.asset.scale.x, 10 * ref.asset.scale.y, 10 * ref.asset.scale.z)
-
-                res(object)
+                _object.scale.set(10 * ref.asset.scale.x, 10 * ref.asset.scale.y, 10 * ref.asset.scale.z)
+                object = _object;
+                res()
             });
-        });
+        }))
 
+        var texture: THREE.Texture;
+        var desc_text_texture: THREE.Texture;
+        promises.push((async () => texture = await new THREE.TextureLoader().loadAsync(`/assets/environment/portofolio/${ref.text}/billboard_image.png`))());
+        promises.push((async () => desc_text_texture = await new THREE.TextureLoader().loadAsync(`/assets/environment/portofolio/${ref.text}/desc_text.png`))());
+        //#region links
+        const popUpSize = {
+            x: 12, y: 2, z: 6
+        }
+        for (let i = 0; i < this.urlRef.length; i++) {
+            const url = this.urlRef[i];
+            const popUp = new PopUp(this.PhysicsWorld, this.scene, this.camera,
+                popUpSize, 0.3, `${this.floorText}`, url);
+            promises.push(popUp.init());
+            // todo: ini pakai promise All.
+            this.PopUpObjects.push(popUp);
+        }
+        //#endregion
+        await Promise.all(promises);
         // this.position.y += 5;
         // this.mesh = fbx;
 
+
+        //#region initialize loaded asset
         this.position.y += 14 * this.asset.scale.y;
         object.position.copy(this.position);
         object.rotateY(degToRad(10))
         this.scene.add(object);
         // this.mesh = fbx;
-        const texture = await new THREE.TextureLoader().loadAsync(`/assets/environment/portofolio/${this.text}/billboard_image.png`);
+
 
 
         const geometry = new THREE.PlaneGeometry(27 * this.asset.scale.x, 16 * this.asset.scale.y);
@@ -123,8 +148,6 @@ export default class Billboard {
 
 
         //description
-
-        const desc_text_texture = await new THREE.TextureLoader().loadAsync(`/assets/environment/portofolio/${this.text}/desc_text.png`);
         const sizePlaneDescText = {
             x: desc_text_texture.image.width as number / 25,
             y: desc_text_texture.image.height as number / 25
@@ -132,10 +155,7 @@ export default class Billboard {
         const descGeometry = new THREE.PlaneGeometry(sizePlaneDescText.x, sizePlaneDescText.y);
 
         const desc_text_material = new THREE.MeshBasicMaterial({
-            // map: desc_text_texture,
             alphaMap: desc_text_texture,
-            // lightMapIntensity: 0.2,
-            // side: THREE.FrontSide,
             transparent: true
         })
         const planeDescText = new THREE.Mesh(descGeometry, desc_text_material);
@@ -148,19 +168,14 @@ export default class Billboard {
         planeDescText.rotateX(degToRad(-90))
         this.scene.add(planeDescText);
 
-        //#region links
-        const popUpSize = {
-            x: 12, y: 2, z: 6
+        //initialize objectpos
+        for (let i = 0; i < this.PopUpObjects.length; i++) {
+            const PopUpObject = this.PopUpObjects[i];
+            PopUpObject.setPosition(new Vector3(this.position.x + (i * (popUpSize.x + 2)), 0.25, planeDescText.position.z + sizePlaneDescText.y / 2 + 5))
         }
-        for (let i = 0; i < this.urlRef.length; i++) {
-            const url = this.urlRef[i];
-            const popUp = new PopUp(this.PhysicsWorld, this.scene, this.camera, new Vector3(this.position.x + (i * (popUpSize.x + 2)), 0.25, planeDescText.position.z + sizePlaneDescText.y / 2 + 5),
-                popUpSize, 0.3, `${this.floorText}`, url);
-            await popUp.init();
-            this.PopUpObjects.push(popUp);
-        }
-        this.initialized = true;
+
         //#endregion
+        this.initialized = true;
     }
     PopUpObjects: PopUp[];
     body: CANNON.Body;

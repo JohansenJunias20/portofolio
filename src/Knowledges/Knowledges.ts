@@ -12,6 +12,9 @@ import Frameworks from "./Frameworks/Frameworks"
 import ProLangs from "./ProLang/ProLangs"
 import Softwares from "./Softwares/Softwares"
 
+
+import vertShader from "../../public/assets/shaders/floorShadow.vert";
+import fragShader from "../../public/assets/shaders/floorShadow.frag";
 export default class Knowledge {
     prolang: ProLangs
     dbs: DBs
@@ -27,9 +30,17 @@ export default class Knowledge {
         this.floorModel = new THREE.Group();
     }
     async init(loading: Loading) {
-        await this.loadShadowTexture();
-        await this.loadShadowModel();
-        const circlePlate: THREE.Mesh = await this.loadCirclePlate()
+        var promises: Promise<void>[] = []
+        var circlePlate: THREE.Mesh;
+        promises.push(this.loadShadowTexture());
+        promises.push(this.loadShadowModel());
+        promises.push((async () => circlePlate = await this.loadCirclePlate())())
+        promises.push(this.dbs.loadAsset())
+        promises.push(this.softwares.loadAsset())
+        promises.push(this.prolang.loadAsset())
+        promises.push(this.frameworks.loadAsset())
+        await Promise.all(promises);
+        this.initShadowModel();
         // circlePlate.scale.set(10, 10, 10);
         // console.log({ circlePlate })
 
@@ -38,13 +49,12 @@ export default class Knowledge {
             newCirclePlane.material = (circlePlate.material as Material).clone();
             this.prolang.keys[i].asset.additionalMesh[0] = newCirclePlane;
 
-
-
             this.prolang.keys[i].shape = createBody(newCirclePlane);
             (this.prolang.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
+            this.prolang.keys[i].asset.floorShadow.preload = true;
+            this.prolang.keys[i].asset.floorShadow.Mesh = this.floorModel;
+
         }
-
-
 
         for (let i = 0; i < this.dbs.keys.length; i++) {
             const newCirclePlane = circlePlate.clone(); // ternyata mesh.clone() itu menggunakan reference material yang sama
@@ -52,9 +62,11 @@ export default class Knowledge {
             this.dbs.keys[i].asset.additionalMesh[0] = newCirclePlane;
 
             this.dbs.keys[i].shape = createBody(newCirclePlane);
-            (this.dbs.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
-        }
+            (this.dbs.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger.
 
+            this.dbs.keys[i].asset.floorShadow.preload = true;
+            this.dbs.keys[i].asset.floorShadow.Mesh = this.floorModel;
+        }
 
         for (let i = 0; i < this.softwares.keys.length; i++) {
             const newCirclePlane = circlePlate.clone(); // ternyata mesh.clone() itu menggunakan reference material yang sama
@@ -63,8 +75,10 @@ export default class Knowledge {
 
             this.softwares.keys[i].shape = createBody(newCirclePlane);
             (this.softwares.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
-        }
 
+            this.softwares.keys[i].asset.floorShadow.preload = true;
+            this.softwares.keys[i].asset.floorShadow.Mesh = this.floorModel;
+        }
 
         for (let i = 0; i < this.frameworks.keys.length; i++) {
             const newCirclePlane = circlePlate.clone(); // ternyata mesh.clone() itu menggunakan reference material yang sama
@@ -73,13 +87,31 @@ export default class Knowledge {
 
             this.frameworks.keys[i].shape = createBody(newCirclePlane);
             (this.frameworks.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
+
+            this.frameworks.keys[i].asset.floorShadow.preload = true;
+            this.frameworks.keys[i].asset.floorShadow.Mesh = this.floorModel;
         }
-        var promises: Promise<void>[] = []
-        promises.push(this.dbs.init(this.floorModel))
-        promises.push(this.softwares.init(this.floorModel))
-        promises.push(this.prolang.init(this.floorModel))
-        promises.push(this.frameworks.init(this.floorModel))
-        await Promise.all(promises);
+
+        for (let i = 0; i < this.prolang.keys.length; i++) {
+            const key = this.prolang.keys[i];
+            key.prepare();
+        }
+
+        for (let i = 0; i < this.dbs.keys.length; i++) {
+            const key = this.dbs.keys[i];
+            key.prepare();
+        }
+
+        for (let i = 0; i < this.softwares.keys.length; i++) {
+            const key = this.softwares.keys[i];
+            key.prepare();
+        }
+
+        for (let i = 0; i < this.frameworks.keys.length; i++) {
+            const key = this.frameworks.keys[i];
+            key.prepare();
+        }
+
         loading.addProgress(40);
         this.initialized = true;
     }
@@ -96,11 +128,11 @@ export default class Knowledge {
 
         const material = new ShaderMaterial({
             depthWrite: false,
-            vertexShader: await (await fetch(`/assets/shaders/floorShadow.vert`)).text(),
-            fragmentShader: await (await fetch(`/assets/shaders/floorShadow.frag`)).text(),
+            vertexShader: vertShader,
+            fragmentShader: fragShader,
             uniforms: {
                 textureMap: {
-                    value: this.floorShadow
+                    value: null
                 }
             },
             transparent: true
@@ -122,6 +154,12 @@ export default class Knowledge {
         });
 
         this.floorModel = object;
+    }
+    private initShadowModel() {
+        const ref = this;
+        this.floorModel.children.forEach((c: THREE.Mesh) => {
+            (c.material as ShaderMaterial).uniforms.textureMap.value = ref.floorShadow;
+        })
     }
     async loadCirclePlate() {
         // customShader("gray")
