@@ -283,6 +283,7 @@ import DigitRecognition from './Playgrounds/DigitRegocnition';
 import Loading from './Loading/Loading';
 import Knowledge from './Knowledges/Knowledges';
 import setOpacity from './utility/setOpacity';
+import { WaveEffect } from './waveEffect';
 var debug = false;
 
 interface IHash<T> {
@@ -354,40 +355,52 @@ function animate() {
 
     //#region update mesh & body
     if (trees.initialized) {
+        trees.setWaveEffect(waveEffect)
         trees.update(deltatime)
     }
     if (character.initialized) {
         // alert(camera.position.distanceTo(character.position))
+        // character.setWaveEffect(waveEffect)
         character.update(deltatime);
     }
-    if (hotkeys.initialized)
+    if (hotkeys.initialized) {
+        hotkeys.setWaveEffect(waveEffect)
         hotkeys.update(deltatime);
+        
+    }
 
-    if (navigationBoards.initialized)
+    if (navigationBoards.initialized){
+        navigationBoards.setWaveEffect(waveEffect)
         navigationBoards.update(deltatime)
-
+        
+    }
     if (lobby.initialized) {
+        lobby.setWaveEffect(waveEffect)
         lobby.update(deltatime)
     }
 
     if (roadStones.initialized) {
+        roadStones.setWaveEffect(waveEffect)
         roadStones.update(deltatime)
     }
 
     if (johansen.initialized) {
+        johansen.setWaveEffect(waveEffect)
         johansen.update(deltatime)
     }
 
-
     if (knowledge.initialized) {
+        knowledge.setWaveEffect(waveEffect)
         knowledge.update(deltatime)
     }
 
     if (billboards.initialized) {
+        billboards.setWaveEffect(waveEffect)
         billboards.updateBillboard(deltatime, character.body, intersects) // give intersects because contain popup mesh
     }
 
     if (digitRegocnition.initialized) {
+        // digitRegocnition.setWaveEffect(waveEffect)
         digitRegocnition.update(deltatime, character.body, intersects) // give intersects because contain popup mesh
     }
 
@@ -514,7 +527,11 @@ joinButton.onclick = () => {
 //     await otherPlayers[id].init();
 //     otherPlayers[id].body.mass = 0;//not affected to gravity
 // }
-
+var startWaveEffect = false;
+const waveEffect: WaveEffect = {
+    originPos: new Vector3(),
+    range: 0
+}
 var initialized = false;
 const loading = new Loading();
 async function init() {
@@ -561,6 +578,7 @@ async function init() {
 loading.onfull = () => {
     initialized = true;
     startHides = true;
+    startWaveEffect = true;
     // setTimeout(() => {
     // }, 3000);
 }

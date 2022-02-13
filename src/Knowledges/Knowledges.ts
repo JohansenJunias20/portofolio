@@ -15,7 +15,22 @@ import Softwares from "./Softwares/Softwares"
 
 import vertShader from "../../public/assets/shaders/floorShadow.vert";
 import fragShader from "../../public/assets/shaders/floorShadow.frag";
+import { WaveEffect } from "../waveEffect"
 export default class Knowledge {
+    setWaveEffect(waveEffect: WaveEffect) {
+        this.prolang.keys.forEach(key => {
+            key.waveEffect = waveEffect;
+        })
+        this.dbs.keys.forEach(key => {
+            key.waveEffect = waveEffect;
+        })
+        this.frameworks.keys.forEach(key => {
+            key.waveEffect = waveEffect;
+        })
+        this.softwares.keys.forEach(key => {
+            key.waveEffect = waveEffect;
+        })
+    }
     prolang: ProLangs
     dbs: DBs
     frameworks: Frameworks

@@ -1,4 +1,4 @@
-import { Float32BufferAttribute, Group, Mesh, MeshLambertMaterial, MeshPhongMaterial, ShaderMaterial, TextureLoader, Uint8ClampedBufferAttribute, Vector3 } from "three";
+import { Float32BufferAttribute, Group, Mesh, MeshLambertMaterial, MeshPhongMaterial, ShaderMaterial, TextureLoader, Uint8ClampedBufferAttribute, Vector2, Vector3 } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import * as CANNON from 'cannon';
 import * as THREE from "three";
@@ -24,9 +24,11 @@ import loadFBX from "./utility/loadFBX";
 import loadOBJ from "./utility/loadOBJ";
 import isFBX from "./utility/isFBX";
 import isOBJ from "./utility/isOBJ";
+import { WaveEffect } from "./waveEffect";
 //please load default custom shader here (only once)
 
 export default class PhysicsObject3d {
+    public waveEffect: WaveEffect
     public asset: {
         url: string;
         scale: THREE.Vector3;
@@ -62,24 +64,26 @@ export default class PhysicsObject3d {
         this.shapeType = shapeType;
         this.shape = shape;
         this.mass = mass;
+        this.waveEffect = {
+            originPos: new Vector3(),
+            range: 0
+        }
     }
-    
+
     public async init() {
         await this.loadAsset();
         this.prepare();
         this.initialized = true;
     }
-    // public async init(floorModel: THREE.Group) {
-    //     await this.loadAsset();
-    //     this.prepare();
-    //     this.initialized = true;
-    // }
+    private updateWaveEffect() {
+
+    }
     public update(deltatime: number) {
         this.walk(deltatime);
         this.mesh.position.copy(this.position);
         this.resetOpacity(deltatime);
-
         this.updatePhysics(deltatime);
+        this.updateWaveEffect()
     }
     protected walk(deltatime: number) {
 
@@ -100,61 +104,7 @@ export default class PhysicsObject3d {
         this.mesh = object;
 
 
-        // this.position.y += 5;
-        // if (this.shapeType == "TRIMESH") {
-        //     const temp: THREE.Mesh = this.mesh.children[0] as Mesh;
-        //     this.shape = createBody(temp);
-        // }
-        // if (isOBJ(url))
-        //     (this.shape as any).setScale(new CANNON.Vec3(10, 10, 10) as any)
-        // if (this.shapeType == "BOX")
-        //     new THREE.Box3().setFromObject(object).getSize(size);
 
-        // this.body = new CANNON.Body({
-        //     mass: this.mass, material: { friction: 1, restitution: 0, id: 1, name: "test" },
-        //     shape: this.shapeType == "CUSTOM" ?
-        //         this.shape :
-        //         this.shapeType == "BOX" ?
-        //             new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) :
-        //             this.shapeType == "TRIMESH" ?
-        //                 this.shape :
-        //                 new CANNON.Sphere(1)
-        // });
-        // this.body.position.set(this.position.x, this.position.y, this.position.z);
-        // this.PhysicsWorld.addBody(this.body);
-        // this.scene.add(this.mesh);
-        // if (floorShadowModel) // ini ditaruh setelah create body karena bila tidak maka floorshadowmodel akan juga dibuatkan body
-        //     this.mesh.children.push(floorShadowModel);
-
-        // //#region load floorShadow
-        // if (this.asset.floorShadow) {
-        //     if (this.asset.floorShadow.preload) {
-        //         // await this.loadFloorShadow();
-
-        //         const newfloorShadow = this.asset.floorShadow.Mesh.clone();
-        //         newfloorShadow.position.copy(this.position);
-        //         newfloorShadow.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
-        //         newfloorShadow.position.y = 0;
-        //         this.mesh.children.push(newfloorShadow)
-        //         // this.mesh.children.push(newfloorShadow);
-        //     }
-
-        // }
-        // //#endregion
-
-        // //adding additional mesh if available
-        // if (!this.asset.additionalMesh) {
-        //     this.initialized = true;
-        //     return;
-        // }
-        // if (this.asset.additionalMesh.length == 0) {
-        //     this.initialized = true;
-        //     return;
-        // }
-
-        // this.mesh.add(...this.asset.additionalMesh)
-
-        // this.initialized = true;
 
     }
     public prepare() {

@@ -8,9 +8,11 @@ import Billboard from "./Billboards/Billboard";
 import Loading from "./Loading/Loading";
 import MeshOnlyObject3d from "./MeshOnlyObject";
 import PhysicsObject3d from "./PhysicsObject";
+import { WaveEffect } from "./waveEffect";
 
 //T extends A | B artinya T bisa typesnya A atau B
 export default class Wrapper<T extends PhysicsObject3d | MeshOnlyObject3d>{ //karena Billboard memiliki sruktur class yg unik
+    public waveEffect: WaveEffect
     public keys: Array<T>;
     public initialized: boolean;
     constructor(keys: Array<T> = []) {
@@ -58,5 +60,10 @@ export default class Wrapper<T extends PhysicsObject3d | MeshOnlyObject3d>{ //ka
     public async loadAsset() {
         var promises = this.keys.map(_ => _.loadAsset());
         await Promise.all(promises);
+    }
+    public setWaveEffect(waveEffect: WaveEffect) {
+        this.keys.forEach(key => {
+            key.waveEffect = waveEffect;
+        })
     }
 }
