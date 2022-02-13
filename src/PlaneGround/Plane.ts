@@ -2,7 +2,8 @@ import { Vec3 } from "cannon";
 import * as CANNON from "cannon";
 import * as THREE from "three";
 import { ShaderMaterial, WebGLRenderTarget } from "three";
-
+import vertShader from '../../public/assets/shaders/background.vert';
+import fragShader from '../../public/assets/shaders/background.frag';
 
 export default class Plane {
     world: CANNON.World;
@@ -76,8 +77,9 @@ export default class Plane {
         geometry.setIndex(new THREE.BufferAttribute(indices, 1, false));
         //#endregion
         const material = new THREE.ShaderMaterial({
-            vertexShader: await (await fetch("/assets/shaders/background.vert")).text(),
-            fragmentShader: await (await fetch("/assets/shaders/background.frag")).text(),
+            vertexShader: vertShader,
+            // pakai syntax import, jangan fetch
+            fragmentShader: fragShader,
             // side: THREE.FrontSide
         });
         this.material = material;

@@ -29,13 +29,15 @@ export default class DigitRecognition {
         divDOM.style.height = "100%";
         divDOM.appendChild(iframeDOM)
         this.modal = new Modal(divDOM);
-        this.PopUp = new PopUp(world, scene, camera, position, { x: 12, y: 2, z: 6 }, 0.3, "open", this.modal)
-
+        this.PopUp = new PopUp(world, scene, camera, { x: 12, y: 2, z: 6 }, 0.3, "open", this.modal)
+        this.position = position;
         this.initialized = false;
     }
+    public position: THREE.Vector3;
     public initialized: boolean;
     public async init(): Promise<void> {
         await this.PopUp.init()
+        this.PopUp.setPosition(this.position)
         // this.PopUp.rotation(0, 0, 0);
         // await super.inist()
         this.initialized = true;

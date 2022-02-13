@@ -17,7 +17,7 @@ export default class Billboards extends Wrapper<any> {
 
     }
     public async init() {
-        super.init();
+        await super.init();
         this.initialized = true;
 
     }

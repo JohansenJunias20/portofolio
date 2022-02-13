@@ -12,6 +12,9 @@ import Frameworks from "./Frameworks/Frameworks"
 import ProLangs from "./ProLang/ProLangs"
 import Softwares from "./Softwares/Softwares"
 
+
+import vertShader from "../../public/assets/shaders/floorShadow.vert";
+import fragShader from "../../public/assets/shaders/floorShadow.frag";
 export default class Knowledge {
     prolang: ProLangs
     dbs: DBs
@@ -27,9 +30,13 @@ export default class Knowledge {
         this.floorModel = new THREE.Group();
     }
     async init(loading: Loading) {
-        await this.loadShadowTexture();
-        await this.loadShadowModel();
-        const circlePlate: THREE.Mesh = await this.loadCirclePlate()
+        var promises: Promise<void>[] = []
+        var circlePlate: THREE.Mesh;
+        promises.push(this.loadShadowTexture());
+        promises.push(this.loadShadowModel());
+        promises.push((async () => circlePlate = await this.loadCirclePlate())())
+        await Promise.all(promises)
+        this.initShadowModel();
         // circlePlate.scale.set(10, 10, 10);
         // console.log({ circlePlate })
 
@@ -74,7 +81,7 @@ export default class Knowledge {
             this.frameworks.keys[i].shape = createBody(newCirclePlane);
             (this.frameworks.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
         }
-        var promises: Promise<void>[] = []
+        promises = [];
         promises.push(this.dbs.init(this.floorModel))
         promises.push(this.softwares.init(this.floorModel))
         promises.push(this.prolang.init(this.floorModel))
@@ -96,11 +103,11 @@ export default class Knowledge {
 
         const material = new ShaderMaterial({
             depthWrite: false,
-            vertexShader: await (await fetch(`/assets/shaders/floorShadow.vert`)).text(),
-            fragmentShader: await (await fetch(`/assets/shaders/floorShadow.frag`)).text(),
+            vertexShader: vertShader,
+            fragmentShader: fragShader,
             uniforms: {
                 textureMap: {
-                    value: this.floorShadow
+                    value: null
                 }
             },
             transparent: true
@@ -122,6 +129,12 @@ export default class Knowledge {
         });
 
         this.floorModel = object;
+    }
+    private initShadowModel() {
+        const ref = this;
+        this.floorModel.children.forEach((c: THREE.Mesh) => {
+            (c.material as ShaderMaterial).uniforms.textureMap.value = ref.floorShadow;
+        })
     }
     async loadCirclePlate() {
         // customShader("gray")
