@@ -63,10 +63,17 @@ export default class PhysicsObject3d {
         this.shape = shape;
         this.mass = mass;
     }
-
+    
     public async init() {
         await this.loadAsset();
+        this.prepare();
+        this.initialized = true;
     }
+    // public async init(floorModel: THREE.Group) {
+    //     await this.loadAsset();
+    //     this.prepare();
+    //     this.initialized = true;
+    // }
     public update(deltatime: number) {
         this.walk(deltatime);
         this.mesh.position.copy(this.position);
@@ -77,12 +84,85 @@ export default class PhysicsObject3d {
     protected walk(deltatime: number) {
 
     }
-    private async loadAsset() {
+    floorShadowModel: THREE.Group;
+    public async loadAsset() {
         var size = new THREE.Vector3();
         const { url, scale, mtl } = this.asset;
-        const object = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale));
-        this.position.y += 5;
+        const ref = this;
+        var promises = [];
+        // var object: THREE.Group;
+        var object: THREE.Group = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale));
+        // promises.push((async () => { object = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale)) })())
+        var floorShadowModel: THREE.Group;
+        if (this.asset.floorShadow && !this.asset.floorShadow.preload)
+            promises.push((async () => { ref.floorShadowModel = await ref.loadFloorShadow() })())
+        await Promise.all(promises);
         this.mesh = object;
+
+
+        // this.position.y += 5;
+        // if (this.shapeType == "TRIMESH") {
+        //     const temp: THREE.Mesh = this.mesh.children[0] as Mesh;
+        //     this.shape = createBody(temp);
+        // }
+        // if (isOBJ(url))
+        //     (this.shape as any).setScale(new CANNON.Vec3(10, 10, 10) as any)
+        // if (this.shapeType == "BOX")
+        //     new THREE.Box3().setFromObject(object).getSize(size);
+
+        // this.body = new CANNON.Body({
+        //     mass: this.mass, material: { friction: 1, restitution: 0, id: 1, name: "test" },
+        //     shape: this.shapeType == "CUSTOM" ?
+        //         this.shape :
+        //         this.shapeType == "BOX" ?
+        //             new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) :
+        //             this.shapeType == "TRIMESH" ?
+        //                 this.shape :
+        //                 new CANNON.Sphere(1)
+        // });
+        // this.body.position.set(this.position.x, this.position.y, this.position.z);
+        // this.PhysicsWorld.addBody(this.body);
+        // this.scene.add(this.mesh);
+        // if (floorShadowModel) // ini ditaruh setelah create body karena bila tidak maka floorshadowmodel akan juga dibuatkan body
+        //     this.mesh.children.push(floorShadowModel);
+
+        // //#region load floorShadow
+        // if (this.asset.floorShadow) {
+        //     if (this.asset.floorShadow.preload) {
+        //         // await this.loadFloorShadow();
+
+        //         const newfloorShadow = this.asset.floorShadow.Mesh.clone();
+        //         newfloorShadow.position.copy(this.position);
+        //         newfloorShadow.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
+        //         newfloorShadow.position.y = 0;
+        //         this.mesh.children.push(newfloorShadow)
+        //         // this.mesh.children.push(newfloorShadow);
+        //     }
+
+        // }
+        // //#endregion
+
+        // //adding additional mesh if available
+        // if (!this.asset.additionalMesh) {
+        //     this.initialized = true;
+        //     return;
+        // }
+        // if (this.asset.additionalMesh.length == 0) {
+        //     this.initialized = true;
+        //     return;
+        // }
+
+        // this.mesh.add(...this.asset.additionalMesh)
+
+        // this.initialized = true;
+
+    }
+    public prepare() {
+        var size = new THREE.Vector3();
+        const { url, scale, mtl } = this.asset;
+        const ref = this;
+
+        this.position.y += 5;
         if (this.shapeType == "TRIMESH") {
             const temp: THREE.Mesh = this.mesh.children[0] as Mesh;
             this.shape = createBody(temp);
@@ -90,7 +170,7 @@ export default class PhysicsObject3d {
         if (isOBJ(url))
             (this.shape as any).setScale(new CANNON.Vec3(10, 10, 10) as any)
         if (this.shapeType == "BOX")
-            new THREE.Box3().setFromObject(object).getSize(size);
+            new THREE.Box3().setFromObject(ref.mesh).getSize(size);
 
         this.body = new CANNON.Body({
             mass: this.mass, material: { friction: 1, restitution: 0, id: 1, name: "test" },
@@ -105,6 +185,8 @@ export default class PhysicsObject3d {
         this.body.position.set(this.position.x, this.position.y, this.position.z);
         this.PhysicsWorld.addBody(this.body);
         this.scene.add(this.mesh);
+        if (this.floorShadowModel) // ini ditaruh setelah create body karena bila tidak maka floorshadowmodel akan juga dibuatkan body
+            this.mesh.children.push(this.floorShadowModel);
 
         //#region load floorShadow
         if (this.asset.floorShadow) {
@@ -118,8 +200,6 @@ export default class PhysicsObject3d {
                 this.mesh.children.push(newfloorShadow)
                 // this.mesh.children.push(newfloorShadow);
             }
-            else
-                await this.loadFloorShadow();
 
         }
         //#endregion
@@ -134,22 +214,7 @@ export default class PhysicsObject3d {
             return;
         }
 
-        // if (!this.text) {
-        //     this.initialized = true;
-        //     return;
-        // }
-        // if (this.text != "ts" && this.text != "golang") {
-        //     this.initialized = true;
-        //     return;
-        // }
-        // this.asset.additionalMesh[0].position.set(0, 0, 0);
-        // this.mesh.children.push(this.asset.additionalMesh[0]);
-        // this.asset.additionalMesh[0].position.copy(this.position);
-        // console.log({ addmesh: this.asset.additionalMesh[0] })
-        // this.asset.additionalMesh[0].scale.copy(object.scale);
         this.mesh.add(...this.asset.additionalMesh)
-
-        this.initialized = true;
 
     }
     private async loadFloorShadowModel(material: THREE.ShaderMaterial) {
@@ -157,7 +222,7 @@ export default class PhysicsObject3d {
         const object = await new Promise<Group>((res, rej) => {
             var objLoader = new OBJLoader();
             objLoader.load(ref.asset.floorShadow.modelUrl == "" ? ref.asset.floorShadow.modelUrl : "/assets/floorShadow.obj", function (object) {
-                object.traverse(async (c: THREE.Mesh) => {
+                object.traverse((c: THREE.Mesh) => {
                     if (c.isMesh) {
                     }
                     c.material = material;
@@ -167,7 +232,6 @@ export default class PhysicsObject3d {
                 res(object)
             });
         });
-
         object.position.copy(this.position);
         object.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
         object.position.y = 0;
@@ -175,21 +239,22 @@ export default class PhysicsObject3d {
 
     }
     private async loadFloorShadow() {
+        var promises = [];
         var texture: THREE.Texture;
+        const ref = this;
+        console.log({ textureUrl: this.asset.floorShadow.textureUrl })
         if (typeof this.asset.floorShadow.textureUrl === 'string' || this.asset.floorShadow.textureUrl instanceof String)
-            texture = await new TextureLoader().loadAsync(this.asset.floorShadow.textureUrl as string);
+            promises.push((async () => { texture = await new TextureLoader().loadAsync(ref.asset.floorShadow.textureUrl as string) })())
         else {
             texture = this.asset.floorShadow.textureUrl;
         }
-
-
         const material = new ShaderMaterial({
             depthWrite: false,
             vertexShader: shadowVert,
             fragmentShader: shadowFrag,
             uniforms: {
                 textureMap: {
-                    value: texture
+                    value: null
                 },
                 _opacity: {
                     value: 1
@@ -197,8 +262,16 @@ export default class PhysicsObject3d {
             },
             transparent: true
         })
-        const model = await this.loadFloorShadowModel(material);
-        this.mesh.children.push(model);
+        var model: THREE.Group;
+        promises.push((async () => { model = await ref.loadFloorShadowModel(material) })())
+        await Promise.all(promises);
+
+        model.children.forEach((c: Mesh) => {
+            if (c.isMesh) {
+                (c.material as ShaderMaterial).uniforms.textureMap.value = texture;
+            }
+        })
+        return model;
         // this.scene.add(model);
 
     }

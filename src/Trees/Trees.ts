@@ -98,27 +98,6 @@ export default class Trees extends Wrapper<Tree> {
 
 
         return;
-        return new Promise<void>(async (res, rej) => {
-            await ref.loadShadowTextures();
-            await ref.loadShadowModel();
-            for (let i = 0; i < ref.keys.length; i++) {
-                const key = ref.keys[i];
-                const { model } = ref.shadowModel.find(_ => _.name == `floorShadow_${key.type}_deg${key.rotationDeg}`)
-                model.scale.copy(new THREE.Vector3(44 * key.asset.scale.x, 0, 44 * key.asset.scale.z))
-                key.asset.floorShadow.Mesh = model;
-                key.asset.floorShadow.preload = true;
-                key.init().then(() => {
-                    key.body.quaternion.copy(key.mesh.quaternion as any)
-                    if (super.isAllInitialized()) {
-                        ref.initialized = true;
-                        res()
-                    }
-
-                });
-                // key.mesh.receiveShadow = true
-                // key.mesh.castShadow = true
-            }
-        })
 
     }
     private initShadowModel() {

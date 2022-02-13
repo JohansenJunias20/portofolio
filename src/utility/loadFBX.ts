@@ -3,7 +3,7 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import customShader from "./customShader";
 
 export default async function loadFBX(url: string, scale: THREE.Vector3, castShadow: boolean = false, recieveShadow: boolean = false) {
-    const fbx = await new Promise<THREE.Object3D>((res, rej) => {
+    const fbx = await new Promise<THREE.Group>((res, rej) => {
         const loader = new FBXLoader();
         loader.load(url, (f) => {
             for (let i = 0; i < f.children.length; i++) {

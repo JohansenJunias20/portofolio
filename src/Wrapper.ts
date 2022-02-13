@@ -31,38 +31,32 @@ export default class Wrapper<T extends PhysicsObject3d | MeshOnlyObject3d>{ //ka
         if (this.onKeysInitialized)
             this.onKeysInitialized();
         return;
-        return new Promise<void>((res, rej) => {
-
-            for (let i = 0; i < ref.keys.length; i++) {
-                const key = ref.keys[i];
-                key.init(loading).then(() => {
-                    if (onEachInitialized)
-                        onEachInitialized(key);
-                    if (ref.isAllInitialized()) {
-                        res();
-                    }
-                });
-
-            }
-        })
     }
     public onKeysInitialized: () => void;
     public counter: number;
-    protected isAllInitialized() {
-        const initialized = this.keys.filter(key => key.initialized == true).length;
-        if (initialized == this.keys.length || this.counter == this.keys.length) {
-            this.initialized = true;
-            if (this.onKeysInitialized)
-                this.onKeysInitialized();
-            return true;
-        }
-        return false;
-    }
+    // protected isAllInitialized() {
+    //     const initialized = this.keys.filter(key => key.initialized == true).length;
+    //     if (initialized == this.keys.length || this.counter == this.keys.length) {
+    //         this.initialized = true;
+    //         if (this.onKeysInitialized)
+    //             this.onKeysInitialized();
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     public update(deltatime: number) {
         this.keys.forEach(key => {
             key.update(deltatime);
         })
     }
-
+    public prepare() {
+        this.keys.forEach(key => {
+            key.prepare();
+        })
+    }
+    public async loadAsset() {
+        var promises = this.keys.map(_ => _.loadAsset());
+        await Promise.all(promises);
+    }
 }

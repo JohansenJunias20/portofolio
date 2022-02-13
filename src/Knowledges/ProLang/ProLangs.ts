@@ -1,14 +1,15 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
+import Loading from "../../Loading/Loading";
 import Wrapper from "../../Wrapper";
 import ProLang from "./ProLang";
 
 //cannot use Wrapper because init need 
-export default class ProLangs {
-    keys: Array<ProLang>;
+export default class ProLangs extends Wrapper<ProLang> {
     initialized: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene) {
+        super()
         this.keys = [
             new ProLang(world, scene, new Vector3(-52.5, -5, 100), "js"),
             new ProLang(world, scene, new Vector3(-52.5, -5, 120), "ts"),
@@ -20,16 +21,8 @@ export default class ProLangs {
             new ProLang(world, scene, new Vector3(52.5, -5, 160), "bash"),
         ];
     }
-    public async init(floorModel: THREE.Group) {
-        var promises = [];
-        for (let i = 0; i < this.keys.length; i++) {
-            const key = this.keys[i];
-            key.asset.floorShadow.preload = true;
-            key.asset.floorShadow.Mesh = floorModel;
-            promises.push(key.init())
-
-        }
-        await Promise.all(promises);
+    public prepare(){
+        super.prepare();
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             key.mesh.rotateY(degToRad(-45));
@@ -39,11 +32,6 @@ export default class ProLangs {
         this.initialized = true;
         return;
     }
-
-    public update(deltatime: number) {
-        this.keys.forEach(key => {
-            key.update(deltatime);
-        })
-    }
+    
 
 }
