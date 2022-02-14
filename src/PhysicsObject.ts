@@ -77,6 +77,10 @@ export default class PhysicsObject3d {
     }
     public updateWaveEffect() {
         const ref = this;
+        if(this.mesh.position.distanceTo(this.waveEffect.originPos) < this.waveEffect.range){
+            //lerp from underground to surface.
+            
+        }
         this.mesh.children.forEach((c: THREE.Mesh) => {
             if (c.isMesh) {
                 try {

@@ -430,6 +430,12 @@ function animate() {
     //#endregion
 
 
+    if (initialized) {
+        if (waveEffect.range <= config.waveEffect.range.max) {
+            waveEffect.range += deltatime * config.waveEffect.speed;
+        }
+    }
+
     if (followCharacter) {
         if (character.position.z >= config.area.knowledge.offset) {
             if (character.on != "knowledge") {
@@ -575,7 +581,7 @@ joinButton.onclick = () => {
 var startWaveEffect = false;
 const waveEffect: WaveEffect = {
     originPos: new Vector3(),
-    range: 0
+    range: config.waveEffect.range.start
 }
 var initialized = false;
 const loading = new Loading();
@@ -621,10 +627,13 @@ async function init() {
 
 }
 loading.onfull = () => {
+    loading.hide()
     initialized = true;
     startHides = true;
-    startWaveEffect = true;
-    waveEffect.range = 5000;
+    setTimeout(() => {
+        startWaveEffect = true;
+    }, 500);
+    // waveEffect.range = 5000;
     //     setInterval(() => {
     //         waveEffect.range += 10;
     //     }, 500);

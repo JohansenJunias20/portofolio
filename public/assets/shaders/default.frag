@@ -79,5 +79,6 @@ void main() {
 	// if(distance(finalPos,originPos) > waveRange){
 	// 	_opacity = 0.2;
 	// }
-	gl_FragColor = vec4(gl_FragColor.xyz,abs(distance(finalPos,originPos)) > waveRange ? 0. : _opacity);
+	// gl_FragColor = vec4(gl_FragColor.xyz,abs(distance(finalPos,originPos)) > waveRange ? 0. : _opacity);
+	gl_FragColor = vec4(gl_FragColor.xyz, _opacity);
 }

@@ -14,10 +14,10 @@ const Config = {
         }
     },
     waveEffect: {
-        speed: 10,
+        speed: 100,
         originPos: 0,
         range: {
-            start: 0,
+            start: -20,
             max: 3000
         }
     },
