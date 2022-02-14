@@ -75,15 +75,46 @@ export default class PhysicsObject3d {
         this.prepare();
         this.initialized = true;
     }
-    private updateWaveEffect() {
+    public updateWaveEffect() {
+        const ref = this;
+        this.mesh.children.forEach((c: THREE.Mesh) => {
+            if (c.isMesh) {
+                try {
+                    if (Array.isArray(c.material)) {
+                        c.material.forEach((mat: ShaderMaterial) => {
+                            if ((mat as ShaderMaterial).uniforms.waveRange) {
+                                (mat as ShaderMaterial).uniforms.waveRange.value = ref.waveEffect.range;
+                                (mat as ShaderMaterial).uniforms.originPos.value = ref.waveEffect.originPos;
+                                (mat as ShaderMaterial).needsUpdate = true;
+                                (mat as ShaderMaterial).uniformsNeedUpdate = true;
 
+                            }
+                        })
+                        return;
+                    }
+                    else
+                        if ((c.material as ShaderMaterial).uniforms.waveRange) {
+                            (c.material as ShaderMaterial).uniforms.waveRange.value = ref.waveEffect.range;
+                            (c.material as ShaderMaterial).uniforms.originPos.value = ref.waveEffect.originPos;
+                            (c.material as ShaderMaterial).needsUpdate = true;
+                            (c.material as ShaderMaterial).uniformsNeedUpdate = true;
+
+                        }
+                }
+                catch (ex) {
+                    console.log(ex)
+                    console.log({ mesh: this.mesh })
+                    console.log({ material: c.material })
+                    throw ex;
+                }
+            }
+        })
     }
     public update(deltatime: number) {
         this.walk(deltatime);
         this.mesh.position.copy(this.position);
         this.resetOpacity(deltatime);
         this.updatePhysics(deltatime);
-        this.updateWaveEffect()
     }
     protected walk(deltatime: number) {
 

@@ -37,7 +37,7 @@ export default class MeshOnlyObject3d {
         this.mesh.position.copy(this.position);
         this.updateWaveEffect()
     }
-    updateWaveEffect() {
+    public updateWaveEffect() {
 
     }
     public async loadAsset() {

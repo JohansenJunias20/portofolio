@@ -61,6 +61,12 @@ export default class Wrapper<T extends PhysicsObject3d | MeshOnlyObject3d>{ //ka
         var promises = this.keys.map(_ => _.loadAsset());
         await Promise.all(promises);
     }
+    public updateWaveEffect(){
+        this.keys.forEach(key => {
+            key.updateWaveEffect();
+        })
+
+    }
     public setWaveEffect(waveEffect: WaveEffect) {
         this.keys.forEach(key => {
             key.waveEffect = waveEffect;

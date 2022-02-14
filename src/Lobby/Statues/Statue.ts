@@ -30,12 +30,12 @@ export default class Statue extends PhysicsObject3d {
             scale: new THREE.Vector3(11.05, 0, 11.05),
         }
     }
-    public async init() {
-        await super.init()
-    }
-    public update(deltatime: number) {
-        super.update(deltatime);
-    }
+    // public async init() {
+    //     await super.init()
+    // }
+    // public update(deltatime: number) {
+    //     super.update(deltatime);
+    // }
 
 
 }

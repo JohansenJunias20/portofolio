@@ -177,6 +177,9 @@ export default class Billboard {
         //#endregion
         this.initialized = true;
     }
+    public updateWaveEffect() {
+
+    }
     PopUpObjects: PopUp[];
     body: CANNON.Body;
 

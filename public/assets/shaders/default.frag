@@ -34,6 +34,8 @@ vec3 BRDF_Diffuse_Lambert( const in vec3 diffuseColor ) {
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 varying vec3 finalPos;
+uniform float waveRange;
+uniform vec3 originPos;
 void main() {
 	if(finalPos.y<0.){
 		discard;
@@ -74,5 +76,8 @@ void main() {
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>
-	gl_FragColor = vec4(gl_FragColor.xyz,_opacity);
+	// if(distance(finalPos,originPos) > waveRange){
+	// 	_opacity = 0.2;
+	// }
+	gl_FragColor = vec4(gl_FragColor.xyz,abs(distance(finalPos,originPos)) > waveRange ? 0. : _opacity);
 }

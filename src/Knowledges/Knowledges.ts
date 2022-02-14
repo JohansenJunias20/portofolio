@@ -139,6 +139,12 @@ export default class Knowledge {
     }
     floorShadow: THREE.Texture;
     floorModel: THREE.Group;
+    public updateWaveEffect() {
+        this.prolang.updateWaveEffect()
+        this.dbs.updateWaveEffect()
+        this.frameworks.updateWaveEffect()
+        this.softwares.updateWaveEffect()
+    }
     async loadShadowModel() {
 
         const material = new ShaderMaterial({

@@ -32,8 +32,9 @@ export default class Character extends PhysicsObject3d {
             s: false,
             d: false
         }
-
+        this.on = "lobby";
     }
+    on: "lobby" | "knowledge" | "playground" | "portofolio"
     public async init() {
         await super.init()
     }
