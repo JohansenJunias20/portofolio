@@ -86,7 +86,6 @@ export default class Trees extends Wrapper<Tree> {
 
         }
         var result = await Promise.all(promises)
-        console.log({ result });
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             key.body.quaternion.copy(key.mesh.quaternion as any)
@@ -94,7 +93,6 @@ export default class Trees extends Wrapper<Tree> {
             key.mesh.castShadow = true
         }
         this.initialized = true;
-        console.log({ keys: this.keys.map(_ => _.initialized) })
 
 
         return;
@@ -155,7 +153,6 @@ export default class Trees extends Wrapper<Tree> {
             ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
         })())
         await Promise.all(promises)
-        console.log({ shadow: ref.shadowTexture })
     }
     private async loadShadowModel() {
         const material = new ShaderMaterial({

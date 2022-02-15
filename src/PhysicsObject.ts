@@ -77,9 +77,9 @@ export default class PhysicsObject3d {
     }
     public updateWaveEffect() {
         const ref = this;
-        if(this.mesh.position.distanceTo(this.waveEffect.originPos) < this.waveEffect.range){
+        if (this.mesh.position.distanceTo(this.waveEffect.originPos) < this.waveEffect.range) {
             //lerp from underground to surface.
-            
+
         }
         this.mesh.children.forEach((c: THREE.Mesh) => {
             if (c.isMesh) {
@@ -137,7 +137,6 @@ export default class PhysicsObject3d {
             promises.push((async () => { ref.floorShadowModel = await ref.loadFloorShadow() })())
         await Promise.all(promises);
         this.mesh = object;
-
 
 
 
@@ -227,7 +226,6 @@ export default class PhysicsObject3d {
         var promises = [];
         var texture: THREE.Texture;
         const ref = this;
-        console.log({ textureUrl: this.asset.floorShadow.textureUrl })
         if (typeof this.asset.floorShadow.textureUrl === 'string' || this.asset.floorShadow.textureUrl instanceof String)
             promises.push((async () => { texture = await new TextureLoader().loadAsync(ref.asset.floorShadow.textureUrl as string) })())
         else {
@@ -263,7 +261,6 @@ export default class PhysicsObject3d {
     private updatePhysics(deltatime: number) {
         this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
         this.mesh.quaternion.copy(this.body.quaternion as any);
-
     }
     private resetOpacity(deltatime: number) {
         // return

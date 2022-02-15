@@ -107,25 +107,30 @@ export default class Knowledge {
             this.frameworks.keys[i].asset.floorShadow.Mesh = this.floorModel;
         }
 
-        for (let i = 0; i < this.prolang.keys.length; i++) {
-            const key = this.prolang.keys[i];
-            key.prepare();
-        }
+        this.dbs.prepare();
+        this.frameworks.prepare();
+        this.softwares.prepare();
+        this.prolang.prepare();
+        // for (let i = 0; i < this.prolang.keys.length; i++) {
+        //     const key = this.prolang.keys[i];
+        //     key.prepare();
+        //     key.mesh.rotat
+        // }
 
-        for (let i = 0; i < this.dbs.keys.length; i++) {
-            const key = this.dbs.keys[i];
-            key.prepare();
-        }
+        // for (let i = 0; i < this.dbs.keys.length; i++) {
+        //     const key = this.dbs.keys[i];
+        //     key.prepare();
+        // }
 
-        for (let i = 0; i < this.softwares.keys.length; i++) {
-            const key = this.softwares.keys[i];
-            key.prepare();
-        }
+        // for (let i = 0; i < this.softwares.keys.length; i++) {
+        //     const key = this.softwares.keys[i];
+        //     key.prepare();
+        // }
 
-        for (let i = 0; i < this.frameworks.keys.length; i++) {
-            const key = this.frameworks.keys[i];
-            key.prepare();
-        }
+        // for (let i = 0; i < this.frameworks.keys.length; i++) {
+        //     const key = this.frameworks.keys[i];
+        //     key.prepare();
+        // }
 
         loading.addProgress(40);
         this.initialized = true;
