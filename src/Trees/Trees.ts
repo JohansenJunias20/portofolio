@@ -17,14 +17,14 @@ export default class Trees extends Wrapper<Tree> {
         this.keys = [
             new Tree({ world, scene, position: new Vector3(89, -5, 101), type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg: 0 }),
             new Tree({ world, scene, position: new Vector3(-40, -5, 5), type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg: 75 }),
-            new Tree({ world, scene, position: new Vector3(-70, -5, 100), type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 45 }),
-            new Tree({ world, scene, position: new Vector3(-25, -5, 85), type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 0 }),
+            // new Tree({ world, scene, position: new Vector3(-70, -5, 100), type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 45 }),
+            // new Tree({ world, scene, position: new Vector3(-25, -5, 85), type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 0 }),
             new Tree({ world, scene, position: new Vector3(20, -5, 15), type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg: 75 }),
             new Tree({ world, scene, position: new Vector3(-50, -5, 20), type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg: 45 }),
             new Tree({ world, scene, position: new Vector3(-50, -5, 20), type: 3, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 0 }),
             new Tree({ world, scene, position: new Vector3(75, -5, 30), type: 3, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 45 }),
             new Tree({ world, scene, position: new Vector3(-40, -5, 175), type: 3, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 75 }),
-            new Tree({ world, scene, position: new Vector3(-60, -5, 120), type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 0 }),
+            // new Tree({ world, scene, position: new Vector3(-60, -5, 120), type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 0 }),
             new Tree({ world, scene, position: new Vector3(-90, -5, 170), type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 0 }),
             new Tree({ world, scene, position: new Vector3(-120, -5, 110), type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 45 }),
             new Tree({ world, scene, type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.12, 0.12, 0.12), rotationDeg: 0, position: new Vector3(53, -5, 23) }),
@@ -34,16 +34,16 @@ export default class Trees extends Wrapper<Tree> {
             new Tree({ world, scene, type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.12, 0.12, 0.12), rotationDeg: 45, position: new Vector3(-3, -5, 168) }),
             new Tree({ world, scene, type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 75, position: new Vector3(81, -5, 162) }),
             new Tree({ world, scene, type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg: 0, position: new Vector3(96, -5, 133) }),
-            new Tree({ world, scene, type: 3, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 45, position: new Vector3(-49, -5, 71) }),
+            // new Tree({ world, scene, type: 3, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 45, position: new Vector3(-49, -5, 71) }),
             new Tree({ world, scene, type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg: 75, position: new Vector3(-74, -5, 80) }),
             new Tree({ world, scene, type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 0, position: new Vector3(-77, -5, 2) }),
-            new Tree({ world, scene, type: 3, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg: 45, position: new Vector3(-79, -5, 147) }),
+            // new Tree({ world, scene, type: 3, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg: 45, position: new Vector3(-79, -5, 147) }),
             new Tree({ world, scene, type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 75, position: new Vector3(-59, -5, 188) }),
             new Tree({ world, scene, type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.12, 0.12, 0.12), rotationDeg: 0, position: new THREE.Vector3(28, -5, 90) }),
             new Tree({ world, scene, type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 75, position: new THREE.Vector3(66, -5, 92) }),
             new Tree({ world, scene, type: 3, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg: 45, position: new THREE.Vector3(48, -5, 2) }),
             new Tree({ world, scene, type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.14, 0.14, 0.14), rotationDeg: 0, position: new THREE.Vector3(-29, -5, -19) }),
-            new Tree({ world, scene, type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 45, position: new THREE.Vector3(-3, -5, -21) }),
+            // new Tree({ world, scene, type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.1, 0.1, 0.1), rotationDeg: 45, position: new THREE.Vector3(-3, -5, -21) }),
             new Tree({ world, scene, type: 3, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.12, 0.12, 0.12), rotationDeg: 75, position: new THREE.Vector3(-34, -5, 61) }),
             new Tree({ world, scene, type: 2, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.13, 0.13, 0.13), rotationDeg: 75, position: new THREE.Vector3(38, -5, -14) }),
         ];
@@ -86,12 +86,12 @@ export default class Trees extends Wrapper<Tree> {
 
         }
         var result = await Promise.all(promises)
-        for (let i = 0; i < this.keys.length; i++) {
-            const key = this.keys[i];
-            key.body.quaternion.copy(key.mesh.quaternion as any)
-            key.mesh.receiveShadow = true
-            key.mesh.castShadow = true
-        }
+        // for (let i = 0; i < this.keys.length; i++) {
+        //     const key = this.keys[i];
+        //     key.body.quaternion.copy(key.mesh.quaternion as any)
+        //     key.mesh.receiveShadow = true
+        //     key.mesh.castShadow = true
+        // }
         this.initialized = true;
 
 

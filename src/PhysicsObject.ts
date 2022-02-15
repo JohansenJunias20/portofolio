@@ -182,6 +182,7 @@ export default class PhysicsObject3d {
                 newfloorShadow.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
                 newfloorShadow.position.y = 0;
                 this.mesh.children.push(newfloorShadow)
+                this.floorShadowModel = newfloorShadow as THREE.Group;
                 // this.mesh.children.push(newfloorShadow);
             }
 

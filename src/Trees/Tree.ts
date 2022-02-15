@@ -35,7 +35,7 @@ export default class Tree extends PhysicsObject3d {
             preload: true
         }
     }
-    rotationDeg = 0;
+    rotationDeg: 0 | 45 | 75 = 0;
     public readonly type: 1 | 2 | 3;
     // constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, type: 1 | 2 | 3, shape: null | CANNON.Shape = null, scale = new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg = 0) {
     //     super(world, scene, position, 0, "CUSTOM", 0, shape);
@@ -72,9 +72,14 @@ export default class Tree extends PhysicsObject3d {
         // this.asset.floorShadow.scale = new Vector3(10, 0, 10);
     }
     public async init() {
-        await super.init()
-        this.mesh.rotateY(degToRad(this.rotationDeg));
-        // this.body.quaternion.copy(this.mesh.quaternion);
+        await super.loadAsset()
+        this.mesh.rotation.y = degToRad(this.rotationDeg);
+        const quaternion = this.mesh.quaternion.clone();
+        super.prepare();
+        this.mesh.quaternion.copy(quaternion);
+        this.body.quaternion.copy(quaternion as any);
+        this.floorShadowModel.quaternion.set(0, 0, 0, 0)
+        // this.f.quaternion.copy(quaternion);
 
     }
     public update(deltatime: number) {

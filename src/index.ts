@@ -181,10 +181,14 @@ document.onkeydown = (e) => {
     else if (key == "d") {
     }
     else if (key == "z") {
-        //for placing trees purposes.
         debug = !debug;
-        // console.log(`${character.position.x.toFixed(0)}, -5, ${character.position.z.toFixed(0)}`);
         return;
+    }
+    else if(key=="p"){
+        // for placing trees purposes.
+        console.log(`${character.position.x.toFixed(0)}, -5, ${character.position.z.toFixed(0)}`);
+        return;
+
     }
     else if (key == "g") {
         const raycast3 = new Raycaster();
@@ -449,13 +453,10 @@ function animate() {
             alphaOffsetCamera_playground = 0;
             //on knowledge position
             if (clamp(alphaOffsetCamera_knowledge, 0, 1) < 1) {
-                console.log({ alphaOffsetCamera_knowledge })
+                // console.log({ alphaOffsetCamera_knowledge })
                 //tambah 1 variable yaitu LAST_OFFSET_CAMARA -> INI TIDAK BOLEH BERUBAH VALUENYA SAMPAI TRANSISI SELESAI
                 //diset tepat pertama x melakukan transisi(hanya 1x)
                 CURRENT_OFFSET_CAMERA = new Vector3().copy(START_OFFSET_CAMERA).lerp(KNOWLEDGE_OFFSET_CAMERA, alphaOffsetCamera_knowledge);
-                console.log({ x: CURRENT_OFFSET_CAMERA.x, y: CURRENT_OFFSET_CAMERA.y, z: CURRENT_OFFSET_CAMERA.z })
-                console.log({ START_OFFSET_CAMERA })
-                console.log({ KNOWLEDGE_OFFSET_CAMERA })
                 offsetChanged = true;
             } else {
                 // alert("changed")
