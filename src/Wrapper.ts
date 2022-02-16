@@ -61,9 +61,9 @@ export default class Wrapper<T extends PhysicsObject3d | MeshOnlyObject3d>{ //ka
         var promises = this.keys.map(_ => _.loadAsset());
         await Promise.all(promises);
     }
-    public updateWaveEffect(){
+    public updateWaveEffect(deltatime:number){
         this.keys.forEach(key => {
-            key.updateWaveEffect();
+            key.updateWaveEffect(deltatime);
         })
 
     }

@@ -36,6 +36,7 @@ export default class Character extends PhysicsObject3d {
     }
     on: "lobby" | "knowledge" | "playground" | "portofolio"
     public async init() {
+        this.position.y += 5;
         await super.init()
     }
     public update(deltatime: number) {

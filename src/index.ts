@@ -184,7 +184,7 @@ document.onkeydown = (e) => {
         debug = !debug;
         return;
     }
-    else if(key=="p"){
+    else if (key == "p") {
         // for placing trees purposes.
         console.log(`${character.position.x.toFixed(0)}, -5, ${character.position.z.toFixed(0)}`);
         return;
@@ -229,7 +229,7 @@ canvas.onmousedown = (e) => {
     raycast.setFromCamera(mouse, camera);
     const intsCenterScreen = raycast.intersectObjects(scene.children);
     if (intsCenterScreen.length != 0) {
-        console.log({intsCenterScreen})
+        console.log({ intsCenterScreen })
         return;
         // for (let i = 0; i < intsCenterScreen.length; i++) {
         //     const obj = intsCenterScreen[i];
@@ -367,7 +367,7 @@ function animate() {
     //#region update mesh & body
     if (trees.initialized) {
         trees.setWaveEffect(waveEffect)
-        trees.updateWaveEffect()
+        trees.updateWaveEffect(deltatime)
         trees.update(deltatime)
     }
     if (character.initialized) {
@@ -377,14 +377,14 @@ function animate() {
     }
     if (hotkeys.initialized) {
         hotkeys.setWaveEffect(waveEffect)
-        hotkeys.updateWaveEffect()
+        hotkeys.updateWaveEffect(deltatime)
         hotkeys.update(deltatime);
 
     }
 
     if (navigationBoards.initialized) {
         navigationBoards.setWaveEffect(waveEffect)
-        navigationBoards.updateWaveEffect()
+        navigationBoards.updateWaveEffect(deltatime)
         navigationBoards.update(deltatime)
 
     }
@@ -396,19 +396,19 @@ function animate() {
 
     if (roadStones.initialized) {
         roadStones.setWaveEffect(waveEffect)
-        roadStones.updateWaveEffect()
+        roadStones.updateWaveEffect(deltatime)
         roadStones.update(deltatime)
     }
 
     if (johansen.initialized) {
         johansen.setWaveEffect(waveEffect)
-        johansen.updateWaveEffect()
+        johansen.updateWaveEffect(deltatime)
         johansen.update(deltatime)
     }
 
     if (knowledge.initialized) {
         knowledge.setWaveEffect(waveEffect)
-        knowledge.updateWaveEffect()
+        knowledge.updateWaveEffect(deltatime)
         knowledge.update(deltatime)
     }
 
@@ -552,7 +552,8 @@ function animate() {
     requestAnimationFrame(animate);
 
 }
-
+// import { TweenLite } from 'gsap/all';
+// const test = TweenLite.fromTo({x:0,y:0,z:0},durat)
 animate();
 
 
@@ -604,6 +605,7 @@ async function init() {
         loading.addProgress(3);
     })
     loading.setText("Loading Character");
+    character.followWaveEffect = false;
     character.init().then(() => {
         loading.addProgress(2);
     });

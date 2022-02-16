@@ -14,7 +14,7 @@ interface IPhysicsObject3dConstructor {
     shapeType: "TRIMESH" | "BOX" | "SPHERE" | "CUSTOM",
     mass: number, shape?: CANNON.Shape
 }
-
+import gsap from "gsap"
 import defaultFrag from '../public/assets/shaders/default.frag';
 import defaultVert from '../public/assets/shaders/default.vert';
 import shadowVert from '../public/assets/shaders/floorShadow.vert';
@@ -25,6 +25,7 @@ import loadOBJ from "./utility/loadOBJ";
 import isFBX from "./utility/isFBX";
 import isOBJ from "./utility/isOBJ";
 import { WaveEffect } from "./waveEffect";
+import { Back, Bounce, Elastic, Power2, Sine } from "gsap/all";
 //please load default custom shader here (only once)
 
 export default class PhysicsObject3d {
@@ -48,13 +49,19 @@ export default class PhysicsObject3d {
     protected PhysicsWorld: CANNON.World;
     public initialized: boolean;
     public mesh: THREE.Object3D;
-    public readonly position: Vector3;
+    public position: Vector3; // current posisi mesh.
+    public originPosition: Vector3; // posisi saat disurface
+    public spawnPosition: Vector3; //posisi saat berada diundergrond
     public scene: THREE.Scene;
+    public alphaSpawn: number;
     public movementSpeed: number;
     public body: CANNON.Body;
     public shapeType: "BOX" | "SPHERE" | "CUSTOM" | "TRIMESH";
     public shape: CANNON.Shape | null;
-    public readonly mass: number;
+    public originMass: number;
+    floorShadowModel: THREE.Group;
+    isSpawned: boolean;
+    public followWaveEffect: boolean;
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 10, shapeType: "TRIMESH" | "BOX" | "SPHERE" | "CUSTOM", mass: number, shape: null | CANNON.Shape = null) {
         this.PhysicsWorld = world;
         this.scene = scene;
@@ -63,11 +70,18 @@ export default class PhysicsObject3d {
         this.movementSpeed = movementSpeed;
         this.shapeType = shapeType;
         this.shape = shape;
-        this.mass = mass;
+        this.followWaveEffect = true;
+        this.originPosition = new THREE.Vector3()
+        this.originPosition.copy(position);
+        this.originPosition.y += 5;
+        this.spawnPosition = new THREE.Vector3(); //posisi saat berada diundergrond
         this.waveEffect = {
             originPos: new Vector3(),
             range: 0
         }
+        this.originMass = mass;
+        this.alphaSpawn = 0;
+        this.isSpawned = false;
     }
 
     public async init() {
@@ -75,44 +89,37 @@ export default class PhysicsObject3d {
         this.prepare();
         this.initialized = true;
     }
-    public updateWaveEffect() {
+    public updateWaveEffect(deltatime: number) {
         const ref = this;
+        if (this.isSpawned) return;
+        if (!this.followWaveEffect) return;
         if (this.mesh.position.distanceTo(this.waveEffect.originPos) < this.waveEffect.range) {
             //lerp from underground to surface.
-
-        }
-        this.mesh.children.forEach((c: THREE.Mesh) => {
-            if (c.isMesh) {
-                try {
-                    if (Array.isArray(c.material)) {
-                        c.material.forEach((mat: ShaderMaterial) => {
-                            if ((mat as ShaderMaterial).uniforms.waveRange) {
-                                (mat as ShaderMaterial).uniforms.waveRange.value = ref.waveEffect.range;
-                                (mat as ShaderMaterial).uniforms.originPos.value = ref.waveEffect.originPos;
-                                (mat as ShaderMaterial).needsUpdate = true;
-                                (mat as ShaderMaterial).uniformsNeedUpdate = true;
-
-                            }
-                        })
-                        return;
-                    }
-                    else
-                        if ((c.material as ShaderMaterial).uniforms.waveRange) {
-                            (c.material as ShaderMaterial).uniforms.waveRange.value = ref.waveEffect.range;
-                            (c.material as ShaderMaterial).uniforms.originPos.value = ref.waveEffect.originPos;
-                            (c.material as ShaderMaterial).needsUpdate = true;
-                            (c.material as ShaderMaterial).uniformsNeedUpdate = true;
-
+            this.alphaSpawn += 2 * deltatime;
+            gsap.to(this.position, {
+                duration: 1,
+                ...this.originPosition,
+                ease: Back.easeOut.config(2),
+                onComplete: () => {
+                    if (ref.key)
+                        if (ref.key == "W") {
+                            console.log({ pos: ref.position })
+                            console.log({ mass: ref.originMass })
+                        }
+                    ref.body.mass = ref.originMass;
+                },
+                onUpdate: () => {
+                    if (ref.key)
+                        if (ref.key == "W") {
+                            console.log()
                         }
                 }
-                catch (ex) {
-                    console.log(ex)
-                    console.log({ mesh: this.mesh })
-                    console.log({ material: c.material })
-                    throw ex;
-                }
-            }
-        })
+            })
+            // this.position.copy(new Vector3().copy(this.spawnPosition).lerp(this.originPosition, clamp(this.alphaSpawn, 0, 1)));
+            // this.position.copy(this.originPosition);
+            this.isSpawned = true;
+            // console.log({ spawnpos: this.spawnPosition })
+        }
     }
     public update(deltatime: number) {
         this.walk(deltatime);
@@ -121,9 +128,7 @@ export default class PhysicsObject3d {
         this.updatePhysics(deltatime);
     }
     protected walk(deltatime: number) {
-
     }
-    floorShadowModel: THREE.Group;
     public async loadAsset() {
         var size = new THREE.Vector3();
         const { url, scale, mtl } = this.asset;
@@ -147,18 +152,19 @@ export default class PhysicsObject3d {
         const { url, scale, mtl } = this.asset;
         const ref = this;
 
-        this.position.y += 5;
+        // this.position.y += 5;
+
         if (this.shapeType == "TRIMESH") {
             const temp: THREE.Mesh = this.mesh.children[0] as Mesh;
             this.shape = createBody(temp);
         }
         if (isOBJ(url))
             (this.shape as any).setScale(new CANNON.Vec3(10, 10, 10) as any)
-        if (this.shapeType == "BOX")
-            new THREE.Box3().setFromObject(ref.mesh).getSize(size);
+
+        new THREE.Box3().setFromObject(ref.mesh).getSize(size);
 
         this.body = new CANNON.Body({
-            mass: this.mass, material: { friction: 1, restitution: 0, id: 1, name: "test" },
+            mass: this.followWaveEffect ? 0 : this.originMass, material: { friction: 1, restitution: 0, id: 1, name: "test" },
             shape: this.shapeType == "CUSTOM" ?
                 this.shape :
                 this.shapeType == "BOX" ?
@@ -169,6 +175,7 @@ export default class PhysicsObject3d {
         });
         this.body.position.set(this.position.x, this.position.y, this.position.z);
         this.PhysicsWorld.addBody(this.body);
+
         this.scene.add(this.mesh);
         if (this.floorShadowModel) // ini ditaruh setelah create body karena bila tidak maka floorshadowmodel akan juga dibuatkan body
             this.mesh.children.push(this.floorShadowModel);
@@ -187,6 +194,13 @@ export default class PhysicsObject3d {
 
         }
         //#endregion
+
+
+        this.spawnPosition.copy(this.position);
+        this.spawnPosition.y = this.position.y - size.y;
+        this.position.copy(this.spawnPosition);
+        this.mesh.position.copy(this.position);
+        console.log({ spawnpos: this.spawnPosition })
 
         //adding additional mesh if available
         if (!this.asset.additionalMesh) {
@@ -259,7 +273,12 @@ export default class PhysicsObject3d {
 
     }
     private updatePhysics(deltatime: number) {
-        this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
+        if (this.body.mass == 0) {
+            this.body.position.copy(this.position as any);
+        }
+        else {
+            this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
+        }
         this.mesh.quaternion.copy(this.body.quaternion as any);
     }
     private resetOpacity(deltatime: number) {
@@ -280,28 +299,5 @@ export default class PhysicsObject3d {
             }
         }
     }
-    private customShader(color: THREE.ColorRepresentation) {
-        return new THREE.ShaderMaterial({
-            uniforms: {
-                ...THREE.UniformsLib["common"],
-                ...THREE.UniformsLib["fog"],
-                ...THREE.UniformsLib["lights"],
-                ...THREE.UniformsLib["bumpmap"],
-                ...THREE.UniformsLib["displacementmap"],
-                ...THREE.UniformsLib["normalmap"],
-                diffuse: {
-                    value: color
-                },
-                _opacity: {
-                    value: 1
-                }
-            },
-            lights: true,
-            transparent: true,
-            // defines:{'LAMBERT'}
-            vertexShader: defaultVert,
-            fragmentShader: defaultFrag
-        })
 
-    }
 }

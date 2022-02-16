@@ -144,11 +144,11 @@ export default class Knowledge {
     }
     floorShadow: THREE.Texture;
     floorModel: THREE.Group;
-    public updateWaveEffect() {
-        this.prolang.updateWaveEffect()
-        this.dbs.updateWaveEffect()
-        this.frameworks.updateWaveEffect()
-        this.softwares.updateWaveEffect()
+    public updateWaveEffect(deltatime:number) {
+        this.prolang.updateWaveEffect(deltatime)
+        this.dbs.updateWaveEffect(deltatime)
+        this.frameworks.updateWaveEffect(deltatime)
+        this.softwares.updateWaveEffect(deltatime)
     }
     async loadShadowModel() {
 
