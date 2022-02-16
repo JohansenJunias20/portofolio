@@ -23,12 +23,8 @@ const float offset = -5.;
 uniform float waveRange;
 uniform vec3 originPos;
 void main() {
-	vec3 _position = position;
 	finalPos =( modelMatrix * vec4(position,1.)).xyz;
-	if(abs(distance(finalPos,originPos)) > waveRange){
-		_position.z +=offset;
-	}
-	finalPos = ( modelMatrix * vec4(_position,1.)).xyz;
+	
 	#include <uv_vertex>
 	#include <uv2_vertex>
 	#include <color_vertex>
@@ -49,5 +45,5 @@ void main() {
 	#include <shadowmap_vertex>
 	#include <fog_vertex>
 	// gl_Position = projectionMatrix * modelViewMatrix * vec4( _position, 1.0 );
-	gl_Position = projectionMatrix * viewMatrix  * vec4( finalPos, 1.);
+	// gl_Position = projectionMatrix * viewMatrix  * vec4( finalPos, 1.);
 }

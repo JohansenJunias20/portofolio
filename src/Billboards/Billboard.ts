@@ -120,6 +120,7 @@ export default class Billboard {
         object.position.copy(this.position);
         object.rotateY(degToRad(10))
         this.scene.add(object);
+        this.mesh = object;
         // this.mesh = fbx;
 
 
@@ -173,7 +174,9 @@ export default class Billboard {
             const PopUpObject = this.PopUpObjects[i];
             PopUpObject.setPosition(new Vector3(this.position.x + (i * (popUpSize.x + 2)), 0.25, planeDescText.position.z + sizePlaneDescText.y / 2 + 5))
         }
-
+        plane.position.copy(this.position)
+        this.mesh.position.copy(this.position)
+        this.body.position.copy(this.position as any)
         //#endregion
         this.initialized = true;
     }
