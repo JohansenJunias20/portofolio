@@ -54,8 +54,9 @@ export default async function loadOBJ(objUrl: string, _mtl: string | THREE.Shade
                         }
 
                     }
+                   
                 }
-
+             
                 object.scale.copy(scale)
                 res(object)
             });

@@ -133,8 +133,9 @@ export default class PhysicsObject3d {
         var object: THREE.Group = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale));
         // promises.push((async () => { object = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale)) })())
         var floorShadowModel: THREE.Group;
-        if (this.asset.floorShadow && !this.asset.floorShadow.preload)
+        if (this.asset.floorShadow && !this.asset.floorShadow.preload) {
             promises.push((async () => { ref.floorShadowModel = await ref.loadFloorShadow() })())
+        }
         await Promise.all(promises);
         this.mesh = object;
 
@@ -175,15 +176,13 @@ export default class PhysicsObject3d {
         //#region load floorShadow
         if (this.asset.floorShadow) {
             if (this.asset.floorShadow.preload) {
-                // await this.loadFloorShadow();
 
                 const newfloorShadow = this.asset.floorShadow.Mesh.clone();
                 newfloorShadow.position.copy(this.position);
                 newfloorShadow.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
                 newfloorShadow.position.y = 0;
-                this.mesh.children.push(newfloorShadow)
+                this.scene.add(newfloorShadow)
                 this.floorShadowModel = newfloorShadow as THREE.Group;
-                // this.mesh.children.push(newfloorShadow);
             }
 
         }

@@ -76,14 +76,16 @@ export default class Tree extends PhysicsObject3d {
         this.mesh.rotation.y = degToRad(this.rotationDeg);
         const quaternion = this.mesh.quaternion.clone();
         super.prepare();
-        this.mesh.quaternion.copy(quaternion);
-        this.body.quaternion.copy(quaternion as any);
-        this.floorShadowModel.quaternion.set(0, 0, 0, 0)
+        this.initialized = true;
+        // this.mesh.quaternion.copy(quaternion);
+        // this.body.quaternion.copy(quaternion as any);
+        // this.floorShadowModel.quaternion.set(0, 0, 0, 0)
         // this.f.quaternion.copy(quaternion);
 
     }
     public update(deltatime: number) {
         super.update(deltatime);
+        // console.log({ q: this.floorShadowModel.quaternion })
     }
 
 

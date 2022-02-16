@@ -225,34 +225,36 @@ document.onkeyup = (e) => {
 
 
 canvas.onmousedown = (e) => {
-    // const raycast = new Raycaster();
-    // raycast.setFromCamera(mouse, camera);
-    // const intsCenterScreen = raycast.intersectObjects(scene.children);
-    // if (intsCenterScreen.length != 0) {
-    //     for (let i = 0; i < intsCenterScreen.length; i++) {
-    //         const obj = intsCenterScreen[i];
-    //         if (character.mesh.children[0].uuid != obj.object.uuid) {
-    //             const mesh: Mesh = obj.object as any;
-    //             if (Array.isArray(mesh.material)) {
-    //                 const material = mesh.material[0];
-    //                 var val = (material as ShaderMaterial).uniforms?._opacity?.value;
-    //                 // if (!val) continue;
-    //                 val -= 4 * deltatime;
-    //                 const opacity = clamp(val, 0.2, 1);
-    //                 setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
+    const raycast = new Raycaster();
+    raycast.setFromCamera(mouse, camera);
+    const intsCenterScreen = raycast.intersectObjects(scene.children);
+    if (intsCenterScreen.length != 0) {
+        console.log({intsCenterScreen})
+        return;
+        // for (let i = 0; i < intsCenterScreen.length; i++) {
+        //     const obj = intsCenterScreen[i];
+        //     if (character.mesh.children[0].uuid != obj.object.uuid) {
+        //         const mesh: Mesh = obj.object as any;
+        //         if (Array.isArray(mesh.material)) {
+        //             const material = mesh.material[0];
+        //             var val = (material as ShaderMaterial).uniforms?._opacity?.value;
+        //             // if (!val) continue;
+        //             val -= 4 * deltatime;
+        //             const opacity = clamp(val, 0.2, 1);
+        //             setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
 
 
-    //                 continue;
-    //             }
-    //             var val = (mesh.material as ShaderMaterial).uniforms?._opacity?.value;
-    //             // if (!val) continue;
-    //             val -= 4 * deltatime;
-    //             const opacity = clamp(val, 0.2, 1);
-    //             setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
-    //         }
+        //             continue;
+        //         }
+        //         var val = (mesh.material as ShaderMaterial).uniforms?._opacity?.value;
+        //         // if (!val) continue;
+        //         val -= 4 * deltatime;
+        //         const opacity = clamp(val, 0.2, 1);
+        //         setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
+        //     }
 
-    //     }
-    // }
+        // }
+    }
 
 }
 
