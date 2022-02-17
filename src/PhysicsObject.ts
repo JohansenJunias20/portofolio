@@ -71,9 +71,7 @@ export default class PhysicsObject3d {
         this.shapeType = shapeType;
         this.shape = shape;
         this.followWaveEffect = true;
-        if (this.key) {
-            console.log({ poskey: this.position })
-        }
+       
         this.originPosition = new THREE.Vector3()
         this.originPosition.copy(position);
         this.originPosition.y += 5;
@@ -97,10 +95,7 @@ export default class PhysicsObject3d {
         if (!this.followWaveEffect) return;
         if (this.isSpawned) return;
         if (this.mesh.position.distanceTo(this.waveEffect.originPos) < this.waveEffect.range) {
-            if (ref.key == "W") {
-                console.log({ pos: ref.position })
-                console.log({ originPosition: ref.originPosition })
-            }
+          
             //lerp from underground to surface.
             this.alphaSpawn += 2 * deltatime;
             gsap.to(this.position, {
@@ -296,8 +291,6 @@ export default class PhysicsObject3d {
         else {
             this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
         }
-        if (this.key == "W")
-            console.log({ pos: this.position.y })
         this.mesh.quaternion.copy(this.body.quaternion as any);
     }
     private resetOpacity(deltatime: number) {

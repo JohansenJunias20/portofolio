@@ -24,8 +24,8 @@ export default class Lobby {
     setWaveEffect(waveEffect: WaveEffect) {
         this.keys[0].setWaveEffect(waveEffect);
     }
-    updateWaveEffect() {
-        this.keys[0].updateWaveEffect();
+    updateWaveEffect(deltatime:number) {
+        this.keys[0].updateWaveEffect(deltatime);
     }
     update(deltatime: number) {
         this.keys[0].update(deltatime);

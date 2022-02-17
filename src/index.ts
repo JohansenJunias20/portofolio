@@ -390,7 +390,7 @@ function animate() {
     }
     if (lobby.initialized) {
         lobby.setWaveEffect(waveEffect)
-        lobby.updateWaveEffect()
+        lobby.updateWaveEffect(deltatime)
         lobby.update(deltatime)
     }
 
