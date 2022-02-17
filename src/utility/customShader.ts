@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { Vector3 } from "three";
 
 import defaultFrag from '../../public/assets/shaders/default.frag';
 import defaultVert from '../../public/assets/shaders/default.vert';
@@ -17,6 +18,12 @@ export default function customShader(color: THREE.ColorRepresentation) {
             },
             _opacity: {
                 value: 1
+            },
+            waveRange: {
+                value: 0
+            },
+            originPos: {
+                value: new Vector3(0, 0, 0)
             }
         },
         lights: true,

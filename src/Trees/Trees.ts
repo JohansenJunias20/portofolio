@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Group, ShaderMaterial, TextureLoader, Vector3 } from "three";
+import { BufferGeometry, Group, Mesh, ShaderMaterial, TextureLoader, Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
 import Tree from "./Tree";
 import * as CANNON from 'cannon';
@@ -7,12 +7,33 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 
 import shadowVert from '../../public/assets/shaders/floorShadow.vert';
 import shadowFrag from '../../public/assets/shaders/floorShadow.frag';
+// const shadowFrag = `
+// uniform sampler2D textureMap;
+// uniform float _opacity;
+// varying vec2 vUv;
+// const vec3 shadowColor=vec3(.8588,.3686,.0392);
+// void main(){
+//     vec3 textureColor=texture(textureMap,vUv).xyz;
+//     float alpha=1.-textureColor.x;
+//     // if(alpha!=0.){
+//         //     alpha+=.05;
+//     // }
+//     alpha-=.05;
+//     // gl_FragColor=vec4(shadowColor,_opacity*clamp(alpha,0.,1.));
+//     // gl_FragColor=vec4(shadowColor,clamp(alpha,0.,1.));
+//     gl_FragColor=vec4(textureColor,1.);
+//     // gl_FragColor=vec4(shadowColor,0.2);
+// }
+// `
 import loadOBJ from "../utility/loadOBJ";
 import Wrapper from "../Wrapper";
+import CloneMesh from "../utility/CloneMesh";
 
 export default class Trees extends Wrapper<Tree> {
+    scene: THREE.Scene;
     constructor(world: CANNON.World, scene: THREE.Scene) {
         super()
+        this.scene = scene;
         this.shadowTexture = []
         this.keys = [
             new Tree({ world, scene, position: new Vector3(89, -5, 101), type: 1, shape: new CANNON.Box(new CANNON.Vec3(1, 5, 1)), scale: new THREE.Vector3(0.15, 0.15, 0.15), rotationDeg: 0 }),
@@ -55,129 +76,122 @@ export default class Trees extends Wrapper<Tree> {
         var promises = [];
         promises.push(this.loadShadowTextures());
         promises.push(this.loadShadowModel());
-        await Promise.all(promises);
-        await this.initShadowModel();
+        // await Promise.all(promises);
         // todo: jadikan 1 dgn promise All utk semua loadnya kemudian baru di init
 
-        promises = [];
+        // var promises = [];
+
         ref.initialized = false;
         for (let i = 0; i < ref.keys.length; i++) {
             const key = ref.keys[i];
-            const { model } = ref.shadowModel.find(_ => _.name == `floorShadow_${key.type}_deg${key.rotationDeg}`)
-            model.scale.copy(new THREE.Vector3(44 * key.asset.scale.x, 0, 44 * key.asset.scale.z))
-            key.asset.floorShadow.Mesh = model;
-            key.asset.floorShadow.preload = true;
-            promises.push(key.init())
-            // key.init().then(() => {
-            //     ref.counter++;
-            //     console.log(`${ref.counter} finished`)
-            //     // console.log(ref.initialized)
-            //     key.body.quaternion.copy(key.mesh.quaternion as any)
-            //     if (super.isAllInitialized()) {
-            //         ref.initialized = true;
-            //         key.body.quaternion.copy(key.mesh.quaternion as any)
-            //         key.mesh.receiveShadow = true
-            //         key.mesh.castShadow = true
-            //         alert("RESOLVE")
-            //         res()
-            //     }
+            promises.push(key.loadAsset())
 
-            // });
 
         }
-        var result = await Promise.all(promises)
-        console.log({ result });
+        await Promise.all(promises)
+        this.prepareShadowModel();
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
-            key.body.quaternion.copy(key.mesh.quaternion as any)
+            const shadowModel = ref.shadowModel.find(_ => _.name == `floorShadow_${key.type}_deg${key.rotationDeg}`).model;
+            const newShadowModel = CloneMesh(shadowModel.children[0] as THREE.Mesh) as any;
+            key.asset.floorShadow.Mesh = newShadowModel;
+            key.asset.floorShadow.Mesh.scale.copy(new THREE.Vector3(44 * key.asset.scale.x, 0, 44 * key.asset.scale.z));
+            key.prepare();
+            // key.body.quaternion.copy(key.mesh.quaternion as any)
             key.mesh.receiveShadow = true
             key.mesh.castShadow = true
         }
+
         this.initialized = true;
-        console.log({ keys: this.keys.map(_ => _.initialized) })
 
 
         return;
 
     }
-    private initShadowModel() {
-        const model = this.loadedShadowModel;
-        for (let i = 0; i < this.shadowTexture.length; i++) {
-            const { texture, name } = this.shadowTexture[i];
-            model.children.forEach((c: THREE.Mesh) => {
-                if ((c as THREE.Mesh).isMesh) {
-                    (c.material as ShaderMaterial).uniforms.textureMap.value = texture;
-                }
-            })
-
-            this.shadowModel.push({ model, name });
-        }
-    }
-    private async loadShadowTextures() {
-        var name: entityNames = "";
+    prepareShadowModel() {
         const ref = this;
-        var promises = [];
-
-        promises.push((async () => {
-            name = "floorShadow_1_deg0";
-            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        })())
-        promises.push((async () => {
-            name = "floorShadow_1_deg45";
-            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        })())
-        promises.push((async () => {
-            name = "floorShadow_1_deg75";
-            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        })())
-        promises.push((async () => {
-            name = "floorShadow_2_deg0";
-            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        })())
-        promises.push((async () => {
-            name = "floorShadow_2_deg45";
-            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        })())
-        promises.push((async () => {
-            name = "floorShadow_2_deg75";
-            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        })())
-        promises.push((async () => {
-            name = "floorShadow_3_deg0";
-            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        })())
-        promises.push((async () => {
-            name = "floorShadow_3_deg45";
-            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        })())
-        promises.push((async () => {
-            name = "floorShadow_3_deg75";
-            ref.shadowTexture.push({ name, texture: await new TextureLoader().loadAsync(`/assets/environment/trees/${name}.png`) })
-        })())
-        await Promise.all(promises)
-        console.log({ shadow: ref.shadowTexture })
+        this.shadowTexture.forEach(_ => {
+            const { name, texture } = _;
+            const newModel = ref.loadedShadowModel.clone();
+            (newModel.children[0] as THREE.Mesh).material = ((newModel.children[0] as THREE.Mesh).material as ShaderMaterial).clone();
+            ((newModel.children[0] as THREE.Mesh).material as ShaderMaterial).uniforms.textureMap.value = texture;
+            ((newModel.children[0] as THREE.Mesh).material as ShaderMaterial).needsUpdate = true;
+            ((newModel.children[0] as THREE.Mesh).material as ShaderMaterial).transparent = true;
+            ((newModel.children[0] as THREE.Mesh).material as ShaderMaterial).uniformsNeedUpdate = true;
+            ref.shadowModel.push({ name, model: newModel })
+        })
+     
     }
-    private async loadShadowModel() {
+    async loadShadowModel() {
         const material = new ShaderMaterial({
             depthWrite: false,
             vertexShader: shadowVert,
             fragmentShader: shadowFrag,
             uniforms: {
                 textureMap: {
-                    value: null
-                },
-                _opacity: {
-                    value: 1
+                    value:null
                 }
 
             },
             transparent: true
         })
-
-        const object = await loadOBJ("/assets/floorShadow.obj", material);
-        this.loadedShadowModel = object;
+        const ref = this;
+        this.loadedShadowModel = await new Promise<Group>((res, rej) => {
+            var objLoader = new OBJLoader();
+            objLoader.load("/assets/floorShadow.obj", function (object) {
+                object.traverse((c: THREE.Mesh) => {
+                    if (c.isMesh) {
+                    }
+                    c.material = material;
+                    return c;
+                })
+                res(object)
+            });
+        });
+        // this.loadedShadowModel = await loadOBJ("/assets/floorShadow.obj", material);
 
     }
+    async loadShadowTextures() {
+        var promises: any[] = [];
+        promises.push((async () => {
+            var texture_1_deg0 = await new TextureLoader().loadAsync("/assets/environment/trees/floorShadow_1_deg0.png");
+            this.shadowTexture.push({ name: "floorShadow_1_deg0", texture: texture_1_deg0 })
+        })())
+        promises.push((async () => {
+            var texture_1_deg45 = await new TextureLoader().loadAsync("/assets/environment/trees/floorShadow_1_deg45.png");
+            this.shadowTexture.push({ name: "floorShadow_1_deg45", texture: texture_1_deg45 })
+        })())
+        promises.push((async () => {
+            var texture_1_deg75 = await new TextureLoader().loadAsync("/assets/environment/trees/floorShadow_1_deg75.png");
+            this.shadowTexture.push({ name: "floorShadow_1_deg75", texture: texture_1_deg75 })
+        })())
+        promises.push((async () => {
+            var texture_2_deg0 = await new TextureLoader().loadAsync("/assets/environment/trees/floorShadow_2_deg0.png");
+            this.shadowTexture.push({ name: "floorShadow_2_deg0", texture: texture_2_deg0 })
+        })())
+        promises.push((async () => {
+            var texture_2_deg45 = await new TextureLoader().loadAsync("/assets/environment/trees/floorShadow_2_deg45.png");
+            this.shadowTexture.push({ name: "floorShadow_2_deg45", texture: texture_2_deg45 })
+        })())
+        promises.push((async () => {
+            var texture_2_deg75 = await new TextureLoader().loadAsync("/assets/environment/trees/floorShadow_2_deg75.png");
+            this.shadowTexture.push({ name: "floorShadow_2_deg75", texture: texture_2_deg75 })
+        })())
+        promises.push((async () => {
+            var texture_3_deg0 = await new TextureLoader().loadAsync("/assets/environment/trees/floorShadow_3_deg0.png");
+            this.shadowTexture.push({ name: "floorShadow_3_deg0", texture: texture_3_deg0 })
+        })())
+        promises.push((async () => {
+            var texture_3_deg45 = await new TextureLoader().loadAsync("/assets/environment/trees/floorShadow_3_deg45.png");
+            this.shadowTexture.push({ name: "floorShadow_3_deg45", texture: texture_3_deg45 })
+        })())
+        promises.push((async () => {
+            var texture_3_deg75 = await new TextureLoader().loadAsync("/assets/environment/trees/floorShadow_3_deg75.png");
+            this.shadowTexture.push({ name: "floorShadow_3_deg75", texture: texture_3_deg75 })
+        })())
+        await Promise.all(promises);
+    }
+
     loadedShadowModel: THREE.Group;
     shadowTexture: {
         name: entityNames,

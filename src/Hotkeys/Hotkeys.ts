@@ -9,10 +9,10 @@ export default class Hotkeys extends Wrapper<Key>{
     constructor(world: CANNON.World, scene: THREE.Scene, HOTKEYSPOSITION: Vector3) {
         super();
         this.keys = [
-            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(4, 0, 0)), "D"),
-            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(-4, 0, 0)), "A"),
-            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(0, 0, 0)), "S"),
-            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(0, 0, -4)), "W")
+            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(4, -5, 0)), "D"),
+            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(-4, -5, 0)), "A"),
+            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(0, -5, 0)), "S"),
+            new Key(world, scene, new Vector3().copy(HOTKEYSPOSITION).add(new Vector3(0, -5, -4)), "W")
         ];
 
     }

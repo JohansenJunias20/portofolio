@@ -6,6 +6,7 @@ import { Group, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { clamp } from 'three/src/math/MathUtils';
 import PhysicsObject3d from './PhysicsObject';
+import { WaveEffect } from './waveEffect';
 declare var followCharacter: boolean;
 
 interface AnimationCharacter {
@@ -31,44 +32,11 @@ export default class Character extends PhysicsObject3d {
             s: false,
             d: false
         }
-        // document.onkeydown = (e) => {
-        //     if (e.key == "w") {
-        //     }
-        //     else if (e.key == "s") {
-        //     }
-        //     else if (e.key == "a") {
-        //     }
-        //     else if (e.key == "d") {
-        //     }
-        //     else {
-        //         return
-        //     }
-        //     this.isPress[e.key] = true;
-        //     followCharacter = true;
-        // }
-
-        // document.onkeyup = (e) => {
-        //     if (e.key == "w") {
-        //     }
-        //     else if (e.key == "s") {
-        //     }
-        //     else if (e.key == "a") {
-
-        //     }
-        //     else if (e.key == "d") {
-
-        //     }
-        //     else {
-        //         return;
-        //     }
-        //     this.isPress[e.key] = false;
-        // }
-
-
-
-
+        this.on = "lobby";
     }
+    on: "lobby" | "knowledge" | "playground" | "portofolio"
     public async init() {
+        this.position.y += 5;
         await super.init()
     }
     public update(deltatime: number) {
@@ -76,6 +44,7 @@ export default class Character extends PhysicsObject3d {
     }
     private isWalking: boolean;
     addResistance() {
+        if(!this.body) return
         if (this.isPress.a == this.isPress.d) {
             this.body.velocity.x = 0;
         }
@@ -93,6 +62,7 @@ export default class Character extends PhysicsObject3d {
 
     }
     public walk(deltatime: number) {
+        if(!this.body) return
         this.addResistance();
         if (!this.isWalking) {
             //start animating walk

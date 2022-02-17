@@ -15,7 +15,22 @@ import Softwares from "./Softwares/Softwares"
 
 import vertShader from "../../public/assets/shaders/floorShadow.vert";
 import fragShader from "../../public/assets/shaders/floorShadow.frag";
+import { WaveEffect } from "../waveEffect"
 export default class Knowledge {
+    setWaveEffect(waveEffect: WaveEffect) {
+        this.prolang.keys.forEach(key => {
+            key.waveEffect = waveEffect;
+        })
+        this.dbs.keys.forEach(key => {
+            key.waveEffect = waveEffect;
+        })
+        this.frameworks.keys.forEach(key => {
+            key.waveEffect = waveEffect;
+        })
+        this.softwares.keys.forEach(key => {
+            key.waveEffect = waveEffect;
+        })
+    }
     prolang: ProLangs
     dbs: DBs
     frameworks: Frameworks
@@ -40,6 +55,10 @@ export default class Knowledge {
         promises.push(this.prolang.loadAsset())
         promises.push(this.frameworks.loadAsset())
         await Promise.all(promises);
+        console.log(this.frameworks.initialized)
+        console.log(this.dbs.initialized)
+        console.log(this.prolang.initialized)
+        console.log(this.softwares.initialized)
         this.initShadowModel();
         // circlePlate.scale.set(10, 10, 10);
         // console.log({ circlePlate })
@@ -92,25 +111,30 @@ export default class Knowledge {
             this.frameworks.keys[i].asset.floorShadow.Mesh = this.floorModel;
         }
 
-        for (let i = 0; i < this.prolang.keys.length; i++) {
-            const key = this.prolang.keys[i];
-            key.prepare();
-        }
+        this.dbs.prepare();
+        this.frameworks.prepare();
+        this.softwares.prepare();
+        this.prolang.prepare();
+        // for (let i = 0; i < this.prolang.keys.length; i++) {
+        //     const key = this.prolang.keys[i];
+        //     key.prepare();
+        //     key.mesh.rotat
+        // }
 
-        for (let i = 0; i < this.dbs.keys.length; i++) {
-            const key = this.dbs.keys[i];
-            key.prepare();
-        }
+        // for (let i = 0; i < this.dbs.keys.length; i++) {
+        //     const key = this.dbs.keys[i];
+        //     key.prepare();
+        // }
 
-        for (let i = 0; i < this.softwares.keys.length; i++) {
-            const key = this.softwares.keys[i];
-            key.prepare();
-        }
+        // for (let i = 0; i < this.softwares.keys.length; i++) {
+        //     const key = this.softwares.keys[i];
+        //     key.prepare();
+        // }
 
-        for (let i = 0; i < this.frameworks.keys.length; i++) {
-            const key = this.frameworks.keys[i];
-            key.prepare();
-        }
+        // for (let i = 0; i < this.frameworks.keys.length; i++) {
+        //     const key = this.frameworks.keys[i];
+        //     key.prepare();
+        // }
 
         loading.addProgress(40);
         this.initialized = true;
@@ -124,6 +148,12 @@ export default class Knowledge {
     }
     floorShadow: THREE.Texture;
     floorModel: THREE.Group;
+    public updateWaveEffect(deltatime: number) {
+        this.prolang.updateWaveEffect(deltatime)
+        this.dbs.updateWaveEffect(deltatime)
+        this.frameworks.updateWaveEffect(deltatime)
+        this.softwares.updateWaveEffect(deltatime)
+    }
     async loadShadowModel() {
 
         const material = new ShaderMaterial({

@@ -15,7 +15,7 @@ export default class Plane {
         z: number
     }
     geometry: THREE.BufferGeometry
-    constructor(world: CANNON.World, scene: THREE.Scene, dirLight: THREE.DirectionalLight, position: THREE.Vector3, size: { x: number, y: number, z: number }, color: string, shadowColor: string) {
+    constructor(world: CANNON.World, scene: THREE.Scene, position: THREE.Vector3, size: { x: number, y: number, z: number }) {
         this.world = world;
 
         this.scene = scene;

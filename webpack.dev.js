@@ -10,12 +10,20 @@ module.exports = (env) => {
           test: /\.(glsl|vert|frag)$/,
           loader: 'ts-shader-loader'
         },
-
         {
           test: /\.tsx?$/,
           use: 'ts-loader',
           exclude: /node_modules/,
-        }
+        },
+        {
+          test: /\.(glb|gltf|fbx|obj)$/,
+          use:
+            [
+              {
+                loader: 'file-loader',
+              }
+            ]
+        },
       ],
     },
     plugins: [

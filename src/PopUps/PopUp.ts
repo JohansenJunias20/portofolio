@@ -328,7 +328,6 @@ export default class PopUp {
         this.borderFloor.mesh = meshBorderFloor;
         this.borderFloor.mesh = meshBorderFloor;
         this.scene.add(meshBorderFloor)
-        console.log({ size: new CANNON.Vec3(this.borderFloor.size.x / 2, 0.005, this.borderFloor.size.y / 2) })
 
         const body = new CANNON.Body({
             shape: new CANNON.Box(new CANNON.Vec3(this.borderFloor.size.x / 2, 0.005, this.borderFloor.size.y / 2)),

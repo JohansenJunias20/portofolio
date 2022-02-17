@@ -3,9 +3,11 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import * as CANNON from 'cannon';
 import * as THREE from "three";
 import Loading from "./Loading/Loading";
+import { WaveEffect } from "./waveEffect";
 
 //default parent for Mesh Only Object (without physics & collision on it)
 export default class MeshOnlyObject3d {
+    waveEffect: WaveEffect
     protected asset: {
         url: string;
         scale: THREE.Vector3;
@@ -20,6 +22,10 @@ export default class MeshOnlyObject3d {
         this.scene = scene;
         this.initialized = false;
         this.position = position;
+        this.waveEffect = {
+            originPos: new Vector3(),
+            range: 0
+        }
     }
     public async init(loading: Loading) {
         await this.loadAsset();
@@ -29,6 +35,10 @@ export default class MeshOnlyObject3d {
     }
     public update(deltatime: number) {
         this.mesh.position.copy(this.position);
+        this.updateWaveEffect()
+    }
+    public updateWaveEffect() {
+
     }
     public async loadAsset() {
         const fbx = await new Promise<Group>((res, rej) => {
