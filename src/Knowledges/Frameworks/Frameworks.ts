@@ -23,7 +23,7 @@ export default class Frameworks extends Wrapper<Framework> {
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
             key.mesh.rotateY(degToRad(-45));
-            key.body.quaternion.copy(key.mesh.quaternion as any)
+            // key.body.quaternion.copy(key.mesh.quaternion as any)
             key.mesh.receiveShadow = false
         }
         this.initialized = true;

@@ -14,7 +14,7 @@ const Config = {
         }
     },
     waveEffect: {
-        speed: 50,
+        speed: 5,
         originPos: 0,
         range: {
             start: 0,

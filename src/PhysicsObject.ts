@@ -71,6 +71,9 @@ export default class PhysicsObject3d {
         this.shapeType = shapeType;
         this.shape = shape;
         this.followWaveEffect = true;
+        if (this.key) {
+            console.log({ poskey: this.position })
+        }
         this.originPosition = new THREE.Vector3()
         this.originPosition.copy(position);
         this.originPosition.y += 5;
@@ -91,9 +94,13 @@ export default class PhysicsObject3d {
     }
     public updateWaveEffect(deltatime: number) {
         const ref = this;
-        if (this.isSpawned) return;
         if (!this.followWaveEffect) return;
+        if (this.isSpawned) return;
         if (this.mesh.position.distanceTo(this.waveEffect.originPos) < this.waveEffect.range) {
+            if (ref.key == "W") {
+                console.log({ pos: ref.position })
+                console.log({ originPosition: ref.originPosition })
+            }
             //lerp from underground to surface.
             this.alphaSpawn += 2 * deltatime;
             gsap.to(this.position, {
@@ -101,8 +108,12 @@ export default class PhysicsObject3d {
                 ...this.originPosition,
                 ease: Back.easeOut.config(2),
                 onComplete: () => {
+                    ref.addBody();
+                    // ref.body.mass = ref.originMass;
+                    // ref.body.updateMassProperties();
+                    // ref.body.position.copy(ref.position)
+                    // ref.body.updateMassProperties();
 
-                    ref.body.mass = ref.originMass;
                 }
             })
             // this.position.copy(new Vector3().copy(this.spawnPosition).lerp(this.originPosition, clamp(this.alphaSpawn, 0, 1)));
@@ -137,11 +148,26 @@ export default class PhysicsObject3d {
 
 
     }
+    public size: THREE.Vector3;
+    private addBody() {
+        this.body = new CANNON.Body({
+            mass: this.originMass, material: { friction: 1, restitution: 0, id: 1, name: "test" },
+            shape: this.shapeType == "CUSTOM" ?
+                this.shape :
+                this.shapeType == "BOX" ?
+                    new CANNON.Box(new CANNON.Vec3(this.size.x / 2, this.size.y / 2, this.size.z / 2)) :
+                    this.shapeType == "TRIMESH" ?
+                        this.shape :
+                        new CANNON.Sphere(1)
+        });
+        this.body.position.set(this.position.x, this.position.y, this.position.z);
+        this.body.quaternion.set(this.mesh.quaternion.x, this.mesh.quaternion.y, this.mesh.quaternion.z, this.mesh.quaternion.w);
+        this.PhysicsWorld.addBody(this.body);
+    }
     public prepare() {
-        var size = new THREE.Vector3();
         const { url, scale, mtl } = this.asset;
         const ref = this;
-
+        this.size = new THREE.Vector3()
         // this.position.y += 5;
 
         if (this.shapeType == "TRIMESH") {
@@ -151,20 +177,21 @@ export default class PhysicsObject3d {
         if (isOBJ(url))
             (this.shape as any).setScale(new CANNON.Vec3(10, 10, 10) as any)
 
-        new THREE.Box3().setFromObject(ref.mesh).getSize(size);
+        new THREE.Box3().setFromObject(ref.mesh).getSize(this.size);
 
-        this.body = new CANNON.Body({
-            mass: this.followWaveEffect ? 0 : this.originMass, material: { friction: 1, restitution: 0, id: 1, name: "test" },
-            shape: this.shapeType == "CUSTOM" ?
-                this.shape :
-                this.shapeType == "BOX" ?
-                    new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) :
-                    this.shapeType == "TRIMESH" ?
-                        this.shape :
-                        new CANNON.Sphere(1)
-        });
-        this.body.position.set(this.position.x, this.position.y, this.position.z);
-        this.PhysicsWorld.addBody(this.body);
+        if (!this.followWaveEffect) this.addBody();
+        // this.body = new CANNON.Body({
+        //     mass: this.followWaveEffect ? 0 : this.originMass, material: { friction: 1, restitution: 0, id: 1, name: "test" },
+        //     shape: this.shapeType == "CUSTOM" ?
+        //         this.shape :
+        //         this.shapeType == "BOX" ?
+        //             new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2)) :
+        //             this.shapeType == "TRIMESH" ?
+        //                 this.shape :
+        //                 new CANNON.Sphere(1)
+        // });
+        // this.body.position.set(this.position.x, this.position.y, this.position.z);
+        // this.PhysicsWorld.addBody(this.body);
 
         this.scene.add(this.mesh);
         if (this.floorShadowModel) // ini ditaruh setelah create body karena bila tidak maka floorshadowmodel akan juga dibuatkan body
@@ -187,7 +214,7 @@ export default class PhysicsObject3d {
 
 
         this.spawnPosition.copy(this.position);
-        this.spawnPosition.y = this.position.y - size.y;
+        this.spawnPosition.y = this.position.y - this.size.y;
         this.position.copy(this.spawnPosition);
         this.mesh.position.copy(this.position);
 
@@ -262,12 +289,15 @@ export default class PhysicsObject3d {
 
     }
     private updatePhysics(deltatime: number) {
+        if (!this.body) return;
         if (this.body.mass == 0) {
             this.body.position.copy(this.position as any);
         }
         else {
             this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
         }
+        if (this.key == "W")
+            console.log({ pos: this.position.y })
         this.mesh.quaternion.copy(this.body.quaternion as any);
     }
     private resetOpacity(deltatime: number) {

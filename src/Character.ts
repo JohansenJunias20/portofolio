@@ -44,6 +44,7 @@ export default class Character extends PhysicsObject3d {
     }
     private isWalking: boolean;
     addResistance() {
+        if(!this.body) return
         if (this.isPress.a == this.isPress.d) {
             this.body.velocity.x = 0;
         }
@@ -61,6 +62,7 @@ export default class Character extends PhysicsObject3d {
 
     }
     public walk(deltatime: number) {
+        if(!this.body) return
         this.addResistance();
         if (!this.isWalking) {
             //start animating walk

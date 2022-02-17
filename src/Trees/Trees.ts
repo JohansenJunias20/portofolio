@@ -97,7 +97,7 @@ export default class Trees extends Wrapper<Tree> {
         await Promise.all(promises)
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
-            key.body.quaternion.copy(key.mesh.quaternion as any)
+            // key.body.quaternion.copy(key.mesh.quaternion as any)
             key.mesh.receiveShadow = true
             key.mesh.castShadow = true
         }
