@@ -55,6 +55,10 @@ export default class Knowledge {
         promises.push(this.prolang.loadAsset())
         promises.push(this.frameworks.loadAsset())
         await Promise.all(promises);
+        console.log(this.frameworks.initialized)
+        console.log(this.dbs.initialized)
+        console.log(this.prolang.initialized)
+        console.log(this.softwares.initialized)
         this.initShadowModel();
         // circlePlate.scale.set(10, 10, 10);
         // console.log({ circlePlate })
@@ -144,7 +148,7 @@ export default class Knowledge {
     }
     floorShadow: THREE.Texture;
     floorModel: THREE.Group;
-    public updateWaveEffect(deltatime:number) {
+    public updateWaveEffect(deltatime: number) {
         this.prolang.updateWaveEffect(deltatime)
         this.dbs.updateWaveEffect(deltatime)
         this.frameworks.updateWaveEffect(deltatime)

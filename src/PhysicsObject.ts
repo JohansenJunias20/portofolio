@@ -101,18 +101,8 @@ export default class PhysicsObject3d {
                 ...this.originPosition,
                 ease: Back.easeOut.config(2),
                 onComplete: () => {
-                    if (ref.key)
-                        if (ref.key == "W") {
-                            console.log({ pos: ref.position })
-                            console.log({ mass: ref.originMass })
-                        }
+
                     ref.body.mass = ref.originMass;
-                },
-                onUpdate: () => {
-                    if (ref.key)
-                        if (ref.key == "W") {
-                            console.log()
-                        }
                 }
             })
             // this.position.copy(new Vector3().copy(this.spawnPosition).lerp(this.originPosition, clamp(this.alphaSpawn, 0, 1)));
@@ -200,7 +190,6 @@ export default class PhysicsObject3d {
         this.spawnPosition.y = this.position.y - size.y;
         this.position.copy(this.spawnPosition);
         this.mesh.position.copy(this.position);
-        console.log({ spawnpos: this.spawnPosition })
 
         //adding additional mesh if available
         if (!this.asset.additionalMesh) {

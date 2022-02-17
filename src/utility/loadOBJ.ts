@@ -7,17 +7,13 @@ import customShader from "./customShader";
 export default async function loadOBJ(objUrl: string, _mtl: string | THREE.ShaderMaterial, scale: THREE.Vector3 = new THREE.Vector3(1, 1, 1), castShadow: boolean = false) {
     // to do: load dulu semua dengan promise.all baru init
     if (typeof _mtl === 'string') {
-        var promises: Array<Promise<any>> = [];
         var mtl: MTLLoader.MaterialCreator;
         const mtlLoader = new MTLLoader();
         var objLoader = new OBJLoader();
-        promises.push((async () => {
-            mtl = await mtlLoader.loadAsync(_mtl);
-            objLoader.setMaterials(mtl);
-
-        })())
+        mtl = await mtlLoader.loadAsync(_mtl);
+        objLoader.setMaterials(mtl);
         var object: THREE.Group;
-        promises.push(new Promise<void>((res, rej) => {
+        await new Promise<void>((res, rej) => {
             objLoader.load(objUrl, function (_object) {
                 _object.traverse((c: THREE.Mesh) => {
                     if (c.isMesh) {
@@ -28,9 +24,8 @@ export default async function loadOBJ(objUrl: string, _mtl: string | THREE.Shade
                 })
                 object = _object;
                 res()
-            });
-        }))
-        await Promise.all(promises);
+            })
+        });
         object.scale.set(scale.x, scale.y, scale.z)
         return object;
     }
@@ -54,9 +49,9 @@ export default async function loadOBJ(objUrl: string, _mtl: string | THREE.Shade
                         }
 
                     }
-                   
+
                 }
-             
+
                 object.scale.copy(scale)
                 res(object)
             });

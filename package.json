@@ -29,6 +29,7 @@
     "@types/three": "^0.135.0",
     "cannon": "^0.6.2",
     "cannon-es": "^0.18.0",
+    "file-loader": "^6.2.0",
     "glslify-loader": "^2.0.0",
     "gsap": "^3.9.1",
     "socket.io-client": "^4.4.1",
