@@ -76,27 +76,27 @@ export default class Trees extends Wrapper<Tree> {
         var promises = [];
         promises.push(this.loadShadowTextures());
         promises.push(this.loadShadowModel());
-        await Promise.all(promises);
-        this.prepareShadowModel();
+        // await Promise.all(promises);
         // todo: jadikan 1 dgn promise All utk semua loadnya kemudian baru di init
 
-        var promises = [];
+        // var promises = [];
 
         ref.initialized = false;
         for (let i = 0; i < ref.keys.length; i++) {
             const key = ref.keys[i];
-
-            const shadowModel = ref.shadowModel.find(_ => _.name == `floorShadow_${key.type}_deg${key.rotationDeg}`).model;
-            const newShadowModel = CloneMesh(shadowModel.children[0] as THREE.Mesh) as any;
-            key.asset.floorShadow.Mesh = newShadowModel;
-            key.asset.floorShadow.Mesh.scale.copy(new THREE.Vector3(44 * key.asset.scale.x, 0, 44 * key.asset.scale.z));
-            promises.push(key.init())
+            promises.push(key.loadAsset())
 
 
         }
         await Promise.all(promises)
+        this.prepareShadowModel();
         for (let i = 0; i < this.keys.length; i++) {
             const key = this.keys[i];
+            const shadowModel = ref.shadowModel.find(_ => _.name == `floorShadow_${key.type}_deg${key.rotationDeg}`).model;
+            const newShadowModel = CloneMesh(shadowModel.children[0] as THREE.Mesh) as any;
+            key.asset.floorShadow.Mesh = newShadowModel;
+            key.asset.floorShadow.Mesh.scale.copy(new THREE.Vector3(44 * key.asset.scale.x, 0, 44 * key.asset.scale.z));
+            key.prepare();
             // key.body.quaternion.copy(key.mesh.quaternion as any)
             key.mesh.receiveShadow = true
             key.mesh.castShadow = true

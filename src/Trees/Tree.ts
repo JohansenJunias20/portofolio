@@ -71,16 +71,21 @@ export default class Tree extends PhysicsObject3d {
         // this.asset.floorShadow.modelUrl = ``;
         // this.asset.floorShadow.scale = new Vector3(10, 0, 10);
     }
-    public async init() {
-        await super.loadAsset()
-        this.mesh.rotation.y = degToRad(this.rotationDeg);
-        const quaternion = this.mesh.quaternion.clone();
+    // public async init() {
+    //     await super.loadAsset()
+    //     this.mesh.rotation.y = degToRad(this.rotationDeg);
+    //     const quaternion = this.mesh.quaternion.clone();
+    //     super.prepare();
+    //     this.initialized = true;
+    //     // this.mesh.quaternion.copy(quaternion);
+    //     // this.body.quaternion.copy(quaternion as any);
+    //     // this.floorShadowModel.quaternion.set(0, 0, 0, 0)
+    //     // this.f.quaternion.copy(quaternion);
+
+    // }
+    public prepare(): void {
         super.prepare();
-        this.initialized = true;
-        // this.mesh.quaternion.copy(quaternion);
-        // this.body.quaternion.copy(quaternion as any);
-        // this.floorShadowModel.quaternion.set(0, 0, 0, 0)
-        // this.f.quaternion.copy(quaternion);
+        this.mesh.rotation.y = degToRad(this.rotationDeg);
 
     }
     public update(deltatime: number) {
