@@ -32,6 +32,7 @@
     "file-loader": "^6.2.0",
     "glslify-loader": "^2.0.0",
     "gsap": "^3.9.1",
+    "is-mobile": "^3.0.0",
     "socket.io-client": "^4.4.1",
     "three": "^0.135.0",
     "webpack": "^5.65.0"

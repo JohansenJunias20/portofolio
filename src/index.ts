@@ -69,28 +69,41 @@ var followCharacter = true;
 var leftMouseDown = false;
 document.onmousedown = (e) => {
 
-    // alert("mousedown")
     if (e.which == 1) {
-        // alert("mousedown1")
-
-        // if (controls.enablePan)
-        if (followCharacter && character.initialized) {
-            followCharacter = false;
-            const { x, y, z } = character.mesh.position;
-            var disiredPosition = new Vector3(x, y, z).add(CURRENT_OFFSET_CAMERA)
-            camera.position.set(disiredPosition.x, disiredPosition.y, disiredPosition.z)
-            alpha = 0;
-
-            // controls.target.copy(character.position);
-            // controls.update();
-        }
-        leftMouseDown = true;
-        // canvas.requestPointerLock();
+        panCameraStart()
     }
 
 
 }
 
+// document.onpointerdown = (e) => {
+//     panCameraStart();
+// }
+canvas.ontouchstart = (e) => {
+    // alert("touch start")
+    MouselastPos.x = e.touches[0].pageX;
+    MouselastPos.y = e.touches[0].pageY;
+    panCameraStart();
+}
+canvas.ontouchend = (e) => {
+    // alert("touch end")
+    leftMouseDown = false;
+}
+function panCameraStart() {
+    // if (controls.enablePan)
+    if (followCharacter && character.initialized) {
+        followCharacter = false;
+        // const { x, y, z } = character.mesh.position;
+        // var disiredPosition = new Vector3(x, y, z).add(CURRENT_OFFSET_CAMERA)
+        // camera.position.set(disiredPosition.x, disiredPosition.y, disiredPosition.z)
+        alpha = 0;
+
+        // controls.target.copy(character.position);
+        // controls.update();
+    }
+    leftMouseDown = true;
+    // canvas.requestPointerLock();
+}
 canvas.onmouseup = (e) => {
     if (e.which == 1) {
         leftMouseDown = false;
@@ -110,15 +123,64 @@ var leftCam = new Vector3()
 const CameraPanSpeed = 0.035;
 const raycast = new Raycaster();
 canvas.onmousemove = (e) => {
+    // mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    // mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+    // deltaPos.x = MouselastPos.x - e.pageX;
+    // deltaPos.y = MouselastPos.y - e.pageY;
+    // MouselastPos.x = e.pageX;
+    // MouselastPos.y = e.pageY;
+    // // camera.getWorldDirection(frontCam);
+    // if (!followCharacter && leftMouseDown) {
+
+    //     //x camera local axis logic
+    //     camera.getWorldDirection(frontCam);
+    //     leftCam = frontCam.cross(camera.up);
+    //     leftCam = leftCam.normalize()
+    //     camera.position.add(leftCam.multiplyScalar(deltaPos.x).multiplyScalar(CameraPanSpeed));
+
+    //     //y camera local axis logic
+    //     camera.getWorldDirection(frontCam);
+    //     frontCam.y = 0;
+    //     frontCam = frontCam.normalize()
+    //     frontCam.multiplyScalar(deltaPos.y)
+    //     frontCam.multiplyScalar(CameraPanSpeed);
+    //     frontCam.multiplyScalar(-1.5);
+    //     camera.position.add(frontCam);
+    // }
+    dragCamera(e);
+}
+
+//karena dragCamera pada ontouchmove hanya dipanggil saat user touch
+//kalau  dragCamera pada onmousemove dipanggil terus walaupun tidak mouse down
+canvas.ontouchmove = (e) => {
+    if (leftMouseDown)
+        console.log(e.touches.length);
+    dragCamera(e.touches[0]);
+}
+
+function dragCamera(e: Touch | MouseEvent) {
+    // if(!leftMouseDown) return;
+    // if (!e.clientX) {
+    //     alert("welost");
+    //     return;
+    // }
+    // if (e.touches[0]) {
+    // return;
+    // }
+    if (MouselastPos.x == 0 && MouselastPos.y == 0) {
+        MouselastPos.x = e.clientX;
+        MouselastPos.y = e.clientY;
+        return;
+    }
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
-    deltaPos.x = MouselastPos.x - e.pageX;
-    deltaPos.y = MouselastPos.y - e.pageY;
-    MouselastPos.x = e.pageX;
-    MouselastPos.y = e.pageY;
+    deltaPos.x = MouselastPos.x - e.clientX;
+    deltaPos.y = MouselastPos.y - e.clientY;
+    MouselastPos.x = e.clientX;
+    MouselastPos.y = e.clientY;
     // camera.getWorldDirection(frontCam);
     if (!followCharacter && leftMouseDown) {
-
+        // console.log({pageX:e.pageX,pageY:e.pageY})
         //x camera local axis logic
         camera.getWorldDirection(frontCam);
         leftCam = frontCam.cross(camera.up);
@@ -135,6 +197,7 @@ canvas.onmousemove = (e) => {
         camera.position.add(frontCam);
     }
 }
+var joystick = new Joystick(MouselastPos);
 
 
 renderer.shadowMap.enabled = true;
@@ -295,6 +358,7 @@ import setOpacity from './utility/setOpacity';
 import { WaveEffect } from './waveEffect';
 import prodConfig from './config/config.prod';
 import devConfig from './config/config.dev';
+import Joystick from './Joystick';
 var debug = false;
 
 interface IHash<T> {
