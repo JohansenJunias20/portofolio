@@ -23,7 +23,7 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 |[**Map Pointer**](https://forums.rpgmakerweb.com/data/attachments/109/109950-e5cb7855bfce5950a9c055d7053c9d00.jpg)|draw [2D Arrow](https://forums.rpgmakerweb.com/data/attachments/109/109950-e5cb7855bfce5950a9c055d7053c9d00.jpg) on screen if character's position off the map  |
 |**Spawn Wave Effect** |Objects appear from underground to the surface in sequence, start from the center point (character spawn) towards outside  | ✅ 
 |[**Post Processing**](https://threejs.org/examples/#webgl_postprocessing_dof2) | [Bloom](https://threejs.org/examples/#webgl_postprocessing_unreal_bloom) on Billboards Image, [Blur](https://threejs.org/examples/#webgl_postprocessing_dof2) Camera's Edges, [Selective Outline](https://threejs.org/examples/#webgl_postprocessing_outline) on _knowledge_ |
-|**Responsive Mobile UI**|Add Joystick, fixing blury noise when screen resized|
+|**Responsive Mobile UI**|Add Joystick, fixing blury noise when screen resized|On Progress
 |**Desc on _knowledges_**|Whenever user click a _knowledge_, it will show it's description on html modal|
 |**Player List UI**  |Add list players & player count UI in spawn location  |
 |**more _playground_**  |boardgame that can be played with bots or other players like [_connect 4_](https://en.wikipedia.org/wiki/Connect_Four)  |
