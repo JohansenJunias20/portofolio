@@ -305,7 +305,8 @@ window.onresize = (e) => {
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.innerWidth / window.innerHeight)
+    renderer.setPixelRatio(2)
+    // renderer.setPixelRatio(window.innerWidth / window.innerHeight)
 }
 var cameraPos = new THREE.Vector3();
 var cameraDir = new THREE.Vector3();
