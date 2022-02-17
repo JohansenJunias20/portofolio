@@ -8,6 +8,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { clamp, degToRad } from 'three/src/math/MathUtils';
 import PopUp from '../PopUps/PopUp';
 import customShader from '../utility/customShader';
+import loadOBJ from '../utility/loadOBJ';
 
 export default class Billboard {
     public isBillboard: boolean;
@@ -72,26 +73,27 @@ export default class Billboard {
         var mtl: MTLLoader.MaterialCreator;
         const mtlLoader = new MTLLoader();
         var objLoader = new OBJLoader();
-        promises.push((async () => {
-            mtl = await mtlLoader.loadAsync(this.asset.mtl);
-            objLoader.setMaterials(mtl);
-
-        })())
         var object: THREE.Group;
-        promises.push(new Promise<void>((res, rej) => {
-            objLoader.load(ref.asset.url, function (_object) {
-                _object.traverse((c: THREE.Mesh) => {
-                    if (c.isMesh) {
-                        c.castShadow = ref.asset.castShadow;
-                        c.material = customShader((c.material as MeshPhongMaterial).color);
-                    }
-                    // return c;
-                })
-                _object.scale.set(10 * ref.asset.scale.x, 10 * ref.asset.scale.y, 10 * ref.asset.scale.z)
-                object = _object;
-                res()
-            });
-        }))
+        promises.push((async () => { object = await loadOBJ(ref.asset.url, ref.asset.mtl, new THREE.Vector3(10 * ref.asset.scale.x, 10 * ref.asset.scale.y, 10 * ref.asset.scale.z)) })())
+        // promises.push((async () => {
+        //     mtl = await mtlLoader.loadAsync(this.asset.mtl);
+        //     objLoader.setMaterials(mtl);
+
+        // })())
+        // promises.push(new Promise<void>((res, rej) => {
+        //     objLoader.load(ref.asset.url, function (_object) {
+        //         _object.traverse((c: THREE.Mesh) => {
+        //             if (c.isMesh) {
+        //                 c.castShadow = ref.asset.castShadow;
+        //                 c.material = customShader((c.material as MeshPhongMaterial).color);
+        //             }
+        //             // return c;
+        //         })
+        //         _object.scale.set(10 * ref.asset.scale.x, 10 * ref.asset.scale.y, 10 * ref.asset.scale.z)
+        //         object = _object;
+        //         res()
+        //     });
+        // }))
 
         var texture: THREE.Texture;
         var desc_text_texture: THREE.Texture;

@@ -24,8 +24,9 @@ import loadFBX from "./utility/loadFBX";
 import loadOBJ from "./utility/loadOBJ";
 import isFBX from "./utility/isFBX";
 import isOBJ from "./utility/isOBJ";
-import { WaveEffect } from "./waveEffect";
 import { Back, Bounce, Elastic, Power2, Sine } from "gsap/all";
+import Config from "./config/config.common";
+import { WaveEffect } from "./waveEffect";
 //please load default custom shader here (only once)
 
 export default class PhysicsObject3d {
@@ -71,7 +72,7 @@ export default class PhysicsObject3d {
         this.shapeType = shapeType;
         this.shape = shape;
         this.followWaveEffect = true;
-       
+
         this.originPosition = new THREE.Vector3()
         this.originPosition.copy(position);
         this.originPosition.y += 5;
@@ -95,13 +96,13 @@ export default class PhysicsObject3d {
         if (!this.followWaveEffect) return;
         if (this.isSpawned) return;
         if (this.mesh.position.distanceTo(this.waveEffect.originPos) < this.waveEffect.range) {
-          
+
             //lerp from underground to surface.
             this.alphaSpawn += 2 * deltatime;
             gsap.to(this.position, {
                 duration: 1,
                 ...this.originPosition,
-                ease: Back.easeOut.config(2),
+                ease: Back.easeOut.config(Config.waveEffect.overshoot),
                 onComplete: () => {
                     ref.addBody();
                     // ref.body.mass = ref.originMass;

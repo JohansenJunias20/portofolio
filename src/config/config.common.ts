@@ -19,7 +19,8 @@ const Config = {
         range: {
             start: 0,
             max: 3000
-        }
+        },
+        overshoot: 2
     },
     invisibleEffect: {
         speed: 6
