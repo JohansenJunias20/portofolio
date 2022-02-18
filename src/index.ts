@@ -151,9 +151,10 @@ canvas.onmousemove = (e) => {
     dragCamera(e);
 }
 
+
 //karena dragCamera pada ontouchmove hanya dipanggil saat user touch
 //kalau  dragCamera pada onmousemove dipanggil terus walaupun tidak mouse down
-canvas.ontouchmove = (e) => {
+document.ontouchmove = (e) => {
     joystick.ontouchmove(e.touches[0])
     dragCamera(e.touches[0]);
 }
