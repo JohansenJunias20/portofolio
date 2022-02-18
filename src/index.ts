@@ -87,6 +87,7 @@ canvas.ontouchstart = (e) => {
 }
 canvas.ontouchend = (e) => {
     // alert("touch end")
+    joystick.ontouchend();
     leftMouseDown = false;
 }
 function panCameraStart() {
@@ -153,8 +154,7 @@ canvas.onmousemove = (e) => {
 //karena dragCamera pada ontouchmove hanya dipanggil saat user touch
 //kalau  dragCamera pada onmousemove dipanggil terus walaupun tidak mouse down
 canvas.ontouchmove = (e) => {
-    if (leftMouseDown)
-        console.log(e.touches.length);
+    joystick.ontouchmove(e.touches[0])
     dragCamera(e.touches[0]);
 }
 
@@ -197,7 +197,7 @@ function dragCamera(e: Touch | MouseEvent) {
         camera.position.add(frontCam);
     }
 }
-var joystick = new Joystick(MouselastPos);
+var joystick = new Joystick(canvas);
 
 
 renderer.shadowMap.enabled = true;
