@@ -8,7 +8,7 @@ export default class Joystick {
     containerDOM: HTMLDivElement;
     outerDOM: HTMLDivElement;
     innerDOM: HTMLDivElement;
-    initialPos: {
+    initialPos: { //initial pos adalah coordinate joystick pada layar
         x: number;
         y: number;
     }
@@ -55,9 +55,9 @@ export default class Joystick {
         const x = touch.pageX;
         const y = touch.pageY;
         var result_xy = new Vector2();
-        // const rect = this.innerDOM.getBoundingClientRect()
-        const xJoystick = this.initialPos.x + parseFloat(this.innerDOM.style.width.replace("px", "")) / 2;
-        const yJoystick = this.initialPos.y + parseFloat(this.innerDOM.style.height.replace("px", "")) / 2;
+        const rectInner = this.innerDOM.getBoundingClientRect()
+        const xJoystick = this.initialPos.x + rectInner.width / 2;
+        const yJoystick = this.initialPos.y + rectInner.height / 2;
         const joystick_xy = new Vector2(xJoystick, yJoystick);
         const mouse_xy = new Vector2(x, y);
         const rect = this.outerDOM.getBoundingClientRect();
