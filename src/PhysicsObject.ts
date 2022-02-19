@@ -144,7 +144,7 @@ export default class PhysicsObject3d {
 
     }
     public size: THREE.Vector3;
-    private addBody() {
+    public addBody() {
         this.body = new CANNON.Body({
             mass: this.originMass, material: { friction: 1, restitution: 0.1, id: 1, name: "test" },
             shape: this.shapeType == "CUSTOM" ?
@@ -222,9 +222,8 @@ export default class PhysicsObject3d {
             this.initialized = true;
             return;
         }
-
+        
         this.mesh.add(...this.asset.additionalMesh)
-
     }
     private async loadFloorShadowModel(material: THREE.ShaderMaterial) {
         const ref = this;
@@ -311,5 +310,4 @@ export default class PhysicsObject3d {
             }
         }
     }
-
 }

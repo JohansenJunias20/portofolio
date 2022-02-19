@@ -5,3 +5,4 @@ private/*.go
 private/*.mod
 ws-server/visitor.json
 ssl/main/live/*
+dump

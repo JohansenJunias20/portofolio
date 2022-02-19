@@ -35,6 +35,10 @@ io.on("connection", (socket) => {
         // socket.broadcast.emit("candidate", { candidate });
     })
     socket.on("join", () => {
+        console.log(`join room ${socket.id}`);
+        // console.log({ IDs });
+        console.log({ len: Object.keys(IDs).length });
+        if (Object.keys(IDs).length == 0) return;
         socket.broadcast.emit("join", socket.id);
         // const cloneIDs = { ...IDs };
         // console.log({ cloneIDs })
@@ -46,7 +50,9 @@ io.on("connection", (socket) => {
     }) //please init peerconnection first before offering because u cannot recieve icecandidate before new RTCpeerconnection
     socket.on("disconnect", () => {
         socket.broadcast.emit("left", socket.id);
+        console.log("someone disconnected")
         delete IDs[socket.id];
+        console.log({ IDs })
     })
     socket.on("player_count", () => {
         socket.emit("player_count", io.engine.clientsCount);
@@ -55,12 +61,18 @@ io.on("connection", (socket) => {
         io.to(id).emit("cl_ready", socket.id);
     })
     socket.on("rm_ready", (id) => {
+        console.log("emmiting rm id", id)
+        console.log("from:", socket.id)
         io.to(id).emit("rm_ready", socket.id);
 
     })
-    socket.emit("id", socket.id);
     IDs[socket.id] = true;
-    console.log({ IDs })
+    if (Object.keys(IDs).length == 1) {
+        console.log("congratz u are the first connection", socket.id)
+        socket.emit("first?", true)
+    }
+    socket.emit("id", socket.id);
+    // console.log({ IDs })
     console.log(`someone made connection ${socket.id}`)
 });
 // io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {

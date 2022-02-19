@@ -11,7 +11,7 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
-console.log("v1.6");
+console.log("v1.7");
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true,
@@ -375,6 +375,7 @@ import devConfig from './config/config.dev';
 import Joystick from './Joystick';
 import isMobile from 'is-mobile';
 var debug = false;
+//
 
 interface IHash<T> {
     [key: string]: T
@@ -514,6 +515,7 @@ function animate() {
         digitRegocnition.update(deltatime, character.body, intersects) // give intersects because contain popup mesh
     }
 
+    // console.log({ playercount: Object.keys(otherPlayers).length })
     for (var key in otherPlayers) {
         const player = otherPlayers[key];
         if (player.initialized) {
@@ -636,8 +638,9 @@ function animate() {
 
 
 
-    // if (connection && character.body && connection.id)
-    //     connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
+    if (connection && connection.connected && character.body && connection.id) {
+        connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
+    }
     if (initialized)
         renderer.render(scene, camera)
     requestAnimationFrame(animate);
@@ -649,30 +652,39 @@ animate();
 
 
 const connection = new Connection();
-const joinButton: HTMLButtonElement = document.querySelector('#join');
-joinButton.onclick = () => {
-    connection.connect();
+// const joinButton: HTMLButtonElement = document.querySelector('#join');
+// joinButton.onclick = () => {
+// }
+connection.onrecieve = (e) => {
+    // console.log(e.data)
+    const message = JSON.parse(e.data);
+    switch (message.channel) {
+        case "transform":
+            message.id = message.id.toString();
+            for (var key in otherPlayers) {
+            }
+            otherPlayers[message.id].position.copy(message.position);
+            otherPlayers[message.id].body.position.copy(message.position);
+            otherPlayers[message.id].mesh.quaternion.copy(message.quaternion);
+            otherPlayers[message.id].body.quaternion.copy(message.quaternion);
+            // otherPlayers[message.id].mesh.position.copy(message.position);
+            break;
+        default:
+            break;
+    }
 }
-// connection.onrecieve = (e) => {
-//     // console.log(e.data)
-//     const message = JSON.parse(e.data);
-//     switch (message.channel) {
-//         case "transform":
-//             message.id = message.id.toString();
-//             for (var key in otherPlayers) {
-//             }
-//             otherPlayers[message.id].body.position.copy(message.position);
-//             otherPlayers[message.id].body.quaternion.copy(message.quaternion);
-//             break;
-//         default:
-//             break;
-//     }
-// }
-// connection.onnewplayer = async (id: string) => {
-//     otherPlayers[id] = (new Character(world, scene, new Vector3(0, 150, 0), 0));
-//     await otherPlayers[id].init();
-//     otherPlayers[id].body.mass = 0;//not affected to gravity
-// }
+connection.onnewplayer = async (id: string) => {
+    otherPlayers[id] = (new Character(world, scene, new Vector3(0, 150, 0), 0));
+    otherPlayers[id].followWaveEffect = false;
+    await otherPlayers[id].init();
+
+    otherPlayers[id].body.mass = 0;//not affected to gravity
+}
+connection.onleft = async (id: string) => {
+    scene.remove(otherPlayers[id].mesh);
+    world.remove(otherPlayers[id].body);
+    delete otherPlayers[id];
+}
 var startWaveEffect = false;
 const waveEffect: WaveEffect = {
     originPos: new Vector3(),
@@ -729,6 +741,7 @@ loading.onfull = () => {
     setTimeout(() => {
         startWaveEffect = true;
     }, 500);
+    connection.connect();
     // waveEffect.range = 5000;
     //     setInterval(() => {
     //         waveEffect.range += 10;

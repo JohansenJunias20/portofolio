@@ -24,6 +24,7 @@ export default class Character extends PhysicsObject3d {
         url: `/assets/character/Ball FBX.fbx`,
         scale: new THREE.Vector3(0.01, 0.01, 0.01)
     }
+    
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 25) {
         super(world, scene, position, movementSpeed, "SPHERE", 2);
         this.isPress = {

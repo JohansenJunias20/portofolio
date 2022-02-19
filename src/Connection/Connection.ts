@@ -22,8 +22,11 @@ export default class Connection {
     id: string;
     config: any;
     pending_candidates: Array<RTCIceCandidateInit>;
+    connected: boolean;
     constructor() {
         const ref = this;
+        this.AM_I_RM = false;
+        this.connected = false;
         this.ready = false;
         this.remotePeers = {}
         this.DataChannels = {};
@@ -36,9 +39,15 @@ export default class Connection {
                 { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https" ? TURN_PORT_TLS : TURN_PORT}`, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
         }
         // console.log(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`) // belum di commit
+
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
+        this.connected = true;
         this.signalling = signalling;
 
+        //check if I'm the first to connect?
+        ref.signalling.on("first?", () => {
+            ref.AM_I_RM = true;
+        })
 
         ref.signalling.on("join", (id: string) => {
             const tempPeer = new RTCPeerConnection(ref.config)
@@ -67,10 +76,12 @@ export default class Connection {
             ref.remotePeers[id] = tempPeer;
             if (ref.onnewplayer)
                 ref.onnewplayer(id)
-
             ref.signalling.emit("rm_ready", id)
 
         })
+
+
+
         ref.signalling.on("candidate", async ({ id, candidate }) => {
             if (!candidate) return;
             if (ref.remotePeers.hasOwnProperty(id)) { //mencegah console error saja, tanpa if ini sebenarnya juga bisa tapi entah knapa error
@@ -117,7 +128,6 @@ export default class Connection {
             }
             ref.onleft(id);
         })
-
         //hanya ketrigger 1x saat pertama x join room
         ref.signalling.on("rm_ready", (player_id: string) => {
             const tempPeer = new RTCPeerConnection(ref.config)
@@ -155,11 +165,17 @@ export default class Connection {
             ref.id = id;
         })
     }
+    public AM_I_RM: boolean;
     public playerCount: number;
+    private connectSignal: boolean;
     public connect() {
+        this.connectSignal = true; //memberi tahu kpd signal "first?" bahwa fungsi connect() sudah kepanggil
+        // console.log("fs from connect", this.firstSignal)
+        // console.log("1connecting...")
+
+        if (this.AM_I_RM) return; //jika RM maka tidak perlu emit join, biarkan CL(client) yang join
         this.signalling.emit("join");
         this.signalling.emit("player_count");//get player count
-
     }
     onleft: (id: string) => any;
     onnewplayer: (id: string) => any;
