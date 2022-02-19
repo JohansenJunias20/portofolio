@@ -6,62 +6,19 @@ const production = process.env.PRODUCTION ? true : false;
 const ssl = production ? process.env.PROD_WS_SSL == "TRUE" ? true : false : process.env.DEV_WS_SSL == "TRUE" ? true : false;
 const domain = production ? process.env.PROD_WS_DOMAIN : process.env.DEV_WS_DOMAIN;
 const express = require('express');
-const app = express();
-app.use(express.json())
 const httpServer = ssl ? require("https").createServer({
     key: fs.readFileSync(`/etc/letsencrypt/archive/${domain}/privkey1.pem`),
     cert: fs.readFileSync(`/etc/letsencrypt/archive/${domain}/cert1.pem`)
-}, app) :
-    require("http").createServer(app)
+}) :
+    require("http").createServer()
     ;
-app.post('/*', noteVisitor);
 const io = require("socket.io")(httpServer, {
     cors: {
         origin: "*"
     }
 });
 
-function noteVisitor(req, res) {
-    console.log("someone made post request")
-    const body = req.body;
-    res.send({ "status": true });
-    var visitor = []
-    if (fs.existsSync("./visitors/visitor.json"))
-        visitor = JSON.parse(fs.readFileSync('./visitors/visitor.json'))
-    body.time = getDateNow();
-    visitor.push(body)
-    fs.writeFileSync('./visitors/visitor.json', JSON.stringify(visitor));
-
-}
 const IDs = [];
-function getDateNow() {
-    let date_ob = new Date();
-
-    // current date
-    // adjust 0 before single digit date
-    let date = ("0" + date_ob.getDate()).slice(-2);
-
-    // current month
-    let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
-
-    // current year
-    let year = date_ob.getFullYear();
-
-    // current hours
-    let hours = date_ob.getHours();
-
-    // current minutes
-    let minutes = date_ob.getMinutes();
-
-    // current seconds
-    let seconds = date_ob.getSeconds();
-
-    // prints date in YYYY-MM-DD format
-    console.log(year + "-" + month + "-" + date);
-
-    // prints date & time in YYYY-MM-DD HH:MM:SS format
-    return year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
-}
 io.on("connection", (socket) => {
     socket.on("offer", (e) => {
         const { id, sdp } = e;

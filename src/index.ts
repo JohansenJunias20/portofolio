@@ -557,10 +557,10 @@ function animate() {
 animate();
 
 
-// const connection = new Connection();
+const connection = new Connection();
 const joinButton: HTMLButtonElement = document.querySelector('#join');
 joinButton.onclick = () => {
-    // connection.connect();
+    connection.connect();
 }
 // connection.onrecieve = (e) => {
 //     // console.log(e.data)
