@@ -24,7 +24,6 @@ export default class Connection {
     pending_candidates: Array<RTCIceCandidateInit>;
     constructor() {
         const ref = this;
-        return;
         this.ready = false;
         this.remotePeers = {}
         this.DataChannels = {};
@@ -38,9 +37,8 @@ export default class Connection {
         }
         console.log("url ws:")
         console.log(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`) // belum di commit
-        const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
+        const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: true });
         this.signalling = signalling;
-
 
         ref.signalling.on("join", (id: string) => {
             const tempPeer = new RTCPeerConnection(ref.config)
