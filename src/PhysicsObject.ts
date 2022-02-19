@@ -63,7 +63,7 @@ export default class PhysicsObject3d {
     floorShadowModel: THREE.Group;
     isSpawned: boolean;
     public followWaveEffect: boolean;
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 10, shapeType: "TRIMESH" | "BOX" | "SPHERE" | "CUSTOM", mass: number, shape: null | CANNON.Shape = null) {
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 3, shapeType: "TRIMESH" | "BOX" | "SPHERE" | "CUSTOM", mass: number, shape: null | CANNON.Shape = null) {
         this.PhysicsWorld = world;
         this.scene = scene;
         this.initialized = false;
@@ -119,7 +119,6 @@ export default class PhysicsObject3d {
         }
     }
     public update(deltatime: number) {
-        this.walk(deltatime);
         this.mesh.position.copy(this.position);
         this.resetOpacity(deltatime);
         this.updatePhysics(deltatime);
@@ -147,7 +146,7 @@ export default class PhysicsObject3d {
     public size: THREE.Vector3;
     private addBody() {
         this.body = new CANNON.Body({
-            mass: this.originMass, material: { friction: 1, restitution: 0, id: 1, name: "test" },
+            mass: this.originMass, material: { friction: 1, restitution: 0.1, id: 1, name: "test" },
             shape: this.shapeType == "CUSTOM" ?
                 this.shape :
                 this.shapeType == "BOX" ?

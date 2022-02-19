@@ -67,10 +67,11 @@ plane.init()
 
 var followCharacter = true;
 var leftMouseDown = false;
-document.onmousedown = (e) => {
+canvas.onmousedown = (e) => {
 
     if (e.which == 1) {
         panCameraStart()
+
     }
 
 
@@ -80,7 +81,6 @@ document.onmousedown = (e) => {
 //     panCameraStart();
 // }
 canvas.ontouchstart = (e) => {
-    // alert("touch start")
     MouselastPos.x = e.touches[0].pageX;
     MouselastPos.y = e.touches[0].pageY;
     panCameraStart();
@@ -157,8 +157,17 @@ canvas.onmousemove = (e) => {
 document.ontouchmove = (e) => {
     dragCamera(e.touches[0]);
 }
+var touchPos = {
+    x: 0,
+    y: 0,
+    isMoved: false
+};
 (document.querySelector("#outer_joystick") as HTMLDivElement).ontouchmove = (e) => {
-    joystick.ontouchmove(e.touches[0])
+    touchPos.x = e.touches[0].clientX;
+    touchPos.y = e.touches[0].clientY;
+    joystick.ontouchmove(touchPos.x, touchPos.y);
+    followCharacter = true;
+    touchPos.isMoved = true;
 }
 
 function dragCamera(e: Touch | MouseEvent) {
@@ -188,7 +197,7 @@ function dragCamera(e: Touch | MouseEvent) {
         camera.getWorldDirection(frontCam);
         leftCam = frontCam.cross(camera.up);
         leftCam = leftCam.normalize()
-        camera.position.add(leftCam.multiplyScalar(deltaPos.x).multiplyScalar(CameraPanSpeed));
+        camera.position.add(leftCam.multiplyScalar(deltaPos.x).multiplyScalar(isMobile() ? 1.5 * 1.5 : 1).multiplyScalar(CameraPanSpeed));
 
         //y camera local axis logic
         camera.getWorldDirection(frontCam);
@@ -197,10 +206,10 @@ function dragCamera(e: Touch | MouseEvent) {
         frontCam.multiplyScalar(deltaPos.y)
         frontCam.multiplyScalar(CameraPanSpeed);
         frontCam.multiplyScalar(-1.5);
+        frontCam.multiplyScalar(isMobile() ? 1.5 : 1);
         camera.position.add(frontCam);
     }
 }
-var joystick = new Joystick(canvas);
 
 
 renderer.shadowMap.enabled = true;
@@ -221,7 +230,7 @@ const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 const navigationBoards = new NavigationBoards(world, scene);
 
 const lobby = new Lobby(world, scene);
-const character = new Character(world, scene, new Vector3(0, 0, -5));
+const character = new Character(world, scene, new Vector3(0, 0, 5));
 const roadStones = new RoadStones(scene)
 
 const johansen = new Johansen(world, scene)
@@ -271,6 +280,8 @@ document.onkeydown = (e) => {
 
 }
 
+var joystick = new Joystick(canvas, character);
+joystick.followCharacter = () => { followCharacter = true; }
 document.onkeyup = (e) => {
     key = e.key.toLowerCase();
     if (key == "w") {
@@ -362,6 +373,7 @@ import { WaveEffect } from './waveEffect';
 import prodConfig from './config/config.prod';
 import devConfig from './config/config.dev';
 import Joystick from './Joystick';
+import isMobile from 'is-mobile';
 var debug = false;
 
 interface IHash<T> {
@@ -373,6 +385,9 @@ window.onresize = (e) => {
     camera.updateProjectionMatrix()
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(2)
+    if (isMobile()) {
+        joystick.show()
+    }
     // renderer.setPixelRatio(window.innerWidth / window.innerHeight)
 }
 var cameraPos = new THREE.Vector3();
@@ -381,6 +396,7 @@ const raycast2 = new THREE.Raycaster();
 function animate() {
     deltatime = clock.getDelta()
     // if (deltatime < 0.2)
+    // world.step(config.world.step * deltatime);
     world.step(config.world.step);
     // else return
 
@@ -415,9 +431,7 @@ function animate() {
 
                     val -= config.invisibleEffect.speed * deltatime;
                     const opacity = clamp(val, 0.2, 1);
-                    if (debug) {
-                        console.log(mesh.parent);
-                    }
+
                     // if (mesh.parent.name == "" && mesh.parent.type == "Group" && mesh.parent.children.length == 3 && mesh.parent.children[2].name == "Circle_Circle.001") {
                     //     console.log(opacity)
                     //     console.log(mesh)
@@ -441,7 +455,16 @@ function animate() {
     if (character.initialized) {
         // alert(camera.position.distanceTo(character.position))
         // character.setWaveEffect(waveEffect)
+        if (isMobile())
+            joystick.update(deltatime)
+        // joystick.ontouchmove(touchPos.x, touchPos.y, deltatime)
+        else {
+            character.walk(deltatime);
+
+        }
+        touchPos.isMoved = false; //reset
         character.update(deltatime);
+
     }
     if (hotkeys.initialized) {
         hotkeys.setWaveEffect(waveEffect)
