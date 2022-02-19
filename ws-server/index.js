@@ -26,6 +26,7 @@ io.on("connection", (socket) => {
         io.to(id).emit("offer", { id: socket.id, sdp }); //id unecessary
     })
     socket.on("answer", (e) => {
+        console.log("answered", socket.id)
         const { id, sdp } = e;
         io.to(id).emit("answer", { id: socket.id, sdp }); //id unecessary
     })
@@ -58,6 +59,7 @@ io.on("connection", (socket) => {
         socket.emit("player_count", io.engine.clientsCount);
     })
     socket.on("cl_ready", (id) => {
+        console.log("client ready..", socket.id)
         io.to(id).emit("cl_ready", socket.id);
     })
     socket.on("rm_ready", (id) => {

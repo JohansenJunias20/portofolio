@@ -38,6 +38,7 @@ export default class Connection {
                 { urls: "stun:stun.budgetphone.nl:3478" },
                 { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https" ? TURN_PORT_TLS : TURN_PORT}`, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
         }
+        console.log({ config: this.config.iceServers })
         // console.log(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`) // belum di commit
 
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
@@ -61,6 +62,7 @@ export default class Connection {
             tempPeer.onnegotiationneeded = async () => {
                 var offer_desc = await tempPeer.createOffer()
                 await tempPeer.setLocalDescription(offer_desc);
+                console.log("created offer...")
                 ref.signalling.emit("offer", { id, sdp: tempPeer.localDescription }); //broadcast to others except me
             }
 
@@ -83,6 +85,7 @@ export default class Connection {
 
 
         ref.signalling.on("candidate", async ({ id, candidate }) => {
+            console.log("receiving candidate")
             if (!candidate) return;
             if (ref.remotePeers.hasOwnProperty(id)) { //mencegah console error saja, tanpa if ini sebenarnya juga bisa tapi entah knapa error
                 await ref.remotePeers[id].addIceCandidate(candidate)
@@ -92,7 +95,7 @@ export default class Connection {
             }
         })
         ref.signalling.on("offer", async ({ id, sdp }: { id: string, sdp: RTCSessionDescription }) => {
-
+            console.log("recieving candidate")
             const tempPeer = ref.remotePeers[id];
             await tempPeer.setRemoteDescription(sdp)
             var answer_desc = await tempPeer.createAnswer()
@@ -136,13 +139,13 @@ export default class Connection {
                 ref.signalling.emit("candidate", { id: player_id, candidate });
             }
 
-
             tempPeer.ondatachannel = (e) => {
                 ref.remoteDataChannels[player_id] = e.channel;
                 // ref.remoteDataChannel = e.channel;
                 const dc = e.channel;
                 e.channel.onopen = (e) => {
                     ref.ready = true;
+                    console.log("Connection established")
                 }
                 e.channel.onmessage = ref.recieve.bind(ref);
             };

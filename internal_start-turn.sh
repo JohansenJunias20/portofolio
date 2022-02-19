@@ -19,8 +19,7 @@ sed -i "/server-name/c\server-name=$TURN_DOMAIN" ./turnserver.conf
 sed -i "/realm/c\realm=$TURN_DOMAIN" ./turnserver.conf
 sed -i "/min-port/c\min-port=$TURN_MIN_PORT" ./turnserver.conf
 sed -i "/max-port/c\max-port=$TURN_MAX_PORT" ./turnserver.conf
-sed -i "/user/c\user=$TURN_USERNAME" ./turnserver.conf
-sed -i "/password/c\password=$TURN_PASSWORD" ./turnserver.conf
+sed -i "/user/c\user=$TURN_USERNAME:$TURN_PASSWORD" ./turnserver.conf
 minport=$TURN_MIN_PORT
 maxport=$TURN_MAX_PORT
 
@@ -43,5 +42,6 @@ echo "please make sure turn server turned off and port 3478, 5379, $minport-$max
 echo "running turn server..."
 docker run -d --name coturn -p $TURN_PORT:$TURN_PORT -p $minport-$maxport:$minport-$maxport/udp \
 -p $TURN_PORT_TLS:$TURN_PORT_TLS \
+-v "/$(pwd)/ssl/main:/etc/letsencrypt/"\
 -v "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" coturn/coturn
 echo "turn server done. Please server public/ files with web server (nginx/apache/express/etc)"
