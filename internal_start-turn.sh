@@ -14,7 +14,8 @@ export $(cat .env | xargs)
 echo "> CHANGING turnserver.conf BASED .ENV FILE"
 sed -i "/^listening-port/c\listening-port=$TURN_PORT" ./turnserver.conf
 sed -i "/^tls-listening-port/c\tls-listening-port=$TURN_PORT_TLS" ./turnserver.conf
-
+TURN_PASSWORD=${TURN_PASSWORD//[^[:alnum:]]/}
+TURN_USERNAME=${TURN_USERNAME//[^[:alnum:]]/}
 sed -i "/server-name/c\server-name=$TURN_DOMAIN" ./turnserver.conf
 sed -i "/realm/c\realm=$TURN_DOMAIN" ./turnserver.conf
 sed -i "/min-port/c\min-port=$TURN_MIN_PORT" ./turnserver.conf
@@ -28,7 +29,7 @@ maxport=$TURN_MAX_PORT
 maxport=${maxport//[^[:alnum:]]/}
 minport=${minport//[^[:alnum:]]/}
 TURN_PORT=${TURN_PORT//[^[:alnum:]]/}
-TURN_PORT_TLS=${minport//[^[:alnum:]]/}
+TURN_PORT_TLS=${TURN_PORT_TLS//[^[:alnum:]]/}
 
 systemctl stop coturn # if exist coturn in the system
 # just to make sure can run the docker command.
