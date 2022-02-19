@@ -35,8 +35,7 @@ export default class Connection {
                 { urls: "stun:stun.budgetphone.nl:3478" },
                 { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https" ? TURN_PORT_TLS : TURN_PORT}`, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
         }
-        console.log("url ws:")
-        console.log(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`) // belum di commit
+        // console.log(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`) // belum di commit
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
         this.signalling = signalling;
 
@@ -45,7 +44,6 @@ export default class Connection {
             const tempPeer = new RTCPeerConnection(ref.config)
 
             tempPeer.onicecandidate = ({ candidate }) => {
-                console.log("giving candidate...");
                 ref.signalling.emit("candidate", { id, candidate });
             }
 
@@ -76,12 +74,10 @@ export default class Connection {
         ref.signalling.on("candidate", async ({ id, candidate }) => {
             if (!candidate) return;
             if (ref.remotePeers.hasOwnProperty(id)) { //mencegah console error saja, tanpa if ini sebenarnya juga bisa tapi entah knapa error
-                console.log({ candidate })
                 await ref.remotePeers[id].addIceCandidate(candidate)
             }
             else {
                 ref.pending_candidates.push(candidate);
-                console.log("there is pending candidate")
             }
         })
         ref.signalling.on("offer", async ({ id, sdp }: { id: string, sdp: RTCSessionDescription }) => {
@@ -96,7 +92,6 @@ export default class Connection {
         })
 
         ref.signalling.on("answer", async ({ id, sdp }) => {
-            console.log("my offered answered")
             await ref.remotePeers[id].setRemoteDescription(sdp);
         })
 
@@ -128,7 +123,6 @@ export default class Connection {
             const tempPeer = new RTCPeerConnection(ref.config)
 
             tempPeer.onicecandidate = ({ candidate }) => {
-                console.log("giving candidate to other player..")
                 ref.signalling.emit("candidate", { id: player_id, candidate });
             }
 

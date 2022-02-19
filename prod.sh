@@ -3,6 +3,9 @@ export $(cat .env | xargs)
 chmod 777 ./private/main.exe
 ./private/main.exe $PROD_WS_PORT
 
+# renew ssl
+bash ./ssl_renew.sh
+
 # compile typescript to dist file
 # installing dependencies
 docker run -v "/$(pwd)/ws-server:/usr/src/app" customnode:latest npm install

@@ -1,5 +1,10 @@
 #!/bin/bash
 # please run in with sudo command
+
+# removing any servers
+docker-compose -f docker-compose.dev.yml down
+docker-compose -f docker-compose.prod.yml down
+echo y | docker container prune
 echo "generating ssh if expired. please make sure port 80 is open and not used by any server.."
 
 export $(cat .env | xargs)

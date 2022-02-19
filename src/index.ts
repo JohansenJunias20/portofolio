@@ -11,7 +11,7 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
-console.log("v1.5");
+console.log("v1.6");
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true,
@@ -67,30 +67,44 @@ plane.init()
 
 var followCharacter = true;
 var leftMouseDown = false;
-document.onmousedown = (e) => {
+canvas.onmousedown = (e) => {
 
-    // alert("mousedown")
     if (e.which == 1) {
-        // alert("mousedown1")
+        panCameraStart()
 
-        // if (controls.enablePan)
-        if (followCharacter && character.initialized) {
-            followCharacter = false;
-            const { x, y, z } = character.mesh.position;
-            var disiredPosition = new Vector3(x, y, z).add(CURRENT_OFFSET_CAMERA)
-            camera.position.set(disiredPosition.x, disiredPosition.y, disiredPosition.z)
-            alpha = 0;
-
-            // controls.target.copy(character.position);
-            // controls.update();
-        }
-        leftMouseDown = true;
-        // canvas.requestPointerLock();
     }
 
 
 }
 
+// document.onpointerdown = (e) => {
+//     panCameraStart();
+// }
+canvas.ontouchstart = (e) => {
+    MouselastPos.x = e.touches[0].pageX;
+    MouselastPos.y = e.touches[0].pageY;
+    panCameraStart();
+}
+canvas.ontouchend = (e) => {
+    // alert("touch end")
+    joystick.ontouchend();
+    leftMouseDown = false;
+}
+function panCameraStart() {
+    // if (controls.enablePan)
+    if (followCharacter && character.initialized) {
+        followCharacter = false;
+        // const { x, y, z } = character.mesh.position;
+        // var disiredPosition = new Vector3(x, y, z).add(CURRENT_OFFSET_CAMERA)
+        // camera.position.set(disiredPosition.x, disiredPosition.y, disiredPosition.z)
+        alpha = 0;
+
+        // controls.target.copy(character.position);
+        // controls.update();
+    }
+    leftMouseDown = true;
+    // canvas.requestPointerLock();
+}
 canvas.onmouseup = (e) => {
     if (e.which == 1) {
         leftMouseDown = false;
@@ -110,20 +124,80 @@ var leftCam = new Vector3()
 const CameraPanSpeed = 0.035;
 const raycast = new Raycaster();
 canvas.onmousemove = (e) => {
+    // mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    // mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+    // deltaPos.x = MouselastPos.x - e.pageX;
+    // deltaPos.y = MouselastPos.y - e.pageY;
+    // MouselastPos.x = e.pageX;
+    // MouselastPos.y = e.pageY;
+    // // camera.getWorldDirection(frontCam);
+    // if (!followCharacter && leftMouseDown) {
+
+    //     //x camera local axis logic
+    //     camera.getWorldDirection(frontCam);
+    //     leftCam = frontCam.cross(camera.up);
+    //     leftCam = leftCam.normalize()
+    //     camera.position.add(leftCam.multiplyScalar(deltaPos.x).multiplyScalar(CameraPanSpeed));
+
+    //     //y camera local axis logic
+    //     camera.getWorldDirection(frontCam);
+    //     frontCam.y = 0;
+    //     frontCam = frontCam.normalize()
+    //     frontCam.multiplyScalar(deltaPos.y)
+    //     frontCam.multiplyScalar(CameraPanSpeed);
+    //     frontCam.multiplyScalar(-1.5);
+    //     camera.position.add(frontCam);
+    // }
+    dragCamera(e);
+}
+
+
+//karena dragCamera pada ontouchmove hanya dipanggil saat user touch
+//kalau  dragCamera pada onmousemove dipanggil terus walaupun tidak mouse down
+document.ontouchmove = (e) => {
+    dragCamera(e.touches[0]);
+}
+var touchPos = {
+    x: 0,
+    y: 0,
+    isMoved: false
+};
+(document.querySelector("#outer_joystick") as HTMLDivElement).ontouchmove = (e) => {
+    touchPos.x = e.touches[0].clientX;
+    touchPos.y = e.touches[0].clientY;
+    joystick.ontouchmove(touchPos.x, touchPos.y);
+    followCharacter = true;
+    touchPos.isMoved = true;
+}
+
+function dragCamera(e: Touch | MouseEvent) {
+    // if(!leftMouseDown) return;
+    // if (!e.clientX) {
+    //     alert("welost");
+    //     return;
+    // }
+    // if (e.touches[0]) {
+    // return;
+    // }
+    if (MouselastPos.x == 0 && MouselastPos.y == 0) {
+        MouselastPos.x = e.clientX;
+        MouselastPos.y = e.clientY;
+        return;
+    }
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
-    deltaPos.x = MouselastPos.x - e.pageX;
-    deltaPos.y = MouselastPos.y - e.pageY;
-    MouselastPos.x = e.pageX;
-    MouselastPos.y = e.pageY;
+    deltaPos.x = MouselastPos.x - e.clientX;
+    deltaPos.y = MouselastPos.y - e.clientY;
+    MouselastPos.x = e.clientX;
+    MouselastPos.y = e.clientY;
     // camera.getWorldDirection(frontCam);
     if (!followCharacter && leftMouseDown) {
-
+        // console.log({pageX:e.pageX,pageY:e.pageY})
         //x camera local axis logic
         camera.getWorldDirection(frontCam);
         leftCam = frontCam.cross(camera.up);
         leftCam = leftCam.normalize()
-        camera.position.add(leftCam.multiplyScalar(deltaPos.x).multiplyScalar(CameraPanSpeed));
+        camera.position.add(leftCam.multiplyScalar(deltaPos.x).multiplyScalar(isMobile() ? 1.5 * 1.5 : 1).multiplyScalar(CameraPanSpeed));
 
         //y camera local axis logic
         camera.getWorldDirection(frontCam);
@@ -132,6 +206,7 @@ canvas.onmousemove = (e) => {
         frontCam.multiplyScalar(deltaPos.y)
         frontCam.multiplyScalar(CameraPanSpeed);
         frontCam.multiplyScalar(-1.5);
+        frontCam.multiplyScalar(isMobile() ? 1.5 : 1);
         camera.position.add(frontCam);
     }
 }
@@ -155,7 +230,7 @@ const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 const navigationBoards = new NavigationBoards(world, scene);
 
 const lobby = new Lobby(world, scene);
-const character = new Character(world, scene, new Vector3(0, 0, -5));
+const character = new Character(world, scene, new Vector3(0, 0, 5));
 const roadStones = new RoadStones(scene)
 
 const johansen = new Johansen(world, scene)
@@ -205,6 +280,8 @@ document.onkeydown = (e) => {
 
 }
 
+var joystick = new Joystick(canvas, character);
+joystick.followCharacter = () => { followCharacter = true; }
 document.onkeyup = (e) => {
     key = e.key.toLowerCase();
     if (key == "w") {
@@ -295,6 +372,8 @@ import setOpacity from './utility/setOpacity';
 import { WaveEffect } from './waveEffect';
 import prodConfig from './config/config.prod';
 import devConfig from './config/config.dev';
+import Joystick from './Joystick';
+import isMobile from 'is-mobile';
 var debug = false;
 
 interface IHash<T> {
@@ -305,7 +384,11 @@ window.onresize = (e) => {
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.innerWidth / window.innerHeight)
+    renderer.setPixelRatio(2)
+    if (isMobile()) {
+        joystick.show()
+    }
+    // renderer.setPixelRatio(window.innerWidth / window.innerHeight)
 }
 var cameraPos = new THREE.Vector3();
 var cameraDir = new THREE.Vector3();
@@ -313,6 +396,7 @@ const raycast2 = new THREE.Raycaster();
 function animate() {
     deltatime = clock.getDelta()
     // if (deltatime < 0.2)
+    // world.step(config.world.step * deltatime);
     world.step(config.world.step);
     // else return
 
@@ -347,9 +431,7 @@ function animate() {
 
                     val -= config.invisibleEffect.speed * deltatime;
                     const opacity = clamp(val, 0.2, 1);
-                    if (debug) {
-                        console.log(mesh.parent);
-                    }
+
                     // if (mesh.parent.name == "" && mesh.parent.type == "Group" && mesh.parent.children.length == 3 && mesh.parent.children[2].name == "Circle_Circle.001") {
                     //     console.log(opacity)
                     //     console.log(mesh)
@@ -373,7 +455,16 @@ function animate() {
     if (character.initialized) {
         // alert(camera.position.distanceTo(character.position))
         // character.setWaveEffect(waveEffect)
+        if (isMobile())
+            joystick.update(deltatime)
+        // joystick.ontouchmove(touchPos.x, touchPos.y, deltatime)
+        else {
+            character.walk(deltatime);
+
+        }
+        touchPos.isMoved = false; //reset
         character.update(deltatime);
+
     }
     if (hotkeys.initialized) {
         hotkeys.setWaveEffect(waveEffect)
