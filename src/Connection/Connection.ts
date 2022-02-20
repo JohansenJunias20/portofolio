@@ -164,7 +164,7 @@ export default class Connection {
         })
         ref.signalling.on("players", (players: { [socketid: string]: { guest_id: string } }) => { // whenever socket connected to server, server rebroadcast players
             const playerCount = Object.keys(players).length;
-            var html = `<div id="title_board" style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;font-weight:normal;text-align: center;">${playerCount} players</div>`;
+            var html = `<div id="title_board" style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;font-weight:normal;text-align: center;">${playerCount} users</div>`;
             for (var key in players) {
                 const player = players[key];
                 var a: string = '';

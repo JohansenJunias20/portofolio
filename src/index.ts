@@ -69,10 +69,7 @@ var followCharacter = true;
 var leftMouseDown = false;
 canvas.onmousedown = (e) => {
 
-    if (e.which == 1) {
-        panCameraStart()
 
-    }
 
 
 }
@@ -302,6 +299,11 @@ document.onkeyup = (e) => {
 
 
 canvas.onmousedown = (e) => {
+    // document.body.style.cursor = "grabbing";
+    if (e.which == 1) {
+        panCameraStart()
+
+    }
     const raycast = new Raycaster();
     raycast.setFromCamera(mouse, camera);
     const intsCenterScreen = raycast.intersectObjects(scene.children);
@@ -445,7 +447,7 @@ function animate() {
         }
     }
 
-    document.body.style.cursor = "default";
+    document.body.style.cursor = "grab";
 
     //#region update mesh & body
     if (trees.initialized) {
