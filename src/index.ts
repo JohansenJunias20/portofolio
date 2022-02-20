@@ -667,6 +667,7 @@ connection.onrecieve = (e) => {
             otherPlayers[message.id].body.position.copy(message.position);
             otherPlayers[message.id].mesh.quaternion.copy(message.quaternion);
             otherPlayers[message.id].body.quaternion.copy(message.quaternion);
+            otherPlayers[message.id].body.angularVelocity.setZero()
             // otherPlayers[message.id].mesh.position.copy(message.position);
             break;
         default:
@@ -712,10 +713,10 @@ async function init() {
     character.init().then(() => {
         loading.addProgress(2);
     });
-    // johansen.init().then(() => {
-    //     loading.addProgress(5);
+    johansen.init().then(() => {
+        // loading.addProgress(5);
 
-    // })
+    })
     loading.setText("Loading Knowledges");
     knowledge.init(loading).then(() => {
         loading.addProgress(5);

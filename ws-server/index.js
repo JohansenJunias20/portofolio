@@ -18,8 +18,9 @@ const io = require("socket.io")(httpServer, {
     }
 });
 
-const IDs = [];
+const IDs = {};
 io.on("connection", (socket) => {
+    socket.emit("id", socket.id);
     socket.on("offer", (e) => {
         const { id, sdp } = e;
         console.log("someone give offer");
@@ -53,10 +54,10 @@ io.on("connection", (socket) => {
         socket.broadcast.emit("left", socket.id);
         console.log("someone disconnected")
         delete IDs[socket.id];
-        console.log({ IDs })
+        io.emit("players", IDs);
     })
-    socket.on("player_count", () => {
-        socket.emit("player_count", io.engine.clientsCount);
+    socket.on("players", () => {
+        socket.emit("players", IDs);
     })
     socket.on("cl_ready", (id) => {
         console.log("client ready..", socket.id)
@@ -68,12 +69,26 @@ io.on("connection", (socket) => {
         io.to(id).emit("rm_ready", socket.id);
 
     })
-    IDs[socket.id] = true;
+    IDs[socket.id] = {
+        guest_id: (() => {
+            //random until get the unique id
+            var random =
+                Math.floor(Math.random() * 1000)
+            while (Object.entries(IDs).find(([key, value]) => value.guest_id == random)) {
+                var random =
+                    Math.floor(Math.random() * 1000)
+
+            }
+            return random;
+
+        })()
+    };
     if (Object.keys(IDs).length == 1) {
         console.log("congratz u are the first connection", socket.id)
         socket.emit("first?", true)
     }
-    socket.emit("id", socket.id);
+    io.emit("players", IDs);
+    console.log("emitting IDs", IDs)
     // console.log({ IDs })
     console.log(`someone made connection ${socket.id}`)
 });

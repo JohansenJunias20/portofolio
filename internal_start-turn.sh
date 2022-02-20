@@ -33,16 +33,20 @@ TURN_PORT_TLS=${TURN_PORT_TLS//[^[:alnum:]]/}
 
 systemctl stop coturn # if exist coturn in the system
 # just to make sure can run the docker command.
-sudo chmod 777 /run
-sudo chmod 777 /var
-sudo chmod 777 /var/run/turnserver.pid
-sudo chmod 777 /run/turnserver.pid
+chmod 777 /run
+chmod 777 /var
+chmod 777 /var/run/turnserver.pid
+chmod 777 /run/turnserver.pid
 echo "running internal_start-turn script"
 echo "only called by other bash script, please do not run manually"
 echo "please make sure turn server turned off and port 3478, 5379, $minport-$maxport/udp open and not used by other process"
 echo "running turn server..."
+cp ./turnserver.conf /etc/turnserver.conf;
+systemctl restart coturn;
+exit 0 # sementara coturn tidak pakai image karena belum bisa
+
 docker run -d --name coturn -p $TURN_PORT:$TURN_PORT -p $minport-$maxport:$minport-$maxport/udp \
 -p $TURN_PORT_TLS:$TURN_PORT_TLS \
--v "/$(pwd)/ssl/main:/etc/letsencrypt/"\
--v "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" coturn/coturn
+-v "/$(pwd)/ssl/main:/etc/letsencrypt/" \
+-v "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" coturn/coturn;
 echo "turn server done. Please server public/ files with web server (nginx/apache/express/etc)"

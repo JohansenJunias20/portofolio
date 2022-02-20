@@ -26,6 +26,7 @@ export default class Connection {
     constructor() {
         const ref = this;
         this.AM_I_RM = false;
+        this.boardDOM = document.querySelector("#board");
         this.connected = false;
         this.ready = false;
         this.remotePeers = {}
@@ -36,9 +37,9 @@ export default class Connection {
         this.config = {
             iceServers: [
                 { urls: "stun:stun.budgetphone.nl:3478" },
-                { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https" ? TURN_PORT_TLS : TURN_PORT}`, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
+                { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https" ? TURN_PORT_TLS : TURN_PORT}`, secure: false, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
         }
-        console.log({ config: this.config.iceServers })
+        console.log({ config: this.config.iceServers[1] })
         // console.log(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`) // belum di commit
 
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
@@ -62,7 +63,6 @@ export default class Connection {
             tempPeer.onnegotiationneeded = async () => {
                 var offer_desc = await tempPeer.createOffer()
                 await tempPeer.setLocalDescription(offer_desc);
-                console.log("created offer...")
                 ref.signalling.emit("offer", { id, sdp: tempPeer.localDescription }); //broadcast to others except me
             }
 
@@ -85,7 +85,6 @@ export default class Connection {
 
 
         ref.signalling.on("candidate", async ({ id, candidate }) => {
-            console.log("receiving candidate")
             if (!candidate) return;
             if (ref.remotePeers.hasOwnProperty(id)) { //mencegah console error saja, tanpa if ini sebenarnya juga bisa tapi entah knapa error
                 await ref.remotePeers[id].addIceCandidate(candidate)
@@ -94,8 +93,9 @@ export default class Connection {
                 ref.pending_candidates.push(candidate);
             }
         })
+
+
         ref.signalling.on("offer", async ({ id, sdp }: { id: string, sdp: RTCSessionDescription }) => {
-            console.log("recieving candidate")
             const tempPeer = ref.remotePeers[id];
             await tempPeer.setRemoteDescription(sdp)
             var answer_desc = await tempPeer.createAnswer()
@@ -157,17 +157,31 @@ export default class Connection {
         ref.signalling.on("cl_ready", id => {
             ref.DataChannels[id] = ref.remotePeers[id].createDataChannel("main", { ordered: false, maxRetransmits: 0 });
             ref.DataChannels[id].onopen = () => {
+                console.log("Connection established")
                 ref.ready = true;
             }
             ref.DataChannels[id].onmessage = ref.recieve.bind(ref);
         })
-        ref.signalling.on("player_count", count => {
-            ref.playerCount = count;
+        ref.signalling.on("players", (players: { [socketid: string]: { guest_id: string } }) => { // whenever socket connected to server, server rebroadcast players
+            const playerCount = Object.keys(players).length;
+            var html = `<div id="title_board" style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;font-weight:normal;text-align: center;">${playerCount} players</div>`;
+            for (var key in players) {
+                const player = players[key];
+                var a: string = '';
+                if (key == ref.id)
+                    a = `<div style="cursor:pointer;color:#fff700;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-weight:normal;text-align:left;">guest${player.guest_id}</div>`
+                else
+                    a = `<div style="cursor:pointer;color:white;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-weight:normal;text-align:left;">guest${player.guest_id}</div>`
+                html = `${html}${a}`;
+            }
+            ref.boardDOM.innerHTML = html;
+            // ref.playerCount = count;
         })
         ref.signalling.on("id", id => {
             ref.id = id;
         })
     }
+    public boardDOM: HTMLDivElement;
     public AM_I_RM: boolean;
     public playerCount: number;
     private connectSignal: boolean;
@@ -178,7 +192,6 @@ export default class Connection {
 
         if (this.AM_I_RM) return; //jika RM maka tidak perlu emit join, biarkan CL(client) yang join
         this.signalling.emit("join");
-        this.signalling.emit("player_count");//get player count
     }
     onleft: (id: string) => any;
     onnewplayer: (id: string) => any;
