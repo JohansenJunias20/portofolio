@@ -41,12 +41,12 @@ echo "running internal_start-turn script"
 echo "only called by other bash script, please do not run manually"
 echo "please make sure turn server turned off and port 3478, 5379, $minport-$maxport/udp open and not used by other process"
 echo "running turn server..."
-cp ./turnserver.conf /etc/turnserver.conf;
 path="$(pwd)/ssl/main/archive/portofolio.orbitskomputer.com"
 certPath="$path/cert1.pem"
 sed -i "/cert=/c\certt=$certPath" ./turnserver.conf
 privPath="$path/privkey1.pem"
 sed -i "/pkey=/c\pkeyy=$privPath" ./turnserver.conf
+cp ./turnserver.conf /etc/turnserver.conf;
 systemctl restart coturn;
 exit 0 # sementara coturn tidak pakai image karena belum bisa
 
