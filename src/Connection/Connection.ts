@@ -1,5 +1,6 @@
 import { PCFShadowMap } from 'three';
 import { io, Socket } from 'socket.io-client';
+import getCountry from '../utility/getCountry';
 
 interface IHash<T> {
     [details: string]: T;
@@ -162,16 +163,34 @@ export default class Connection {
             }
             ref.DataChannels[id].onmessage = ref.recieve.bind(ref);
         })
-        ref.signalling.on("players", (players: { [socketid: string]: { guest_id: string } }) => { // whenever socket connected to server, server rebroadcast players
+        ref.signalling.on("players", async (players: { [socketid: string]: { guest_id: string } }) => { // whenever socket connected to server, server rebroadcast players
             const playerCount = Object.keys(players).length;
             var html = `<div id="title_board" style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;font-weight:normal;text-align: center;">${playerCount} users</div>`;
             for (var key in players) {
                 const player = players[key];
                 var a: string = '';
                 if (key == ref.id)
-                    a = `<div style="cursor:pointer;color:#fff700;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-weight:normal;text-align:left;">guest${player.guest_id}</div>`
+                    a = `<div 
+                    style="cursor:pointer;color:#fff700;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+                    font-weight:normal;text-align:left;">guest${player.guest_id}
+                    <img
+                    src="https://flagcdn.com/16x12/id.png"
+                    srcset="https://flagcdn.com/32x24/id.png 2x,
+                      https://flagcdn.com/48x36/id.png 3x"
+                    width="16"
+                    height="12"
+                    alt="indonesia flag">
+                    </div>`
                 else
-                    a = `<div style="cursor:pointer;color:white;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-weight:normal;text-align:left;">guest${player.guest_id}</div>`
+                    a = `<div style="cursor:pointer;color:white;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-weight:normal;text-align:left;">guest${player.guest_id}
+                    <img
+                    src="https://flagcdn.com/16x12/id.png"
+                    srcset="https://flagcdn.com/32x24/id.png 2x,
+                      https://flagcdn.com/48x36/id.png 3x"
+                    width="16"
+                    height="12"
+                    alt="indonesia flag">
+                    </div>`
                 html = `${html}${a}`;
             }
             ref.boardDOM.innerHTML = html;
