@@ -35,8 +35,8 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 |**Add more Shadows**|shadows on movable object like character(ball), johansen mesh, and hotkeys||
 |**Add Documentation**|Write readme file in every directory||
 |**Dockerize Coturn**|image coturn/coturn seems to be broken, planning to make own custom coturn image||
-<!-- |**Night Mode**|Change theme to night when || -->
 |**Chat**|Add chat so players can communicate with each other||
+<!-- |**Night Mode**|Change theme to night when || -->
 
 
 
