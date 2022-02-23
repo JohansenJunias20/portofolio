@@ -196,7 +196,10 @@ export default class Connection {
     }
 
     async initCountry() {
-        var response = await getCountry();
+        // var response = await getCountry();
+        var response = {
+            countryCode: "ID"
+        }
         this.myCountryCode = response.countryCode; // trigger updateBillboard()
         this.signalling.emit("country", response.countryCode);
     }
