@@ -93,7 +93,7 @@ export default class PhysicsObject3d {
     }
     public updateWaveEffect(deltatime: number) {
         const ref = this;
-        if (!this.followWaveEffect) return;
+        if (!this.followWaveEffect) return
         if (this.isSpawned) return;
         if (this.mesh.position.distanceTo(this.waveEffect.originPos) < this.waveEffect.range) {
 
@@ -112,9 +112,33 @@ export default class PhysicsObject3d {
 
                 }
             })
+
+            this.isSpawned = true;
+            if (!ref.floorShadowModel) return;
+            var opacityFloorShadow = {
+                val: 0
+            }
+            // gsap.to(, {})
+            // console.log("floor shadow transition start...")
+            gsap.to(opacityFloorShadow, {
+                delay: 1,
+                duration: 1,
+                val: 1,
+                ease: Back.easeOut.config(Config.waveEffect.overshoot),
+                onUpdate: (e) => {
+                    // console.log({e})
+                    if (ref.floorShadowModel) {
+                        // console.log("floor")
+                        // console.log(opacityFloorShadow.val)
+                        setOpacity(ref.floorShadowModel, ref.scene.uuid, opacityFloorShadow.val);
+                        // console.log(ref.floorShadowModel.isMesh)
+                    }
+                    // console.log({ val: opacityFloorShadow.val })
+                }
+            })
             // this.position.copy(new Vector3().copy(this.spawnPosition).lerp(this.originPosition, clamp(this.alphaSpawn, 0, 1)));
             // this.position.copy(this.originPosition);
-            this.isSpawned = true;
+
             // console.log({ spawnpos: this.spawnPosition })
         }
     }
@@ -190,7 +214,7 @@ export default class PhysicsObject3d {
 
         this.scene.add(this.mesh);
         if (this.floorShadowModel) // ini ditaruh setelah create body karena bila tidak maka floorshadowmodel akan juga dibuatkan body
-            this.mesh.children.push(this.floorShadowModel);
+            this.scene.add(this.floorShadowModel);
 
         //#region load floorShadow
         if (this.asset.floorShadow) {
@@ -200,13 +224,16 @@ export default class PhysicsObject3d {
                 newfloorShadow.position.copy(this.position);
                 newfloorShadow.position.add((this.asset.floorShadow.offset || new THREE.Vector3()));
                 newfloorShadow.position.y = 0;
-                this.scene.add(newfloorShadow)
+                this.scene.add(newfloorShadow) // bedanya scene.add dengen children.push adalah bila add maka posisi relative pada
                 this.floorShadowModel = newfloorShadow as THREE.Group;
             }
 
         }
         //#endregion
 
+        if (this.floorShadowModel && this.followWaveEffect) { //maka opacity hrs di set 0 terlebih dahulu
+            setOpacity(this.floorShadowModel, this.scene.uuid, 0);
+        }
 
         this.spawnPosition.copy(this.position);
         this.spawnPosition.y = this.position.y - this.size.y;
@@ -222,7 +249,7 @@ export default class PhysicsObject3d {
             this.initialized = true;
             return;
         }
-        
+
         this.mesh.add(...this.asset.additionalMesh)
     }
     private async loadFloorShadowModel(material: THREE.ShaderMaterial) {
