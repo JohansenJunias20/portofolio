@@ -47,14 +47,19 @@ io.on("connection", (socket) => {
         // cloneIDs[socket.id] = false;
         // socket.emit("players", cloneIDs);
     })
-    socket.on("init", (id_target) => {
-        io.to(id_target).emit("init", ({ id: socket.id }));
-    }) //please init peerconnection first before offering because u cannot recieve icecandidate before new RTCpeerconnection
+    // socket.on("init", (id_target) => {
+    //     io.to(id_target).emit("init", ({ id: socket.id }));
+    // }) //please init peerconnection first before offering because u cannot recieve icecandidate before new RTCpeerconnection
     socket.on("disconnect", () => {
         socket.broadcast.emit("left", socket.id);
         console.log("someone disconnected")
         delete IDs[socket.id];
         io.emit("players", IDs);
+    })
+    socket.on("country", (countryCode) => {
+        IDs[socket.id].countryCode = countryCode;
+        console.log({ countryCode })
+        socket.broadcast.emit("players", IDs);
     })
     socket.on("players", () => {
         socket.emit("players", IDs);
@@ -88,6 +93,7 @@ io.on("connection", (socket) => {
         socket.emit("first?", true)
     }
     io.emit("players", IDs);
+    io.emit("initialized",true);
     console.log("emitting IDs", IDs)
     // console.log({ IDs })
     console.log(`someone made connection ${socket.id}`)

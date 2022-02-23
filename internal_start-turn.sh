@@ -43,9 +43,9 @@ echo "please make sure turn server turned off and port 3478, 5379, $minport-$max
 echo "running turn server..."
 path="$(pwd)/ssl/main/archive/portofolio.orbitskomputer.com"
 certPath="$path/cert1.pem"
-sed -i "/cert=/c\certt=$certPath" ./turnserver.conf
+sed -i "/cert=/c\cert=$certPath" ./turnserver.conf
 privPath="$path/privkey1.pem"
-sed -i "/pkey=/c\pkeyy=$privPath" ./turnserver.conf
+sed -i "/pkey=/c\pkey=$privPath" ./turnserver.conf
 cp ./turnserver.conf /etc/turnserver.conf;
 systemctl restart coturn;
 exit 0 # sementara coturn tidak pakai image karena belum bisa

@@ -36,6 +36,6 @@ module.exports = (env) => {
       filename: 'bundle.js',
       path: path.resolve(__dirname, 'public/dist'),
     },
-    mode: "development" // sementara development karena production tidak mau compile bila typescript ada yg error
+    mode: "production" // sementara development karena production tidak mau compile bila typescript ada yg error
   };
 }

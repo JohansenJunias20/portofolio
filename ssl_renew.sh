@@ -17,3 +17,7 @@ echo "generating ssl for websocket production server..."
 docker run -it --rm --name certbot -p 80:80 -v "/$(pwd)/ssl/main:/etc/letsencrypt" -v "/$(pwd)/ssl/lib:/var/lib/letsencrypt" \
 certbot/certbot \
 certonly --standalone --email johansen.gumbal@gmail.com --agree-tos --no-eff-email -d $PROD_WS_DOMAIN --keep-until-expiring
+
+docker run -it --rm --name certbot -p 80:80 -v "/$(pwd)/ssl/main:/etc/letsencrypt" -v "/$(pwd)/ssl/lib:/var/lib/letsencrypt" \
+certbot/certbot \
+certonly --standalone --email johansen.gumbal@gmail.com --agree-tos --no-eff-email -d $TURN_DOMAIN --keep-until-expiring

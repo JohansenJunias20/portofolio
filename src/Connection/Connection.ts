@@ -1,6 +1,7 @@
 import { PCFShadowMap } from 'three';
 import { io, Socket } from 'socket.io-client';
 import getCountry from '../utility/getCountry';
+import capitalizeFirstLetter from '../utility/UpperCaseFirstLetter';
 
 interface IHash<T> {
     [details: string]: T;
@@ -40,8 +41,6 @@ export default class Connection {
                 { urls: "stun:stun.budgetphone.nl:3478" },
                 { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https" ? TURN_PORT_TLS : TURN_PORT}`, secure: false, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
         }
-        console.log({ config: this.config.iceServers[1] })
-        // console.log(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`) // belum di commit
 
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
         this.connected = true;
@@ -146,7 +145,6 @@ export default class Connection {
                 const dc = e.channel;
                 e.channel.onopen = (e) => {
                     ref.ready = true;
-                    console.log("Connection established")
                 }
                 e.channel.onmessage = ref.recieve.bind(ref);
             };
@@ -158,42 +156,16 @@ export default class Connection {
         ref.signalling.on("cl_ready", id => {
             ref.DataChannels[id] = ref.remotePeers[id].createDataChannel("main", { ordered: false, maxRetransmits: 0 });
             ref.DataChannels[id].onopen = () => {
-                console.log("Connection established")
                 ref.ready = true;
             }
             ref.DataChannels[id].onmessage = ref.recieve.bind(ref);
         })
-        ref.signalling.on("players", async (players: { [socketid: string]: { guest_id: string } }) => { // whenever socket connected to server, server rebroadcast players
-            const playerCount = Object.keys(players).length;
-            var html = `<div id="title_board" style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;font-weight:normal;text-align: center;">${playerCount} users</div>`;
-            for (var key in players) {
-                const player = players[key];
-                var a: string = '';
-                if (key == ref.id)
-                    a = `<div 
-                    style="cursor:pointer;color:#fff700;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-                    font-weight:normal;text-align:left;">guest${player.guest_id}
-                    <img
-                    src="https://flagcdn.com/16x12/id.png"
-                    srcset="https://flagcdn.com/32x24/id.png 2x,
-                      https://flagcdn.com/48x36/id.png 3x"
-                    width="16"
-                    height="12"
-                    alt="indonesia flag">
-                    </div>`
-                else
-                    a = `<div style="cursor:pointer;color:white;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-weight:normal;text-align:left;">guest${player.guest_id}
-                    <img
-                    src="https://flagcdn.com/16x12/id.png"
-                    srcset="https://flagcdn.com/32x24/id.png 2x,
-                      https://flagcdn.com/48x36/id.png 3x"
-                    width="16"
-                    height="12"
-                    alt="indonesia flag">
-                    </div>`
-                html = `${html}${a}`;
-            }
-            ref.boardDOM.innerHTML = html;
+        ref.signalling.on("initialized", () => {
+            ref.initCountry();
+        })
+        ref.signalling.on("players", async (players: { [socketid: string]: { guest_id: string, countryCode?: string } }) => { // whenever socket connected to server, server rebroadcast players
+            ref.players = players;
+            ref.updateBillboard();
             // ref.playerCount = count;
         })
         ref.signalling.on("id", id => {
@@ -204,6 +176,14 @@ export default class Connection {
     public AM_I_RM: boolean;
     public playerCount: number;
     private connectSignal: boolean;
+    private __myCountryCode: string;
+    get myCountryCode(): string {
+        return this.__myCountryCode;
+    }
+    set myCountryCode(value: string) {
+        this.__myCountryCode = value;
+        this.updateBillboard();
+    }
     public connect() {
         this.connectSignal = true; //memberi tahu kpd signal "first?" bahwa fungsi connect() sudah kepanggil
         // console.log("fs from connect", this.firstSignal)
@@ -211,13 +191,59 @@ export default class Connection {
 
         if (this.AM_I_RM) return; //jika RM maka tidak perlu emit join, biarkan CL(client) yang join
         this.signalling.emit("join");
+
     }
+
+    async initCountry() {
+        var response = await getCountry();
+        this.myCountryCode = response.countryCode; // trigger updateBillboard()
+        this.signalling.emit("country", response.countryCode);
+    }
+    players: { [socketid: string]: { guest_id: string, countryCode?: string } }
     onleft: (id: string) => any;
     onnewplayer: (id: string) => any;
     onrecieve: (e: any) => any;
     private recieve(e: any) {
         if (this.onrecieve)
             this.onrecieve(e);
+    }
+    public updateBillboard() {
+        const playerCount = Object.keys(this.players).length;
+        const ref = this;
+        var html = `<div id="title_board" style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;font-weight:normal;text-align: center;">${playerCount} users</div>`;
+        for (var key in ref.players) {
+            const player = ref.players[key];
+            var a: string = '';
+            if (key == ref.id)
+                a = `<div 
+                    style="cursor:pointer;color:#fff700;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+                    font-weight:normal;text-align:left;">guest${player.guest_id}
+                    ${ref.myCountryCode &&
+                    `<img
+                        src="https://flagcdn.com/16x12/${this.myCountryCode.toLowerCase()}.png"
+                        srcset="https://flagcdn.com/32x24/${this.myCountryCode.toLowerCase()}.png 2x,
+                        https://flagcdn.com/48x36/${this.myCountryCode.toLowerCase()}.png 3x"
+                        width="16"
+                        height="12"
+                        alt="indonesia flag">`
+                    }
+                    </div>`
+            else
+                a = `<div style="cursor:pointer;color:white;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-weight:normal;text-align:left;">guest${player.guest_id}
+                   ${player.countryCode ?
+                        `<img
+                    src="https://flagcdn.com/16x12/${player.countryCode.toLowerCase()}.png"
+                    srcset="https://flagcdn.com/32x24/${player.countryCode.toLowerCase()}.png 2x,
+                      https://flagcdn.com/48x36/${player.countryCode.toLowerCase()}.png 3x"
+                    width="16"
+                    height="12"
+                    alt="indonesia flag">` : ``
+                    }
+
+                    </div>`
+            html = `${html}${a}`;
+        }
+        ref.boardDOM.innerHTML = html;
     }
     public send(message: any) {
         if (!this.ready) return;
