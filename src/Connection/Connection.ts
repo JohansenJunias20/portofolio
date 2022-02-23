@@ -39,7 +39,7 @@ export default class Connection {
         this.config = {
             iceServers: [
                 { urls: "stun:stun.budgetphone.nl:3478" },
-                { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https" ? TURN_PORT_TLS : TURN_PORT}`, secure: false, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
+                { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https:" ? TURN_PORT_TLS : TURN_PORT}`, secure: false, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
         }
 
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
@@ -211,6 +211,7 @@ export default class Connection {
         const playerCount = Object.keys(this.players).length;
         const ref = this;
         var html = `<div id="title_board" style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;font-weight:normal;text-align: center;">${playerCount} users</div>`;
+        html += "<div style='overflow-y:auto; max-height:200px'></div>";
         for (var key in ref.players) {
             const player = ref.players[key];
             var a: string = '';
@@ -243,6 +244,7 @@ export default class Connection {
                     </div>`
             html = `${html}${a}`;
         }
+        html += "</div>"
         ref.boardDOM.innerHTML = html;
     }
     public send(message: any) {
