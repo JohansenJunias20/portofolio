@@ -25,6 +25,7 @@ export default class Connection {
     config: any;
     pending_candidates: Array<RTCIceCandidateInit>;
     connected: boolean;
+    playerBoardDOM: HTMLDivElement;
     constructor() {
         const ref = this;
         this.AM_I_RM = false;
@@ -211,12 +212,12 @@ export default class Connection {
         const playerCount = Object.keys(this.players).length;
         const ref = this;
         var html = `<div id="title_board" style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;font-weight:normal;text-align: center;">${playerCount} users</div>`;
-        html += "<div style='overflow-y:auto; max-height:200px'></div>";
+        html += "<div id='players_board' style='overflow-y:auto; max-height:200px'>";
         for (var key in ref.players) {
             const player = ref.players[key];
             var a: string = '';
             if (key == ref.id)
-                a = `<div 
+                a = `<div socketid="${key}"
                     style="cursor:pointer;color:#fff700;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
                     font-weight:normal;text-align:left;">guest${player.guest_id}
                     ${ref.myCountryCode &&
@@ -230,7 +231,7 @@ export default class Connection {
                     }
                     </div>`
             else
-                a = `<div style="cursor:pointer;color:white;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-weight:normal;text-align:left;">guest${player.guest_id}
+                a = `<div  socketid="${key}" style="cursor:pointer;color:white;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-weight:normal;text-align:left;">guest${player.guest_id}
                    ${player.countryCode ?
                         `<img
                     src="https://flagcdn.com/16x12/${player.countryCode.toLowerCase()}.png"
@@ -246,7 +247,24 @@ export default class Connection {
         }
         html += "</div>"
         ref.boardDOM.innerHTML = html;
+        ref.bindDOMlistener();
     }
+    bindDOMlistener() {
+        if (!this.onPlayerNameClick) return;
+        this.playerBoardDOM = document.querySelector("#players_board"); // rebind-ing because updateBillboard delete the old element
+        for (let i = 0; i < this.playerBoardDOM.children.length; i++) {
+            const element = this.playerBoardDOM.children[i];
+            if (element.id == "title_board") continue; // ini bukan player tetapi jumlah player.. kita tidak mau listen ke element ini
+
+            const socketid = element.getAttribute("socketid");
+            console.log({ element });
+            console.log("binded");
+            (element as HTMLDivElement).onclick = () => {
+                this.onPlayerNameClick(this.players[socketid], socketid);
+            }
+        }
+    }
+    public onPlayerNameClick: (guestName: { guest_id: string, countryCode?: string }, socketid: string) => void;
     public send(message: any) {
         if (!this.ready) return;
 

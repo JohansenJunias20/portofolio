@@ -11,7 +11,7 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
-console.log("v1.9");
+console.log("v2.0");//just to make sure on production mode ts compiled correctly (newest version)
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true,
@@ -676,6 +676,9 @@ connection.onrecieve = (e) => {
             break;
     }
 }
+connection.onPlayerNameClick = (player: any, socketid: string) => {
+    gotoPlayer(socketid);
+}
 connection.onnewplayer = async (id: string) => {
     otherPlayers[id] = (new Character(world, scene, new Vector3(0, 150, 0), 0));
     otherPlayers[id].followWaveEffect = false;
@@ -752,3 +755,17 @@ loading.onfull = () => {
 }
 var startHides = false;
 init();
+
+import gsap from "gsap"
+function gotoPlayer(socketid: string) {
+    if (socketid == connection.id) return; // yang dipencet username diri sendiri.
+    const targetPosition = otherPlayers[socketid].position.clone();
+    targetPosition.add(CURRENT_OFFSET_CAMERA);
+    followCharacter = false;
+    gsap.to(camera.position, {
+        ...targetPosition,
+        duration: 1,
+        onComplete: () => {
+        }
+    });
+}
