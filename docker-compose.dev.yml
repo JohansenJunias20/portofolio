@@ -12,5 +12,4 @@ services:
     volumes:
       - "./ws-server:/usr/src/app"
       - "./ssl/main:/etc/letsencrypt"
-      - "../visitors/:/usr/src/app/visitors/"
       - "./ssl/lib:/var/lib/letsencrypt"

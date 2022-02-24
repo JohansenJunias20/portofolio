@@ -22,7 +22,7 @@ jobs:
       - name: Copy build files to deploy directory
         run: ls; cp -r -f public/* ../JohansenJunias20.github.io/
       - name: Copy Readme files Section
-        run: bash copy.sh
+        run: bash copy_readme.sh
       - name: Set up identity before push to deploy server
         run: git config --global user.email "johansen.gumbal@gmail.com"; git config --global user.name "JohansenJunias20"
       - name: Debug
