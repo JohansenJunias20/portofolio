@@ -25,6 +25,8 @@ jobs:
         run: bash copy.sh
       - name: Set up identity before push to deploy server
         run: git config --global user.email "johansen.gumbal@gmail.com"; git config --global user.name "JohansenJunias20"
+      - name: Debug
+        run: cd ../JohansenJunias20.github.io/; cat readme.md;
       - name: Push to Deploy Repository
         run: cd ../JohansenJunias20.github.io/; git add .; git commit -m "${{ github.event.head_commit.message }}";git push https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git;
         continue-on-error: true # incase jika tidak ada changes pada front end code

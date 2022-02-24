@@ -49,4 +49,3 @@ done \
     <readme.md
 
 echo -e "$o\n$txt" >../JohansenJunias20.github.io/readme.md;
-cat ../JohansenJunias20.github.io/readme.md;
