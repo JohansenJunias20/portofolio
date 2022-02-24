@@ -20,9 +20,10 @@ while read p; do
     fi
     echo $p
 done <../JohansenJunias20.github.io/readme.md >o # put in o file
-ls;
-pwd;
+ls
+pwd
 o="$(cat o)"
+echo $o
 rm -f o # remove o file
 
 # reset variable
@@ -43,9 +44,11 @@ while read p; do
     fi
 
     if [ "$ENDCOPY" == "TRUE" ]; then
+        txt="$txt\n" 
+        txt="$txt$p" # copy the ENDCOPY tag
         break
     fi
 done \
     <readme.md
 
-echo -e "$o\n$txt" >../JohansenJunias20.github.io/readme.md;
+echo -e "$o\n$txt" >../JohansenJunias20.github.io/readme.md
