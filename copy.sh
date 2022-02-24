@@ -20,7 +20,7 @@ while read p; do
     fi
     echo $p
 done <../JohansenJunias20.github.io/readme.md >o # put in o file
-echo ls;
+ls;
 pwd;
 o="$(cat o)"
 rm -f o # remove o file
@@ -49,3 +49,4 @@ done \
     <readme.md
 
 echo -e "$o\n$txt" >../JohansenJunias20.github.io/readme.md;
+cat ../JohansenJunias20.github.io/readme.md;
