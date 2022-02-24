@@ -14,22 +14,22 @@ jobs:
       # - uses: actions/checkout@v2
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build Files
-        run: bash ./build.sh -m PROD --use-docker
-        continue-on-error: true
+      # - name: Build Files
+      #   run: bash ./build.sh -m PROD --use-docker
+      #   continue-on-error: true
       - name: Clone deploy repo (johansenjunias20.github.io)
         run: cd ../;rm -r -f ./JohansenJunias20.github.io/;ls;git clone https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git
-      - name: Copy build files to deploy directory
-        run: ls; cp -r -f public/* ../JohansenJunias20.github.io/
+      # - name: Copy build files to deploy directory
+      #   run: ls; cp -r -f public/* ../JohansenJunias20.github.io/
       - name: Copy Readme files Section
         run: bash copy.sh
-      - name: Set up identity before push to deploy server
-        run: git config --global user.email "johansen.gumbal@gmail.com"; git config --global user.name "JohansenJunias20"
-      - name: Push to Deploy Repository
-        run: cd ../JohansenJunias20.github.io/; git add .; git commit -m "${{ github.event.head_commit.message }}";git push https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git;
-        continue-on-error: true # incase jika tidak ada changes pada front end code
-        # run server
-      - name: Run Server to Self Hosted Github Runner
-        run: bash ./prod.sh
-      - name: Wait docker
-        run: sleep 30
+      # - name: Set up identity before push to deploy server
+      #   run: git config --global user.email "johansen.gumbal@gmail.com"; git config --global user.name "JohansenJunias20"
+      # - name: Push to Deploy Repository
+      #   run: cd ../JohansenJunias20.github.io/; git add .; git commit -m "${{ github.event.head_commit.message }}";git push https://JohansenJunias20:${{ secrets.PASSWORD }}@github.com/JohansenJunias20/JohansenJunias20.github.io.git;
+      #   continue-on-error: true # incase jika tidak ada changes pada front end code
+      #   # run server
+      # - name: Run Server to Self Hosted Github Runner
+      #   run: bash ./prod.sh
+      # - name: Wait docker
+      #   run: sleep 30
