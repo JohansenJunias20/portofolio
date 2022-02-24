@@ -1,26 +1,14 @@
-https://JohansenJunias20.github.io  
+go to [Source Code Repo](https://github.com/JohansenJunias20/portofolio)
 
-see [Deploy Repository](https://github.com/JohansenJunias20/JohansenJunias20.github.io)  
-<!-- ## Development
-Run webpack build watch and nodemon websocket
-```sh
-    bash ./dev.sh
-```
-Please make sure [docker](https://docs.docker.com/) and [node](https://nodejs.org/en/) installed.   -->
+[https://JohansenJunias20.github.io](https://JohansenJunias20.github.io)
 
-## Production
-Please install [Git bash](https://git-scm.com/downloads) and [Docker](https://docs.docker.com/)
-Run Coturn Server, websocker server with forever, and build files  
-```sh
-> bash prod.sh
-```
-Only Build files **not serve files**, you still need to serve .html file with public folder as relative path. Use [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)  
-<hr />
+
+###### <i>Inspired by https://bruno-simon.com</i>
 
 <!-- COPY -->
 | To do | Description   | Done    |
 | :---: | ---- | :---: |
-|[**Map Pointer**](https://forums.rpgmakerweb.com/data/attachments/109/109950-e5cb7855bfce5950a9c055d7053c9d00.jpg)|draw [2D Arrow](https://forums.rpgmakerweb.com/data/attachments/109/109950-e5cb7855bfce5950a9c055d7053c9d00.jpg) on screen if character's position off the map  |
+|[**Map Pointerr**](https://forums.rpgmakerweb.com/data/attachments/109/109950-e5cb7855bfce5950a9c055d7053c9d00.jpg)|draw [2D Arrow](https://forums.rpgmakerweb.com/data/attachments/109/109950-e5cb7855bfce5950a9c055d7053c9d00.jpg) on screen if character's position off the map  |
 |**Spawn Wave Effect** |Objects appear from underground to the surface in sequence, start from the center point (character spawn) towards outside  | ✅ |
 |[**Post Processing**](https://threejs.org/examples/#webgl_postprocessing_dof2) | [Bloom](https://threejs.org/examples/#webgl_postprocessing_unreal_bloom) on Billboards Image, [Blur](https://threejs.org/examples/#webgl_postprocessing_dof2) Camera's Edges, [Selective Outline](https://threejs.org/examples/#webgl_postprocessing_outline) on _knowledge_ |
 |**Responsive Mobile UI**|Add Joystick & fix blury noise when screen resized|✅|
@@ -37,15 +25,3 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 |**Dockerize Coturn**|image coturn/coturn seems to be broken, planning to make own custom coturn image||
 |**Chat**|Add chat so players can communicate with each other||
 <!-- |**Night Mode**|Change theme to night when || -->
-<!-- ENDCOPY -->
-
-
-
-
-
-
-
-
-
-
-
