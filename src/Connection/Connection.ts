@@ -40,9 +40,11 @@ export default class Connection {
         this.config = {
             iceServers: [
                 { urls: "stun:stun.budgetphone.nl:3478" },
-                { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https:" ? TURN_PORT_TLS : TURN_PORT}`, secure: false, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
+                { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https:" ? TURN_PORT_TLS : TURN_PORT}`, secure: production ? true : false, credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
         }
-        console.log({url:`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`})
+        console.log("protocol")
+        console.log(location.protocol)
+        console.log({ config:this.config })
 
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
         this.connected = true;
