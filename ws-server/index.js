@@ -102,6 +102,8 @@ io.on("connection", (socket) => {
 //     console.log("test")
 // });
 httpServer.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
-    console.log("done");
+    console.log("done1");
+    console.log({ssl})
+    
 
 })

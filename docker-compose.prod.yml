@@ -8,6 +8,5 @@ services:
     command: sh /usr/src/app/prod.sh
     volumes:
       - "./ws-server:/usr/src/app"
-      - "../visitors/:/usr/src/app/visitors/"
       - "./ssl/main:/etc/letsencrypt"
       - "./ssl/lib:/var/lib/letsencrypt"

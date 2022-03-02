@@ -47,7 +47,7 @@ sed -i "/cert=/c\cert=$certPath" ./turnserver.conf
 privPath="$path/privkey1.pem"
 sed -i "/pkey=/c\pkey=$privPath" ./turnserver.conf
 cp ./turnserver.conf /etc/turnserver.conf;
-systemctl restart coturn;
+service coturn restart;
 exit 0 # sementara coturn tidak pakai image karena belum bisa
 
 docker run -d --name coturn -p $TURN_PORT:$TURN_PORT -p $minport-$maxport:$minport-$maxport/udp \

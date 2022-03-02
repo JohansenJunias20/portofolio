@@ -19,8 +19,8 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 <hr />
 
 <!-- COPY -->
-| To do | Description   | Done    |
-| :---: | ---- | :---: |
+| To do | Description   | Done  |
+| :---: | ----          | :---: |
 |[**Map Pointer**](https://forums.rpgmakerweb.com/data/attachments/109/109950-e5cb7855bfce5950a9c055d7053c9d00.jpg)|draw [2D Arrow](https://forums.rpgmakerweb.com/data/attachments/109/109950-e5cb7855bfce5950a9c055d7053c9d00.jpg) on screen if character's position off the map  |
 |**Spawn Wave Effect** |Objects appear from underground to the surface in sequence, start from the center point (character spawn) towards outside  | ✅ |
 |[**Post Processing**](https://threejs.org/examples/#webgl_postprocessing_dof2) | [Bloom](https://threejs.org/examples/#webgl_postprocessing_unreal_bloom) on Billboards Image, [Blur](https://threejs.org/examples/#webgl_postprocessing_dof2) Camera's Edges, [Selective Outline](https://threejs.org/examples/#webgl_postprocessing_outline) on _knowledge_ |
@@ -52,25 +52,25 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 
 ### build.sh
 - Build `/src/*.tsx` files to `/public/dist/bundle.js`
-- If you are not sure what arguments suit for you just call it from `dev.sh` or `prod.sh`
+- If you are not sure what arguments suit for you just run `dev.sh` or `prod.sh`
 - Contain **2 arguments**
     - `-m | --mode DEV/PROD` specify the mode
-      - mode **DEV** will pass dev config from .env file and use `webpack.dev.js` file config to compile `/src/*.tsx` files
-      - mode **PROD** will pass prod config from .env file and use `webpack.prod.js` file config to compile `/src/*.tsx` files
+      - mode **DEV** will pass dev config from .env file and use `webpack.dev.js` as file config to compile `/src/*.tsx` files
+      - mode **PROD** will pass prod config from .env file and use `webpack.prod.js` as file config to compile `/src/*.tsx` files
     - `-d | --use-docker` with virtualization or not, if you dont have docker installed you can leave this option unwritten (assuming you have node js and npm installed).
-      - On **windows**, **do not** use DEV mode with virtualization because **windows** are not signalling file changes to docker mounted volumes.
+      - On **windows**, **do not** use DEV mode with virtualization because **windows** are not signalling file changes to docker mounted volumes
 
 ### copy_readme.sh
-- Called by Github Actions to copy readme file from `portofolio` to `JohansenJunias20.github.io`
-- Only copy several lines start with COPY tag and end with ENDCOPY tag in readme.md file
+- Called by Github Actions to copy readme.md file from `portofolio` to `JohansenJunias20.github.io`
+- Copy lines start with **COPY tag** and end with **ENDCOPY tag** in readme.md file
 
 ### dev.sh
-- Run code on development mode. It will automatically find and run the most suit config for your OS
+- Run code on development mode. Automatically find and run the most suit config for your OS
 - You still need **live server extension** to serve `public/index.html` file
-- What dev.sh will do:
+- What dev.sh do:
   - Copy `.env` file to `ws-server/.env`
   - Run socket.io server locally with docker
-  - Run webpack development mode and watch changes to `src/*.tsx`
+  - Run webpack development mode and watch changes on `src/*.tsx`
 
 ### docker-compose.dev.yml
 - Run socket.io server service and run `bash ws-server/dev.sh` inside container 
@@ -82,7 +82,7 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 
 ### internal_start-turn.sh
 - Run Coturn Server based on .env config 
-- Please make sure install Coturn first on your machine
+- Please make sure Coturn installed on your machine
 - Named ***internal*** because it is only called by other script, do not run it manually
 - Please use ubuntu server OS
 - Called by `prod.sh`
@@ -94,7 +94,7 @@ Only Build files **not serve files**, you still need to serve .html file with pu
   - Copy `.env` file to `ws-server/.env`
   - Run socket.io server locally with docker
   - Run webpack production mode
-  - Run turn server by running `internal_start-turn.sh`
+  - Run turn server by running `bash internal_start-turn.sh`
 
 ### ssl_renew.sh
 - Renew ssl certificates for turn and ws domains if about to expired
@@ -106,7 +106,7 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 - Config file for coturn server
 - Please do not change manually
 - This config based on `.env` config file
-- Please configure coturn's config on `.env` file, `internal_start-turn.sh` will automatically copied to `turnserver.conf` file
+- Please configure coturn's config on `.env` file, `internal_start-turn.sh` will automatically copied `.env` to `turnserver.conf` file
 
 ### wepback.dev.js
 - Webpack's config for development mode
