@@ -51,8 +51,8 @@ echo "running turn server..."
 
 docker run -d -p $TURN_PORT:$TURN_PORT -p $minport-$maxport:$minport-$maxport/udp \
 -p $TURN_PORT_TLS:$TURN_PORT_TLS \
--v "$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" \
--v "$(pwd)/ssl/main/:/etc/letsencrypt/" \
+-v "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" \
+-v "/$(pwd)/ssl/main/:/etc/letsencrypt/" \
 instrumentisto/coturn
 exit 0 
 
