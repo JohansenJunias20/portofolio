@@ -41,14 +41,14 @@ chmod 777 /var/run/turnserver.pid
 chmod 777 /run/turnserver.pid
 echo "running internal_start-turn script"
 echo "only called by other bash script, please do not run manually"
-echo "please make sure turn server turned off and port 3478, 5379, $minport-$maxport/udp open and not used by other process"
+echo "please make sure turn server turned off and port $TURN_PORT, $TURN_PORT_TLS, $minport-$maxport/udp open and not used by other process"
 echo "running turn server..."
 # path="$(pwd)/ssl/main/archive/portofolio.orbitskomputer.com"
 # certPath="$path/cert1.pem"
 # sed -i "/cert=/c\cert=/etc/letsencrypt/archive/$TURN_DOMAIN/cert1.pem" ./turnserver.conf
 # privPath="$path/privkey1.pem"
 # sed -i "/pkey=/c\pkey=/etc/letsencrypt/archive/$TURN_DOMAIN/privkey1.pem" ./turnserver.conf
-
+cat 
 docker run -d -p $TURN_PORT:$TURN_PORT -p $minport-$maxport:$minport-$maxport/udp \
 -p $TURN_PORT_TLS:$TURN_PORT_TLS \
 -v "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" \
