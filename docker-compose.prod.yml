@@ -1,5 +1,4 @@
 version: '3'
-name: porto_server
 services:
   socketio:
     build: .
@@ -18,6 +17,6 @@ services:
     image: instrumentisto/coturn
     network_mode: host
     volumes:
-      - "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" 
-      - "/$(pwd)/ssl/main/:/etc/letsencrypt/" 
+      - "./turnserver.conf:/etc/coturn/turnserver.conf" 
+      - "./ssl/main/:/etc/letsencrypt/" 
 

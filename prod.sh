@@ -15,8 +15,8 @@ echo "RUNNING WEBSOCKET SERVER..."
 echo "" >>ws-server/.env
 echo "PRODUCTION=TRUE" >>ws-server/.env
 # start socketio server
+bash config_turn.sh; # configuration turnserver.conf
 docker-compose -f docker-compose.prod.yml up -d;
-bash internal_start-turn.sh;
 bash ./build.sh -m PROD -d;
 echo "done"
 exit 0

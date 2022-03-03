@@ -35,7 +35,7 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 |**Contact Person**|IG, [Github](https://github.com/JohansenJunias20), and LinkedIn at *lobby* Area|
 |**Add more Shadows**|shadows on movable object like character(ball), johansen mesh, and hotkeys||
 |**Add Documentation**|Write readme file in every directory|On Progress|
-|**Dockerize Coturn**|image coturn/coturn seems to be broken, planning to make own custom coturn image| On Progress |
+|**Dockerize Coturn**|image coturn/coturn seems to be broken, planning to make own custom coturn image| ✅ |
 |**Chat**|Add chat so players can communicate with each other| |
 <!-- |**Night Mode**|Change theme to night when || -->
 <!-- ENDCOPY -->
@@ -80,11 +80,8 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 - Run socket.io server service and run `bash ws-server/prod.sh` inside container
 - Run by `prod.sh`
 
-### internal_start-turn.sh
-- Run Coturn Server based on .env config 
-- Please make sure Coturn installed on your machine
-- Named ***internal*** because it is only called by other script, do not run it manually
-- Please use ubuntu server OS
+### config_turn.sh
+- Configure `turnserver.conf` file based `.env`
 - Called by `prod.sh`
 
 ### prod.sh
@@ -92,9 +89,9 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 - You still need to use live server extension to server `public/index.html` file
 - What prod.sh do:
   - Copy `.env` file to `ws-server/.env`
-  - Run socket.io server locally with docker
+  - Configure coturn
+  - Run socket.io server & coturn server with docker
   - Run webpack production mode
-  - Run turn server by running `bash internal_start-turn.sh`
 
 ### ssl_renew.sh
 - Renew ssl certificates for turn and ws domains if about to expired
@@ -106,7 +103,7 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 - Config file for coturn server
 - Please do not change manually
 - This config based on `.env` config file
-- Please configure coturn's config on `.env` file, `internal_start-turn.sh` will automatically copied `.env` to `turnserver.conf` file
+- Please configure coturn's config on `.env` file, `config_turn.sh` will automatically copied `.env` to `turnserver.conf` file
 
 ### wepback.dev.js
 - Webpack's config for development mode

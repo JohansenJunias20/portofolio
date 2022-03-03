@@ -43,15 +43,10 @@ echo "running internal_start-turn script"
 echo "only called by other bash script, please do not run manually"
 echo "please make sure turn server turned off and port $TURN_PORT, $TURN_PORT_TLS, $minport-$maxport/udp open and not used by other process"
 echo "running turn server..."
-# path="$(pwd)/ssl/main/archive/portofolio.orbitskomputer.com"
-# certPath="$path/cert1.pem"
-# sed -i "/cert=/c\cert=/etc/letsencrypt/archive/$TURN_DOMAIN/cert1.pem" ./turnserver.conf
-# privPath="$path/privkey1.pem"
-# sed -i "/pkey=/c\pkey=/etc/letsencrypt/archive/$TURN_DOMAIN/privkey1.pem" ./turnserver.conf
-docker run -d --network=host \
--v "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" \
--v "/$(pwd)/ssl/main/:/etc/letsencrypt/" \
-instrumentisto/coturn
+# docker run -d --network=host \
+# -v "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" \
+# -v "/$(pwd)/ssl/main/:/etc/letsencrypt/" \
+# instrumentisto/coturn
 exit 0 
 
 # docker run -d --name coturn -p $TURN_PORT:$TURN_PORT -p $minport-$maxport:$minport-$maxport/udp \
