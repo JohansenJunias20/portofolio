@@ -48,8 +48,7 @@ echo "running turn server..."
 # sed -i "/cert=/c\cert=/etc/letsencrypt/archive/$TURN_DOMAIN/cert1.pem" ./turnserver.conf
 # privPath="$path/privkey1.pem"
 # sed -i "/pkey=/c\pkey=/etc/letsencrypt/archive/$TURN_DOMAIN/privkey1.pem" ./turnserver.conf
-docker run -d -p $TURN_PORT:$TURN_PORT -p $minport-$maxport:$minport-$maxport/udp \
--p $TURN_PORT_TLS:$TURN_PORT_TLS \
+docker run -d --network=host \
 -v "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" \
 -v "/$(pwd)/ssl/main/:/etc/letsencrypt/" \
 instrumentisto/coturn
