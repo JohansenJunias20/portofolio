@@ -2,6 +2,9 @@ version: '3'
 services:
   socketio:
     build: .
+    # build: 
+    #   context: ./dockerfiles
+    #   dockerfile: Dockerfile
     tty: true
     ports:
       - "2000:2000"

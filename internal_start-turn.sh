@@ -1,6 +1,9 @@
 #!/bin/bash
 # please run in with sudo command
 # please chmod 777 this script.
+bash coturn_docker.sh
+exit 0
+
 docker container stop coturn
 echo "y" | docker container prune
 

@@ -1,7 +1,5 @@
 #!/bin/bash
 export $(cat .env | xargs)
-chmod 777 ./private/main.exe
-./private/main.exe $PROD_WS_PORT
 
 # renew ssl
 bash ./ssl_renew.sh

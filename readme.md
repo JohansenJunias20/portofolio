@@ -35,7 +35,7 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 |**Contact Person**|IG, [Github](https://github.com/JohansenJunias20), and LinkedIn at *lobby* Area|
 |**Add more Shadows**|shadows on movable object like character(ball), johansen mesh, and hotkeys||
 |**Add Documentation**|Write readme file in every directory|On Progress|
-|**Dockerize Coturn**|image coturn/coturn seems to be broken, planning to make own custom coturn image| |
+|**Dockerize Coturn**|image coturn/coturn seems to be broken, planning to make own custom coturn image| On Progress |
 |**Chat**|Add chat so players can communicate with each other| |
 <!-- |**Night Mode**|Change theme to night when || -->
 <!-- ENDCOPY -->

@@ -2,6 +2,9 @@ version: '3'
 services:
   socketio:
     build: .
+    # build: 
+    #   context: ./dockerfiles
+    #   dockerfile: Dockerfile
     ports:
       - "2000:2000"
     command: sh /usr/src/app/dev.sh

@@ -71,7 +71,7 @@ DEV_WS_PORT=${DEV_WS_PORT//[^[:alnum:]]/}
 # use virtualization or not.
 if [ "$DOCKER" == "true" ]; then
 
-    docker build -t customnode:latest $(pwd) -f $(pwd)/Dockerfile # build customnode image
+    docker build -t customnode:latest $(pwd) -f $(pwd)/dockerfiles/customnode.dockerfile # build customnode image
     # load dotenv file to variables
     echo "> INSTALLING DEPENDENCIES..."
     # installing dependencies
