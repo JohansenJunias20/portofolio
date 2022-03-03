@@ -32,6 +32,7 @@ minport=${minport//[^[:alnum:]]/}
 TURN_PORT=${TURN_PORT//[^[:alnum:]]/}
 TURN_PORT_TLS=${TURN_PORT_TLS//[^[:alnum:]]/}
 
+service coturn stop
 systemctl stop coturn # if exist coturn in the system
 # just to make sure can run the docker command.
 chmod 777 /run
@@ -42,12 +43,11 @@ echo "running internal_start-turn script"
 echo "only called by other bash script, please do not run manually"
 echo "please make sure turn server turned off and port 3478, 5379, $minport-$maxport/udp open and not used by other process"
 echo "running turn server..."
-path="$(pwd)/ssl/main/archive/portofolio.orbitskomputer.com"
-certPath="$path/cert1.pem"
-sed -i "/cert=/c\cert=$certPath" ./turnserver.conf
-privPath="$path/privkey1.pem"
-sed -i "/pkey=/c\pkey=$privPath" ./turnserver.conf
-service coturn stop
+# path="$(pwd)/ssl/main/archive/portofolio.orbitskomputer.com"
+# certPath="$path/cert1.pem"
+sed -i "/cert=/c\cert=/etc/letsencrypt/archive/$TURN_DOMAIN/cert1.pem" ./turnserver.conf
+# privPath="$path/privkey1.pem"
+sed -i "/pkey=/c\pkey=/etc/letsencrypt/archive/$TURN_DOMAIN/privkey1.pem" ./turnserver.conf
 
 docker run -d -p $TURN_PORT:$TURN_PORT -p $minport-$maxport:$minport-$maxport/udp \
 -p $TURN_PORT_TLS:$TURN_PORT_TLS \
