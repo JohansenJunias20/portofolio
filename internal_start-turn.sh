@@ -45,9 +45,9 @@ echo "please make sure turn server turned off and port 3478, 5379, $minport-$max
 echo "running turn server..."
 # path="$(pwd)/ssl/main/archive/portofolio.orbitskomputer.com"
 # certPath="$path/cert1.pem"
-sed -i "/cert=/c\cert=/etc/letsencrypt/archive/$TURN_DOMAIN/cert1.pem" ./turnserver.conf
+# sed -i "/cert=/c\cert=/etc/letsencrypt/archive/$TURN_DOMAIN/cert1.pem" ./turnserver.conf
 # privPath="$path/privkey1.pem"
-sed -i "/pkey=/c\pkey=/etc/letsencrypt/archive/$TURN_DOMAIN/privkey1.pem" ./turnserver.conf
+# sed -i "/pkey=/c\pkey=/etc/letsencrypt/archive/$TURN_DOMAIN/privkey1.pem" ./turnserver.conf
 
 docker run -d -p $TURN_PORT:$TURN_PORT -p $minport-$maxport:$minport-$maxport/udp \
 -p $TURN_PORT_TLS:$TURN_PORT_TLS \
