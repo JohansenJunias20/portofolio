@@ -1,4 +1,5 @@
 version: '3'
+name: porto_server
 services:
   socketio:
     build: .
@@ -13,3 +14,10 @@ services:
       - "./ws-server:/usr/src/app"
       - "./ssl/main:/etc/letsencrypt"
       - "./ssl/lib:/var/lib/letsencrypt"
+  coturn:
+    image: instrumentisto/coturn
+    network_mode: host
+    volumes:
+      - "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" 
+      - "/$(pwd)/ssl/main/:/etc/letsencrypt/" 
+
