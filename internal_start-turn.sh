@@ -1,8 +1,6 @@
 #!/bin/bash
 # please run in with sudo command
 # please chmod 777 this script.
-bash coturn_docker.sh
-exit 0
 
 docker container stop coturn
 echo "y" | docker container prune
@@ -49,12 +47,17 @@ certPath="$path/cert1.pem"
 sed -i "/cert=/c\cert=$certPath" ./turnserver.conf
 privPath="$path/privkey1.pem"
 sed -i "/pkey=/c\pkey=$privPath" ./turnserver.conf
-cp ./turnserver.conf /etc/turnserver.conf;
-service coturn restart;
+service coturn stop
+
+docker run -d -p 3478:3478 -p $TURN_PORT:$TURN_PORT -p $minport-$maxport:$minport-$maxport/udp \
+-p $TURN_PORT_TLS:$TURN_PORT_TLS \
+-v "$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" \
+-v "$(pwd)/ssl/main/:/etc/letsencrypt/" \
+instrumentisto/coturn
 exit 0 # sementara coturn tidak pakai image karena belum bisa
 
 docker run -d --name coturn -p $TURN_PORT:$TURN_PORT -p $minport-$maxport:$minport-$maxport/udp \
 -p $TURN_PORT_TLS:$TURN_PORT_TLS \
 -v "/$(pwd)/ssl/main:/etc/letsencrypt/" \
--v "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" coturn/coturn;
+-v "/$(pwd)/turnserver.conf:/etc/coturn/turnserver.conf" coturn/coturn
 echo "turn server done. Please server public/ files with web server (nginx/apache/express/etc)"
