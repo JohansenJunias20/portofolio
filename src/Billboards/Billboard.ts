@@ -9,6 +9,7 @@ import { clamp, degToRad } from 'three/src/math/MathUtils';
 import PopUp from '../PopUps/PopUp';
 import customShader from '../utility/customShader';
 import loadOBJ from '../utility/loadOBJ';
+import setOpacity from '../utility/setOpacity';
 
 export default class Billboard {
     public isBillboard: boolean;
@@ -64,6 +65,26 @@ export default class Billboard {
     }
     public update(deltatime: number, characterBody: CANNON.Body, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
         this.PopUpObjects.forEach(popup => popup.update(deltatime, characterBody, intersects))
+        if (this.mesh)
+            this.resetOpacity(deltatime)
+    }
+    private resetOpacity(deltatime: number) {
+        // return
+        const meshChild = (this.mesh.children.find(({ type }) => type == "Mesh") as THREE.Mesh) as any;
+        if (Array.isArray(meshChild.material)) {
+            if (meshChild.material[0].uniforms?.hasOwnProperty('_opacity')) {
+                const opacity = meshChild.material[0].uniforms._opacity.value;
+                setOpacity(this.mesh as THREE.Group, this.scene.uuid,
+                    clamp(opacity ? parseFloat(opacity) + (1.5 * deltatime) : 1, 0.2, 1));
+            }
+        }
+        else {
+            if (meshChild.material.uniforms?.hasOwnProperty('_opacity')) {
+                const opacity = meshChild.material.uniforms._opacity.value;
+                setOpacity(this.mesh as THREE.Group, this.scene.uuid,
+                    clamp(opacity ? parseFloat(opacity) + (1.5 * deltatime) : 1, 0.2, 1));
+            }
+        }
     }
     camera: THREE.PerspectiveCamera;
     private async loadAsset() {
