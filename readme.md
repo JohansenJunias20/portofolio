@@ -10,15 +10,18 @@ Run webpack build watch and nodemon websocket
 Please make sure [docker](https://docs.docker.com/) and [node](https://nodejs.org/en/) installed.   -->
 
 ## Production
-Please install [Git bash](https://git-scm.com/downloads) and [Docker](https://docs.docker.com/)
-Run Coturn Server, websocker server with forever, and build files  
+Please install [Git bash](https://git-scm.com/downloads) and [Docker](https://docs.docker.com/)  
+
 ```sh
-> bash prod.sh
+bash prod.sh
 ```
-Only Build files **not serve files**, you still need to serve .html file with public folder as relative path. Use [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)  
+- Run Coturn Server, websocker server with forever, and build files  
+- Only build files **not serve files**, you still need to serve .html file with public folder as relative path. Use [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)  
 <hr />
 
 <!-- COPY -->
+### Preview
+![alt text](https://github.com/JohansenJunias20/portofolio/raw/master/public/desc.png)
 | To do | Description   | Done  |
 | :---: | ----          | :---: |
 |[**Map Pointer**](https://forums.rpgmakerweb.com/data/attachments/109/109950-e5cb7855bfce5950a9c055d7053c9d00.jpg)|draw [2D Arrow](https://forums.rpgmakerweb.com/data/attachments/109/109950-e5cb7855bfce5950a9c055d7053c9d00.jpg) on screen if character's position off the map  |
@@ -77,7 +80,7 @@ Only Build files **not serve files**, you still need to serve .html file with pu
 - Run by `dev.sh`
  
 ### docker-compose.prod.yml
-- Run socket.io server service and run `bash ws-server/prod.sh` inside container
+- Run socket.io server and turn server services
 - Run by `prod.sh`
 
 ### config_turn.sh
