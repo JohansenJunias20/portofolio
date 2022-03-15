@@ -1,7 +1,10 @@
+# Portofolio
+## Source code of https://johansenjunias20.github.io
+See [Deploy Repository](https://JohansenJunias20.github.io/desc.png)  
 
-https://JohansenJunias20.github.io  
 
-see [Deploy Repository](https://github.com/JohansenJunias20/JohansenJunias20.github.io)  
+<br>
+<br>
 <!-- ## Development
 Run webpack build watch and nodemon websocket
 ```sh
@@ -16,7 +19,7 @@ Please install [Git bash](https://git-scm.com/downloads) and [Docker](https://do
 bash prod.sh
 ```
 - Run Coturn Server, websocker server with forever, and build files  
-- Only build files **not serve files**, you still need to serve .html file with public folder as relative path. Use [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)  
+- Only build files **not serve files**, you still need to serve `public/index.html` file with public folder as relative path. Use [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)  
 <hr />
 
 <!-- COPY -->
