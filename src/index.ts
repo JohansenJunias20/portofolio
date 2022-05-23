@@ -1,6 +1,6 @@
 import { Vec3 } from 'cannon';
 import * as THREE from 'three';
-import { Clock, Group, Material, Mesh, MeshPhongMaterial, Raycaster, Shader, ShaderMaterial, Vector3 } from 'three';
+import { Clock, Group, Material, Mesh, MeshPhongMaterial, Raycaster, Shader, ShaderMaterial, Vector2, Vector3 } from 'three';
 import Character from './Character';
 import * as CANNON from 'cannon';
 import Hotkeys from './Hotkeys/Hotkeys';
@@ -360,7 +360,7 @@ camera.position.copy(character.position)
 camera.position.add(CURRENT_OFFSET_CAMERA)
 camera.lookAt(character.position)
 var deltatime = 0;
-var alpha = 0;
+var alpha = 1;
 const clock = new Clock()
 
 import Trees from './Trees/Trees';
@@ -395,7 +395,9 @@ window.onresize = (e) => {
 }
 var cameraPos = new THREE.Vector3();
 var cameraDir = new THREE.Vector3();
+var lastPosCamUnfollPlayer = new THREE.Vector3(); // posisi kamera terakhir saat unfollow player
 const raycast2 = new THREE.Raycaster();
+
 function animate() {
     deltatime = clock.getDelta()
     // if (deltatime < 0.2)
@@ -404,56 +406,17 @@ function animate() {
     // else return
 
     raycast.setFromCamera(mouse, camera);
-    const intersects = raycast.intersectObjects(scene.children);
+    const intersects = raycast.intersectObjects(scene.children); // diakses oleh floor fence mesh
 
-    // checking intersect mouse with objects
-    if (character.initialized && loading.isFull && initialized && startHides) {
-        camera.getWorldPosition(cameraPos)
-        camera.getWorldDirection(cameraDir)
-        raycast2.set(cameraPos, cameraDir);
-        const intsCenterScreen = raycast2.intersectObjects(scene.children);
-        if (intsCenterScreen.length != 0) {
-            for (let i = 0; i < intsCenterScreen.length; i++) {
-                const obj = intsCenterScreen[i];
-                if (character.mesh.children[0].uuid != obj.object.uuid) {
-                    const mesh: Mesh = obj.object as any;
-                    if (Array.isArray(mesh.material)) { // bila 1 mesh terdiri dari beberapa material, biasanya .obj file
-                        const material: ShaderMaterial = mesh.material[0] as ShaderMaterial;
-                        var val = material.uniforms?._opacity?.value;
-                        // if (!val) continue;
-                        val -= config.invisibleEffect.speed * deltatime;
-                        const opacity = clamp(val, 0.2, 1);
-                        setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
-
-
-                        continue;
-                    }
-
-
-                    var val = (mesh.material as ShaderMaterial).uniforms?._opacity?.value;
-
-                    val -= config.invisibleEffect.speed * deltatime;
-                    const opacity = clamp(val, 0.2, 1);
-
-                    // if (mesh.parent.name == "" && mesh.parent.type == "Group" && mesh.parent.children.length == 3 && mesh.parent.children[2].name == "Circle_Circle.001") {
-                    //     console.log(opacity)
-                    //     console.log(mesh)
-                    //     // throw "err"
-                    // }
-                    setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
-                }
-
-            }
-        }
-    }
 
     document.body.style.cursor = "grab";
-
     //#region update mesh & body
     if (trees.initialized) {
         trees.setWaveEffect(waveEffect)
         trees.updateWaveEffect(deltatime)
         trees.update(deltatime)
+
+        // console.log({ x, y, z });
     }
     if (character.initialized) {
         // alert(camera.position.distanceTo(character.position))
@@ -530,6 +493,54 @@ function animate() {
     }
     //#endregion
 
+    // checking intersect mouse with objects
+    if (character.initialized && loading.isFull && initialized && startHides) {
+        camera.getWorldPosition(cameraPos)
+        camera.getWorldDirection(cameraDir)
+
+        var pos = character.mesh.position.clone();
+        pos.project(camera);
+        var posv2 = new Vector2(pos.x, pos.y);
+        raycast2.setFromCamera(posv2, camera);
+        const intsCenterScreen = raycast2.intersectObjects(scene.children);
+        if (intsCenterScreen.length != 0) {
+            if (intsCenterScreen.length != 1) {
+                // console.log({ intsCenterScreen })
+            }
+            for (let i = 0; i < intsCenterScreen.length; i++) {
+                const obj = intsCenterScreen[i];
+                if (character.mesh.children[0].uuid != obj.object.uuid) {
+                    const mesh: Mesh = obj.object as any;
+                    if (Array.isArray(mesh.material)) { // bila 1 mesh terdiri dari beberapa material, biasanya .obj file
+                        const material: ShaderMaterial = mesh.material[0] as ShaderMaterial;
+                        var val = material.uniforms?._opacity?.value;
+                        // if (!val) continue;
+                        val -= config.invisibleEffect.speed * deltatime;
+                        const opacity = clamp(val, 0.2, 1);
+                        setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
+
+
+                        continue;
+                    }
+
+
+                    var val = (mesh.material as ShaderMaterial).uniforms?._opacity?.value;
+
+                    val -= config.invisibleEffect.speed * deltatime;
+                    const opacity = clamp(val, 0.2, 1);
+
+                    // if (mesh.parent.name == "" && mesh.parent.type == "Group" && mesh.parent.children.length == 3 && mesh.parent.children[2].name == "Circle_Circle.001") {
+                    //     console.log(opacity)
+                    //     console.log(mesh)
+                    //     // throw "err"
+                    // }
+                    setOpacity(mesh.parent as Group, scene.uuid, parseFloat(opacity.toFixed(2)));
+                }
+
+            }
+        }
+    }
+
 
     if (initialized) {
         if (waveEffect.range <= config.waveEffect.range.max) {
@@ -538,6 +549,8 @@ function animate() {
     }
 
     if (followCharacter) {
+
+
         if (character.position.z >= config.area.knowledge.offset) {
             if (character.on != "knowledge") {
                 //first time character hit knowledge area
@@ -554,8 +567,8 @@ function animate() {
                 //tambah 1 variable yaitu LAST_OFFSET_CAMARA -> INI TIDAK BOLEH BERUBAH VALUENYA SAMPAI TRANSISI SELESAI
                 //diset tepat pertama x melakukan transisi(hanya 1x)
                 CURRENT_OFFSET_CAMERA = new Vector3().copy(START_OFFSET_CAMERA).lerp(KNOWLEDGE_OFFSET_CAMERA, alphaOffsetCamera_knowledge);
-                offsetChanged = true;
             } else {
+                offsetChanged = true;
                 // alert("changed")
             }
             alphaOffsetCamera_knowledge += deltatime * config.area.knowledge.camera.transition.speed;
@@ -593,6 +606,7 @@ function animate() {
                 CURRENT_OFFSET_CAMERA = new Vector3().copy(START_OFFSET_CAMERA).lerp(PLAYGROUND_OFFSET_CAMERA, alphaOffsetCamera_playground);
             } else
                 offsetChanged = true;
+
         }
         else {
             //on knowledge lobby position
@@ -609,21 +623,27 @@ function animate() {
             alphaOffsetCamera_lobby += deltatime * config.area.lobby.camera.transition.speed;
             if (clamp(alphaOffsetCamera_lobby, 0, 1) < 1) {
                 CURRENT_OFFSET_CAMERA = new Vector3().copy(START_OFFSET_CAMERA).lerp(LOBBY_OFFSET_CAMERA, alphaOffsetCamera_lobby);
-                offsetChanged = true;
             }
-            // else
+            else
+                offsetChanged = true;
         }
 
         if (character.initialized) {
             const { x, y, z } = character.mesh.position;
             var disiredPosition = new Vector3(x, y, z).add(CURRENT_OFFSET_CAMERA)
 
-            alpha += deltatime * 0.3
-            const finalPosition = new Vector3().copy(camera.position).lerp(disiredPosition, clamp(alpha, 0, 1));
+            alpha += deltatime * 1.5;
+            // bila mau lebih smooth ganti lastPosCamUnfollPlayer dengan camera.position
+            // tetapi cara itu tidak rekomen mengingat value camera.position berubah terus (padahal di lerp)
+            const finalPosition = new Vector3().copy(lastPosCamUnfollPlayer).lerp(disiredPosition, clamp(alpha, 0, 1));
             camera.position.copy(finalPosition)
             if (clamp(alpha, 0, 1) >= 1) {
                 // camera.lookAt(character.position); // lookAt juga perlu di lerp
             }
+            else {
+                // offsetChanged = false; // ini ketriggered membuat saat transisi kamera billbaord langsung rusak
+            }
+            console.log({ alpha })
             alpha = clamp(alpha, 0, 1);
         }
 
@@ -635,7 +655,7 @@ function animate() {
     }
     else {
         alpha = 0.0;
-
+        lastPosCamUnfollPlayer = camera.position.clone();
     }
 
 

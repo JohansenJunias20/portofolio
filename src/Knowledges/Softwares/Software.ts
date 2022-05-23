@@ -10,6 +10,7 @@ import PhysicsObject3d from '../../PhysicsObject';
 interface AnimationCharacter {
     walk: THREE.AnimationAction;
 }
+type Text = "blender" | "ue" | "adobe" | "docker" | "aws" | "nginx" | "opengl" | "nodejs"
 export default class Software extends PhysicsObject3d {
     asset = {
         castShadow: true,
@@ -27,8 +28,8 @@ export default class Software extends PhysicsObject3d {
         },
         additionalMesh: [new THREE.Mesh()]
     }
-    public readonly text: "blender" | "ue" | "adobe"
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "blender" | "ue" | "adobe") {
+    public readonly text: Text
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: Text) {
         super(world, scene, position, 0, "CUSTOM", 0, new CANNON.Shape());
         // super(world, scene, position, 0, "TRIMESH", 0);
         this.text = text;

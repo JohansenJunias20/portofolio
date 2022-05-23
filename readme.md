@@ -36,7 +36,7 @@ bash prod.sh
 |**more _playground_**  |boardgame that can be played with bots or other players like [_connect 4_](https://en.wikipedia.org/wiki/Connect_Four)  |
 |**Bots to _playground_**  |implement bots so players can play alone  |
 |**Advanced Multiplayer**  |implement Multiplayer to _playground_  (play connect 4 with other players)  |
-|**Add more _knowledges_**  | [nginx](https://www.nginx.com/), [tailwind](https://tailwindcss.com/), [adobe](https://www.adobe.com/), [docker](https://www.docker.com/), [expo](https://expo.dev/), [aws](https://aws.amazon.com/), [laravel](https://laravel.com/), [threejs](**https**://threejs.org/), [opengl](https://en.wikipedia.org/wiki/OpenGL)|
+|**Add more _knowledges_**  | [nginx](https://www.nginx.com/), [node.js](https://nodejs.org/en/), [adobe](https://www.adobe.com/), [docker](https://www.docker.com/), [expo](https://expo.dev/), [aws](https://aws.amazon.com/), [laravel](https://laravel.com/), [threejs](**https**://threejs.org/), [opengl](https://en.wikipedia.org/wiki/OpenGL)|In Progress|
 |**Add more _billboard projects_**  | [minecraft-clone](https://github.com/JohansenJunias20/minecraft-clone), Accounting Web, [Laughing Clown](https://github.com/JohansenJunias20/laughing-clown)|
 |**Contact Person**|IG, [Github](https://github.com/JohansenJunias20), and LinkedIn at *lobby* Area|
 |**Add more Shadows**|shadows on movable object like character(ball), johansen mesh, and hotkeys||

@@ -16,6 +16,7 @@ import Softwares from "./Softwares/Softwares"
 import vertShader from "../../public/assets/shaders/floorShadow.vert";
 import fragShader from "../../public/assets/shaders/floorShadow.frag";
 import { WaveEffect } from "../waveEffect"
+import { degToRad } from "three/src/math/MathUtils"
 export default class Knowledge {
     setWaveEffect(waveEffect: WaveEffect) {
         this.prolang.keys.forEach(key => {
@@ -58,6 +59,7 @@ export default class Knowledge {
         this.initShadowModel();
         // circlePlate.scale.set(10, 10, 10);
         // console.log({ circlePlate })
+        circlePlate.rotateY(degToRad(45))
 
         for (let i = 0; i < this.prolang.keys.length; i++) {
             const newCirclePlane = circlePlate.clone(); // ternyata mesh.clone() itu menggunakan reference material yang sama

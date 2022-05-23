@@ -13,6 +13,12 @@ export default class Softwares extends Wrapper<Software> {
         this.keys = [
             new Software(world, scene, new Vector3(52.5, -5, 100), "blender"),
             new Software(world, scene, new Vector3(52.5, -5, 120), "ue"),
+            new Software(world, scene, new Vector3(52.5, -5, 180), "docker"),
+            new Software(world, scene, new Vector3(17.5, -5, 180), "aws"),
+            new Software(world, scene, new Vector3(-17.5, -5, 180), "adobe"),
+            new Software(world, scene, new Vector3(-52.5, -5, 180), "nginx"),
+            new Software(world, scene, new Vector3(-52.5, -5, 200), "opengl"),
+            new Software(world, scene, new Vector3(17.5, -5, 200), "nodejs"),
         ];
 
     }

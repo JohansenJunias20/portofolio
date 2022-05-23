@@ -157,6 +157,7 @@ export default class PhysicsObject3d {
         // var object: THREE.Group;
         var object: THREE.Group = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale));
         // promises.push((async () => { object = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale)) })())
+        //todo: floorshadow ini harus dibuat concurrent saat loadFBX atau loadOBJ
         var floorShadowModel: THREE.Group;
         if (this.asset.floorShadow && !this.asset.floorShadow.preload) {
             promises.push((async () => { ref.floorShadowModel = await ref.loadFloorShadow() })())
