@@ -15,6 +15,7 @@ export default class Frameworks extends Wrapper<Framework> {
             new Framework(world, scene, new Vector3(17.5, -5, 120), "tensorflow"),
             new Framework(world, scene, new Vector3(17.5, -5, 140), "electron"),
             new Framework(world, scene, new Vector3(-17.5, -5, 200), "laravel"),
+            new Framework(world, scene, new Vector3(52.5, -5, 200), "threejs"),
         ];
 
     }

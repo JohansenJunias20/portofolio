@@ -397,7 +397,6 @@ var cameraPos = new THREE.Vector3();
 var cameraDir = new THREE.Vector3();
 var lastPosCamUnfollPlayer = new THREE.Vector3(); // posisi kamera terakhir saat unfollow player
 const raycast2 = new THREE.Raycaster();
-
 function animate() {
     deltatime = clock.getDelta()
     // if (deltatime < 0.2)
@@ -502,13 +501,22 @@ function animate() {
         pos.project(camera);
         var posv2 = new Vector2(pos.x, pos.y);
         raycast2.setFromCamera(posv2, camera);
-        const intsCenterScreen = raycast2.intersectObjects(scene.children);
+        //direverse sehingga mulai dari yang terjauh dulu
+        const intsCenterScreen = raycast2.intersectObjects(scene.children).reverse();
         if (intsCenterScreen.length != 0) {
             if (intsCenterScreen.length != 1) {
                 // console.log({ intsCenterScreen })
             }
+            var isFrontCharacter = false; // intersects object itu arraynya sudah terurut dari distance yang paling dekat ke jauh
+            //sehingga diiterasi mulai dari isFrontCharacter true -> ini diset sampai ketemu character bola.
             for (let i = 0; i < intsCenterScreen.length; i++) {
                 const obj = intsCenterScreen[i];
+                if (character.mesh.children[0].uuid == obj.object.uuid && !isFrontCharacter) {
+                    isFrontCharacter = true;
+                    // console.log({ isFrontCharacter })
+                    continue;
+                }
+                if (!isFrontCharacter) continue;
                 if (character.mesh.children[0].uuid != obj.object.uuid) {
                     const mesh: Mesh = obj.object as any;
                     if (Array.isArray(mesh.material)) { // bila 1 mesh terdiri dari beberapa material, biasanya .obj file
@@ -643,7 +651,6 @@ function animate() {
             else {
                 // offsetChanged = false; // ini ketriggered membuat saat transisi kamera billbaord langsung rusak
             }
-            console.log({ alpha })
             alpha = clamp(alpha, 0, 1);
         }
 
@@ -737,6 +744,7 @@ async function init() {
     character.followWaveEffect = false;
     character.init().then(() => {
         loading.addProgress(2);
+        console.log({ uuidcharacter: character.mesh.uuid })
     });
     johansen.init().then(() => {
         // loading.addProgress(5);

@@ -10,6 +10,7 @@ import PhysicsObject3d from '../../PhysicsObject';
 interface AnimationCharacter {
     walk: THREE.AnimationAction;
 }
+type Text = "react" | "tensorflow" | "laravel" | "expo" | "electron" | "tailwind" | "threejs"
 export default class Framework extends PhysicsObject3d {
     asset = {
         castShadow: true,
@@ -27,8 +28,8 @@ export default class Framework extends PhysicsObject3d {
         },
         additionalMesh: [new THREE.Mesh()]
     }
-    public readonly text: "react" | "tensorflow" | "laravel" | "expo" | "electron" | "tailwind" | "three"
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: "react" | "tensorflow" | "laravel" | "expo" | "electron" | "tailwind" | "three") {
+    public readonly text: Text
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, text: Text) {
         // super(world, scene, position, 0, "TRIMESH", 0);
         super(world, scene, position, 0, "CUSTOM", 0, new CANNON.Shape());
         this.text = text;

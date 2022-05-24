@@ -1,10 +1,10 @@
-# Blender MTL File: 'opengl.blend'
+# Blender MTL File: 'threejs.blend'
 # Material Count: 1
 
-newmtl OPENGL
+newmtl Material.001
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
-Kd 0.330946 0.492787 0.648813
+Kd 0.201900 0.201900 0.201900
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
