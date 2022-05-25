@@ -263,6 +263,13 @@ export default class PopUp {
             this.fence.mesh.material.needsUpdate = true;
             // this.fence.mesh.geometry.attributes.position.needsUpdate = true;
         }
+
+        if (!this.isBeginUpCalled) {
+            if (this.onBeginUp) this.onBeginUp();
+            this.isBeginUpCalled = true;
+            this.isEndDownCalled = false;
+        }
+
         this.alphaAnimationDown = 0;
     }
     alphaAnimationUp = 0;
@@ -273,6 +280,11 @@ export default class PopUp {
         this.alphaAnimationDown = clamp(this.alphaAnimationDown, 0, 1)
         this.fence.mesh.position.copy(this.fence.mesh.position.lerp(this.fence.originalPosition, this.alphaAnimationDown));
         this.alphaAnimationUp = 0;
+        this.isBeginUpCalled = false;
+        if (!this.isEndDownCalled) {
+            if (this.onEndDown) this.onEndDown();
+            this.isEndDownCalled = true;
+        }
 
     }
     update(deltatime: number, characterBody: CANNON.Body, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
@@ -297,6 +309,7 @@ export default class PopUp {
         }
 
         this.onMouseNotHover();
+
     }
 
     async initFloor() {
@@ -365,4 +378,10 @@ export default class PopUp {
 
         this.scene.add(this.fence.mesh)
     }
+    //event listeners binded by parent of PopUp
+    isBeginUpCalled = false;
+    onBeginUp: () => void;
+    isEndDownCalled = true;
+    onEndDown: () => void;
+
 }

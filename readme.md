@@ -38,7 +38,7 @@ bash prod.sh
 |**Advanced Multiplayer**  |implement Multiplayer to _playground_  (play connect 4 with other players)  |
 |**Add more _knowledges_**  | [nginx](https://www.nginx.com/), [node.js](https://nodejs.org/en/), [adobe](https://www.adobe.com/), [docker](https://www.docker.com/), [expo](https://expo.dev/), [aws](https://aws.amazon.com/), [laravel](https://laravel.com/), [threejs](https://threejs.org/), [opengl](https://en.wikipedia.org/wiki/OpenGL)|✅|
 |**Add more _billboard projects_**  | [minecraft-clone](https://github.com/JohansenJunias20/minecraft-clone), Accounting Web, [Laughing Clown](https://github.com/JohansenJunias20/laughing-clown)|
-|**Contact Person**|IG, [Github](https://github.com/JohansenJunias20), and LinkedIn at *lobby* Area|
+|**Contact Person**|IG, [Github](https://github.com/JohansenJunias20), and LinkedIn at *lobby* Area|In progress|
 |**Add more Shadows**|shadows on movable object like character(ball), johansen mesh, and hotkeys||
 |**Add Documentation**|Write readme file in every directory|In Progress|
 |**Dockerize Coturn**|image coturn/coturn seems to be broken, planning to make own custom coturn image| ✅ |

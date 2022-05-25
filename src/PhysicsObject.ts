@@ -142,6 +142,10 @@ export default class PhysicsObject3d {
             // console.log({ spawnpos: this.spawnPosition })
         }
     }
+    //custom update if the update of the object require more arguments than normal update
+    public customUpdate(...args:any[]){
+        
+    }
     public update(deltatime: number) {
         this.mesh.position.copy(this.position);
         this.resetOpacity(deltatime);
@@ -156,6 +160,7 @@ export default class PhysicsObject3d {
         var promises = [];
         // var object: THREE.Group;
         var object: THREE.Group = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale));
+
         // promises.push((async () => { object = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale)) })())
         //todo: floorshadow ini harus dibuat concurrent saat loadFBX atau loadOBJ
         var floorShadowModel: THREE.Group;
@@ -194,7 +199,7 @@ export default class PhysicsObject3d {
             const temp: THREE.Mesh = this.mesh.children[0] as Mesh;
             this.shape = createBody(temp);
         }
-        if (isOBJ(url))
+        if (isOBJ(url) && this.shape)
             (this.shape as any).setScale(new CANNON.Vec3(10, 10, 10) as any)
 
         new THREE.Box3().setFromObject(ref.mesh).getSize(this.size);

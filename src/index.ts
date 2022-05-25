@@ -239,6 +239,8 @@ const knowledge = new Knowledge(world, scene);
 const billboards = new Billboards(world, scene, camera)
 
 const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Vector3(-50, 0.2, 50))
+
+const contacts = new Contacts(world, scene, camera)
 //#endregion
 
 var key: string;
@@ -414,6 +416,13 @@ function animate() {
         trees.setWaveEffect(waveEffect)
         trees.updateWaveEffect(deltatime)
         trees.update(deltatime)
+
+        // console.log({ x, y, z });
+    }
+    if (contacts.initialized && character.initialized) {
+        contacts.setWaveEffect(waveEffect)
+        contacts.updateWaveEffect(deltatime)
+        contacts.customUpdate(deltatime, character.body, intersects)
 
         // console.log({ x, y, z });
     }
@@ -750,6 +759,9 @@ async function init() {
         // loading.addProgress(5);
 
     })
+
+    contacts.init().then(() => {
+    })
     loading.setText("Loading Knowledges");
     knowledge.init(loading).then(() => {
         loading.addProgress(5);
@@ -785,6 +797,7 @@ var startHides = false;
 init();
 
 import gsap from "gsap"
+import Contacts from './Lobby/Contacts/Contacts';
 function gotoPlayer(socketid: string) {
     if (socketid == connection.id) return; // yang dipencet username diri sendiri.
     const targetPosition = otherPlayers[socketid].position.clone();

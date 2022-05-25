@@ -47,6 +47,12 @@ export default class Wrapper<T extends PhysicsObject3d | MeshOnlyObject3d>{ //ka
     //     return false;
     // }
 
+    //custom update if the update of the object require more arguments than normal update
+    //for example a billboard has require intersects, and body of character because popUp object required it to detect if the character is on the top of popup
+    public customUpdate(...args: any[]) {
+
+    }
+
     public update(deltatime: number) {
         this.keys.forEach(key => {
             key.update(deltatime);
