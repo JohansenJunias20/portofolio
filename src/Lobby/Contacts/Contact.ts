@@ -38,13 +38,8 @@ export default class Contact extends PhysicsObject3d {
         this.text = text;
         this.asset.url = `/assets/environment/Lobby/Contacts/${text}.obj`;
         this.asset.mtl = `/assets/environment/Lobby/Contacts/${text}.mtl`;
-        if (text == "github") {
-            this.asset.floorShadow.textureUrl = `/assets/environment/Lobby/Contacts/floorShadow_${text}.png`
-            this.asset.floorShadow.modelUrl = `/assets/floorShadow.obj`
-        }
-        else {
-            this.asset.floorShadow = undefined;
-        }
+        this.asset.floorShadow.textureUrl = `/assets/environment/Lobby/Contacts/floorShadow_${text}.png`
+        this.asset.floorShadow.modelUrl = `/assets/floorShadow.obj`
         this.popUp = new PopUp(world, scene, camera, {
             x: 8, y: 2, z: 4
         }, 0.3, "open", url);
@@ -88,7 +83,7 @@ export default class Contact extends PhysicsObject3d {
             console.log({ floorShadowModel: this.floorShadowModel })
 
             ref.tl.to(((this.floorShadowModel as any).material as ShaderMaterial).uniforms._opacity, {
-                ...{ value: 0.8 },
+                ...{ value: 0.7 },
                 duration: 1,
                 onUpdate: () => {
                 },
