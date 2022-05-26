@@ -2,13 +2,14 @@
 
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
-import { Group, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
+import { Group, PositionalAudio, ShaderMaterial, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { clamp } from 'three/src/math/MathUtils';
 import PhysicsObject3d from '../../PhysicsObject';
 import PopUp from '../../PopUps/PopUp';
 import gsap from "gsap"
 import { Power1, Power2, Power3, Power4, Back } from "gsap"
+import setOpacity from '../../utility/setOpacity';
 
 interface AnimationCharacter {
     walk: THREE.AnimationAction;
@@ -20,31 +21,38 @@ export default class Contact extends PhysicsObject3d {
         recieveShadow: false,
         url: ``,
         mtl: ``,
-        scale: new THREE.Vector3(10, 10, 10)
-        // floorShadow: {
-        //     textureUrl: "/assets/environment/lobby/floorShadow.png",
-        //     modelUrl: "/assets/floorShadow.obj",
-        //     scale: new Vector3(6, 0, 6),
-        //     offset: new Vector3(),
-        //     preload: true,
-        //     Mesh: new THREE.Group()
-        // },
+        scale: new THREE.Vector3(10, 10, 10),
+        floorShadow: {
+            textureUrl: "/assets/environment/lobby/floorShadow.png",
+            modelUrl: "/assets/floorShadow.obj",
+            scale: new Vector3(5, 0, 5),
+            offset: new Vector3(),
+            preload: false,
+        },
     }
     popUp: PopUp
     public readonly text: Text
     from = "CONTACT"
-    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, position: Vector3, text: Text,url:string) {
+    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, position: Vector3, text: Text, url: string) {
         super(world, scene, position, 0, "BOX", 0);
         this.text = text;
         this.asset.url = `/assets/environment/Lobby/Contacts/${text}.obj`;
         this.asset.mtl = `/assets/environment/Lobby/Contacts/${text}.mtl`;
+        if (text == "github") {
+            this.asset.floorShadow.textureUrl = `/assets/environment/Lobby/Contacts/floorShadow_${text}.png`
+            this.asset.floorShadow.modelUrl = `/assets/floorShadow.obj`
+        }
+        else {
+            this.asset.floorShadow = undefined;
+        }
         this.popUp = new PopUp(world, scene, camera, {
             x: 8, y: 2, z: 4
         }, 0.3, "open", url);
 
     }
     tl: gsap.core.Timeline;
-    tldown: gsap.core.Tween;
+    tldown: gsap.core.Tween; //tldown is executed when not hovered anymore. so it play animation back to origin position
+    tldownfloor: gsap.core.Timeline; //for floorshadow opacity when tldown
     public async init() {
         const ref = this;
 
@@ -60,21 +68,61 @@ export default class Contact extends PhysicsObject3d {
             if (ref.tldown) {
                 ref.tldown.pause();
             }
+            if (ref.tldownfloor) {
+                ref.tldownfloor.pause();
+            }
             ref.tl = gsap.timeline({ repeat: -1 });
-            ref.tl.to(this.position, {
+            ref.tl.add('start')
+            var originFloorShadowPos = this.originPosition.clone();
+            originFloorShadowPos.y = 0;
+            ref.tl.to([this.position], {
                 ...this.originPosition.clone().add(new Vector3(0, 0.5, 0)),
                 duration: 1,
                 ease: Power1.easeInOut
-            })
-            ref.tl.to(this.position, {
-                ...this.originPosition.clone(),
+            }, "start")
+            ref.tl.to([this.floorShadowModel.position], {
+                ...this.originPosition.clone().add(new Vector3(0, 0, -0.5)),
                 duration: 1,
                 ease: Power1.easeInOut
-            })
-            // if (ref.tldown)
-            // ref.tldown.kill();
-            // tl.star
+            }, "start");
+            console.log({ floorShadowModel: this.floorShadowModel })
+
+            ref.tl.to(((this.floorShadowModel as any).material as ShaderMaterial).uniforms._opacity, {
+                ...{ value: 0.8 },
+                duration: 1,
+                onUpdate: () => {
+                },
+                ease: Power1.easeInOut
+            }, "start")
+
+
+
+            ref.tl.add("end")
+            ref.tl.to(this.position, {
+                ...this.originPosition,
+                duration: 1,
+                ease: Power1.easeInOut
+            }, "end")
+            ref.tl.to(this.floorShadowModel.position, {
+                ...originFloorShadowPos,
+                duration: 1,
+                ease: Power1.easeInOut
+            }, "end")
+            ref.tl.to(((this.floorShadowModel as any).material as ShaderMaterial).uniforms._opacity, {
+                ...{ value: 1 },
+                duration: 1,
+                onUpdate: () => {
+                },
+                ease: Power1.easeInOut
+            }, "end")
             console.log("begin up!")
+
+            if (ref.tldown) {
+                ref.tldown.kill();
+            }
+            if (ref.tldownfloor) {
+                ref.tldownfloor.kill();
+            }
         }
         this.popUp.onEndDown = () => {
             if (!ref.initialized) return;
@@ -90,6 +138,19 @@ export default class Contact extends PhysicsObject3d {
                 ...this.originPosition.clone(),
                 duration: 1,
             })
+            ref.tldownfloor = gsap.timeline();
+            ref.tldownfloor.add("end");
+            ref.tldownfloor.to(((this.floorShadowModel as any).material as ShaderMaterial).uniforms._opacity, {
+                ...{ value: 1 },
+                duration: 1,
+            }, "end")
+            var originFloorShadowPos = this.originPosition.clone();
+            originFloorShadowPos.y = 0;
+            ref.tldownfloor.to(this.floorShadowModel.position, {
+                ...originFloorShadowPos,
+                duration: 1,
+                ease: Power1.easeInOut
+            }, "end")
         }
     }
 
