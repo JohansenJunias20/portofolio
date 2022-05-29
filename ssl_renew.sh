@@ -18,7 +18,7 @@ for id in $(docker ps -q); do
 done
 
 
-domains=($TURN_DOMAIN $PROD_WS_DOMAIN)
+domains=("portofolio.orbitskomputer.com")
 for i in "${domains[@]}"; do
     echo "check $i is exist in ssl directory?"
     if [ -d "./ssl/main/archive/$i" ]; then
@@ -38,7 +38,6 @@ for i in "${domains[@]}"; do
     fi
     sleep 3;
 done
-
 sleep 5;
 echo "renew all ssl certificates...";
 docker run -it -v "/$(pwd)/ssl/main:/etc/letsencrypt" -p 80:80 \
