@@ -4,5 +4,5 @@ public/dist
 private/*.go
 private/*.mod
 ws-server/visitor.json
-ssl/main/live/*
+# ssl/main/live/*
 dump
