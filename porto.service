@@ -1,0 +1,14 @@
+[Unit]
+Description=Portofolio JohansenJunias20.github.io
+After=docker.service
+BindsTo=docker.service
+ReloadPropagatedFrom=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=__dir__
+ExecStart=__dir__/prod.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

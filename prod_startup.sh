@@ -1,5 +1,6 @@
 #!/bin/bash
 export $(cat .env | xargs)
+
 # renew ssl
 bash ./ssl_renew.sh
 
@@ -18,5 +19,4 @@ bash config_turn.sh; # configuration turnserver.conf
 docker-compose -f docker-compose.prod.yml down;
 docker-compose -f docker-compose.prod.yml up -d;
 bash ./build.sh -m PROD -d;
-echo "done"
-exit 0
+
