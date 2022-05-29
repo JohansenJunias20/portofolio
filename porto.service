@@ -1,8 +1,8 @@
 [Unit]
 Description=Portofolio JohansenJunias20.github.io
-After=docker.service
-BindsTo=docker.service
-ReloadPropagatedFrom=docker.service
+After=rpok.service
+BindsTo=rpok.service
+ReloadPropagatedFrom=rpok.service
 
 [Service]
 Type=oneshot
