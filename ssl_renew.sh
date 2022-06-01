@@ -41,7 +41,7 @@ done
 sleep 5;
 echo "renew all ssl certificates...";
 docker run -it -v "/$(pwd)/ssl/main:/etc/letsencrypt" -p 80:80 \
-    certbot/certbot renew --dry-run --standalone --email johansen.gumbal@gmail.com --agree-tos --no-eff-email
+    certbot/certbot renew --standalone --email johansen.gumbal@gmail.com --agree-tos --no-eff-email
 
 
 # check if stopped_id not null
