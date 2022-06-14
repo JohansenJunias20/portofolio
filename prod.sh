@@ -4,7 +4,6 @@ export $(cat .env | xargs)
 bash ./ssl_renew.sh
 
 # docker build Dockerfile to customnode image
-docker build -t customnode .
 # compile typescript to dist file
 # installing dependencies
 docker run -v "/$(pwd)/ws-server:/usr/src/app" customnode:latest npm install
