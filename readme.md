@@ -43,7 +43,7 @@ bash prod.sh
 |**Add Documentation**|Write readme file in every directory|In Progress|
 |**Dockerize Coturn**|image coturn/coturn seems to be broken, planning to make own custom coturn image| ✅ |
 |**Chat**|Add chat so players can communicate with each other| |
-|**Nicknames**|Add Nicknames on top each player characther| |
+|**Nicknames**|Add nickname on top each player's character| |
 |**Smooth Movement P2P**|Make interpolation position between each data sent to peers| |
 <!-- |**Night Mode**|Change theme to night when || -->
 <!-- ENDCOPY -->
