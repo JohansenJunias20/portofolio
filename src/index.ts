@@ -227,7 +227,7 @@ const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 const navigationBoards = new NavigationBoards(world, scene);
 
 const lobby = new Lobby(world, scene);
-const character = new Character(world, scene, new Vector3(0, 0, 5));
+const character = new Character(world, scene, new Vector3(0, 2, 5));
 const roadStones = new RoadStones(scene)
 
 const johansen = new Johansen(world, scene)
@@ -401,10 +401,14 @@ var lastPosCamUnfollPlayer = new THREE.Vector3(); // posisi kamera terakhir saat
 const raycast2 = new THREE.Raycaster();
 function animate() {
     deltatime = clock.getDelta()
-    // if (deltatime < 0.2)
-    // world.step(config.world.step * deltatime);
-    world.step(config.world.step);
-    // else return
+    if (deltatime < 0.2 && plane.initialized && character.initialized)
+        world.step((1/3) * (1.0 - Math.pow(0.002, deltatime)));
+    else {
+        // console.log("return!")
+        requestAnimationFrame(animate);
+        return;
+    }
+    // world.step(deltatime);
 
     raycast.setFromCamera(mouse, camera);
     const intersects = raycast.intersectObjects(scene.children); // diakses oleh floor fence mesh
