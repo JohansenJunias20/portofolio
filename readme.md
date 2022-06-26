@@ -43,6 +43,8 @@ bash prod.sh
 |**Add Documentation**|Write readme file in every directory|In Progress|
 |**Dockerize Coturn**|image coturn/coturn seems to be broken, planning to make own custom coturn image| ✅ |
 |**Chat**|Add chat so players can communicate with each other| |
+|**Nicknames**|Add Nicknames on top each player characther| |
+|**Smooth Movement P2P**|Make interpolation position between each data sent to peers| |
 <!-- |**Night Mode**|Change theme to night when || -->
 <!-- ENDCOPY -->
 
@@ -85,6 +87,13 @@ bash prod.sh
 ### docker-compose.prod.yml
 - Run socket.io server and turn server services
 - Run by `prod.sh`
+
+### install.sh
+- Run by github action
+- Installing Coturn and Websocket services on boot start up linux automatically ubuntu
+
+### porto.service
+- configuration for linux services used by `install.sh`
 
 ### config_turn.sh
 - Configure `turnserver.conf` file based `.env`
