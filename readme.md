@@ -1,16 +1,17 @@
 # Portofolio
-## Source code of https://johansenjunias20.github.io
-See [Deploy Repository](https://github.com/JohansenJunias20/JohansenJunias20.github.io)  
 
-
+### Source code of https://johansenjunias20.github.io
+[Go to deploy repository](https://github.com/JohansenJunias20/JohansenJunias20.github.io)  
+## Reviewed by Web Programming Unpas
+https://www.youtube.com/watch?v=pjDYyyMh4rM&t=3997s
+![alt text](https://JohansenJunias20.github.io/thumbnail_wpu.png)
 <br>
-<br>
-<!-- ## Development
+## Development
 Run webpack build watch and nodemon websocket
 ```sh
-    bash ./dev.sh
+bash dev.sh
 ```
-Please make sure [docker](https://docs.docker.com/) and [node](https://nodejs.org/en/) installed.   -->
+Please make sure [docker](https://docs.docker.com/) and [node](https://nodejs.org/en/) installed.  
 
 ## Production
 Please install [Git bash](https://git-scm.com/downloads) and [Docker](https://docs.docker.com/)  
