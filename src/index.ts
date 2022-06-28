@@ -65,7 +65,7 @@ const sizeGround = config.ground.size;
 const plane = new Plane(world, scene, new THREE.Vector3(0, 0, 0), sizeGround);
 plane.init()
 
-var followCharacter = true;
+var followCharacter = false;
 var leftMouseDown = false;
 canvas.onmousedown = (e) => {
 
@@ -277,6 +277,7 @@ document.onkeydown = (e) => {
     }
     character.isPress[key] = true;
     followCharacter = true;
+    isCamUnderTransition = true;
 
 }
 
@@ -400,6 +401,8 @@ var cameraPos = new THREE.Vector3();
 var cameraDir = new THREE.Vector3();
 var lastPosCamUnfollPlayer = new THREE.Vector3(); // posisi kamera terakhir saat unfollow player
 const raycast2 = new THREE.Raycaster();
+var isCamUnderTransition = false; //saat follow character false -> true ini di set true sehingga kamera lookAt berpindah ke posisi karakter secara pelan-pelan
+var alphaTransition = 0; // alpha used for lerp transition camera lookat target position
 function animate() {
     deltatime = clock.getDelta()
     // if (deltatime < 0.2)
@@ -662,6 +665,7 @@ function animate() {
             camera.position.copy(finalPosition)
             if (clamp(alpha, 0, 1) >= 1) {
                 // camera.lookAt(character.position); // lookAt juga perlu di lerp
+                isCamUnderTransition = false;
             }
             else {
                 // offsetChanged = false; // ini ketriggered membuat saat transisi kamera billbaord langsung rusak
@@ -670,14 +674,19 @@ function animate() {
         }
 
         //bila offset posisi kamera sedang berubah maka camera lookAt harus diganti juga
-        if (offsetChanged) {
+        if (!isCamUnderTransition) {
+            // character.position.angleTo(camera.position)
             camera.lookAt(character.position)
+        }
+        else{
+            // camera.get
         }
 
     }
     else {
         alpha = 0.0;
         lastPosCamUnfollPlayer = camera.position.clone();
+
     }
 
 
