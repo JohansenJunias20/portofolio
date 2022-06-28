@@ -17,9 +17,9 @@ export default class Key extends PhysicsObject3d {
         scale: new THREE.Vector3(0.07, 0.07, 0.07)
     }
     // public followWaveEffect = false;
-    public readonly key: "W" | "A" | "S" | "D";
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, key: "W" | "A" | "S" | "D") {
-        super(world, scene, position, 0, "BOX", 0.2);
+    public readonly key: "W" | "A" | "S" | "D" | "SPACE";
+    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, key: "W" | "A" | "S" | "D" | "SPACE") {
+        super(world, scene, position, 0, "BOX", 0.1);
         this.key = key;
         this.asset.url = `/assets/environment/hotkeys/key ${key}.fbx`;
     }

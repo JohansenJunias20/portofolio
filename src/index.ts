@@ -227,7 +227,7 @@ const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 const navigationBoards = new NavigationBoards(world, scene);
 
 const lobby = new Lobby(world, scene);
-const character = new Character(world, scene, new Vector3(0, 2, 5));
+const character = new Character(world, scene, new Vector3(0, 5, 5));
 const roadStones = new RoadStones(scene)
 
 const johansen = new Johansen(world, scene)
@@ -254,6 +254,8 @@ document.onkeydown = (e) => {
     }
     else if (key == "d") {
     }
+    else if (key == " ") {
+    }
     else if (key == "z") {
         debug = !debug;
         return;
@@ -268,7 +270,6 @@ document.onkeydown = (e) => {
         const raycast3 = new Raycaster();
         raycast3.setFromCamera(mouse, camera);
         var intersects = raycast3.intersectObjects(scene.children)
-        console.log(intersects)
         return;
     }
     else {
@@ -401,14 +402,13 @@ var lastPosCamUnfollPlayer = new THREE.Vector3(); // posisi kamera terakhir saat
 const raycast2 = new THREE.Raycaster();
 function animate() {
     deltatime = clock.getDelta()
-    if (deltatime < 0.2 && plane.initialized && character.initialized)
-        world.step((1/3) * (1.0 - Math.pow(0.002, deltatime)));
-    else {
-        // console.log("return!")
-        requestAnimationFrame(animate);
-        return;
-    }
-    // world.step(deltatime);
+    // if (deltatime < 0.2)
+    // world.step(config.world.step,);
+    // console.log({ deltatime })
+    if (character.initialized && plane.initialized)
+        // world.step((1 / 60) * Math.min(0.1, deltatime) * 100);
+        world.step((1 / 30) );
+    // else return
 
     raycast.setFromCamera(mouse, camera);
     const intersects = raycast.intersectObjects(scene.children); // diakses oleh floor fence mesh
@@ -426,7 +426,7 @@ function animate() {
     if (contacts.initialized && character.initialized) {
         contacts.setWaveEffect(waveEffect)
         contacts.updateWaveEffect(deltatime)
-        contacts.customUpdate(deltatime, character.body, intersects)
+        contacts.customUpdate(deltatime, character, intersects)
 
         // console.log({ x, y, z });
     }
@@ -484,12 +484,12 @@ function animate() {
     if (billboards.initialized) {
         billboards.setWaveEffect(waveEffect)
         billboards.updateWaveEffect()
-        billboards.updateBillboard(deltatime, character.body, intersects) // give intersects because contain popup mesh
+        billboards.updateBillboard(deltatime, character, intersects) // give intersects because contain popup mesh
     }
 
     if (digitRegocnition.initialized) {
         // digitRegocnition.setWaveEffect(waveEffect)
-        digitRegocnition.update(deltatime, character.body, intersects) // give intersects because contain popup mesh
+        digitRegocnition.update(deltatime, character, intersects) // give intersects because contain popup mesh
     }
 
     // console.log({ playercount: Object.keys(otherPlayers).length })
@@ -645,15 +645,16 @@ function animate() {
             if (clamp(alphaOffsetCamera_lobby, 0, 1) < 1) {
                 CURRENT_OFFSET_CAMERA = new Vector3().copy(START_OFFSET_CAMERA).lerp(LOBBY_OFFSET_CAMERA, alphaOffsetCamera_lobby);
             }
-            else
+            else {
                 offsetChanged = true;
+            }
         }
 
         if (character.initialized) {
             const { x, y, z } = character.mesh.position;
             var disiredPosition = new Vector3(x, y, z).add(CURRENT_OFFSET_CAMERA)
 
-            alpha += deltatime * 1.5;
+            alpha += 0.15;
             // bila mau lebih smooth ganti lastPosCamUnfollPlayer dengan camera.position
             // tetapi cara itu tidak rekomen mengingat value camera.position berubah terus (padahal di lerp)
             const finalPosition = new Vector3().copy(lastPosCamUnfollPlayer).lerp(disiredPosition, clamp(alpha, 0, 1));
@@ -680,14 +681,17 @@ function animate() {
 
 
 
-    if (connection && connection.connected && character.body && connection.id) {
+    if (connection && connection.connected && character.body && connection.id && Math.floor(ticks) >= 10) {
         connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
+        ticks = 0;
     }
+    ticks += 300 * (1 - Math.pow(0.001, deltatime));
     if (initialized)
         renderer.render(scene, camera)
     requestAnimationFrame(animate);
 
 }
+var ticks = 0.0;
 // import { TweenLite } from 'gsap/all';
 // const test = TweenLite.fromTo({x:0,y:0,z:0},durat)
 animate();
@@ -703,12 +707,39 @@ connection.onrecieve = (e) => {
     switch (message.channel) {
         case "transform":
             message.id = message.id.toString();
-            for (var key in otherPlayers) {
-            }
-            otherPlayers[message.id].position.copy(message.position);
-            otherPlayers[message.id].body.position.copy(message.position);
-            otherPlayers[message.id].mesh.quaternion.copy(message.quaternion);
-            otherPlayers[message.id].body.quaternion.copy(message.quaternion);
+            // otherPlayers[message.id].position.copy(message.position);
+            gsap.to(otherPlayers[message.id].position, {
+                duration: 0.3,
+                ...message.position,
+                // ease: Back.easeOut.config(Config.waveEffect.overshoot),
+                onComplete: () => {
+                    // ref.addBody();
+                    // ref.body.mass = ref.originMass;
+                    // ref.body.updateMassProperties();
+                    // ref.body.position.copy(ref.position)
+                    // ref.body.updateMassProperties();
+
+                }
+            })
+            gsap.to(otherPlayers[message.id].body.quaternion, {
+                duration: 0.3,
+                ...message.quaternion,
+                onUpdate: () => {
+                    otherPlayers[message.id].body.angularVelocity.setZero()
+                },
+                // ease: Back.easeOut.config(Config.waveEffect.overshoot),
+                onComplete: () => {
+                    // ref.addBody();
+                    // ref.body.mass = ref.originMass;
+                    // ref.body.updateMassProperties();
+                    // ref.body.position.copy(ref.position)
+                    // ref.body.updateMassProperties();
+
+                }
+            })
+            // otherPlayers[message.id].body.position.copy(message.position);
+            // otherPlayers[message.id].mesh.quaternion.copy(message.quaternion);
+            // otherPlayers[message.id].body.quaternion.copy(message.quaternion);
             otherPlayers[message.id].body.angularVelocity.setZero()
             // otherPlayers[message.id].mesh.position.copy(message.position);
             break;

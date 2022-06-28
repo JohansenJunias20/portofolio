@@ -6,6 +6,7 @@ import { Color, Group, MeshPhongMaterial, PositionalAudio, Raycaster, Triangle, 
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { clamp, degToRad } from 'three/src/math/MathUtils';
+import Character from '../Character';
 import PopUp from '../PopUps/PopUp';
 import customShader from '../utility/customShader';
 import loadOBJ from '../utility/loadOBJ';
@@ -63,8 +64,8 @@ export default class Billboard {
     public async init() {
         await this.loadAsset();
     }
-    public update(deltatime: number, characterBody: CANNON.Body, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
-        this.PopUpObjects.forEach(popup => popup.update(deltatime, characterBody, intersects))
+    public update(deltatime: number, character: Character, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
+        this.PopUpObjects.forEach(popup => popup.update(deltatime, character, intersects))
         if (this.mesh)
             this.resetOpacity(deltatime)
     }

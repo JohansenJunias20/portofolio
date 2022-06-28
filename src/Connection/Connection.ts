@@ -263,8 +263,8 @@ export default class Connection {
             if (element.id == "title_board") continue; // ini bukan player tetapi jumlah player.. kita tidak mau listen ke element ini
 
             const socketid = element.getAttribute("socketid");
-            console.log({ element });
-            console.log("binded");
+            // console.log({ element });
+            // console.log("binded");
             (element as HTMLDivElement).onclick = () => {
                 this.onPlayerNameClick(this.players[socketid], socketid);
             }

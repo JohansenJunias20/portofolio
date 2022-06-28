@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
+import Character from "../Character";
 import { WaveEffect } from "../waveEffect";
 import Wrapper from "../Wrapper";
 import Billboard from "./Billboard";
@@ -26,9 +27,9 @@ export default class Billboards {
         this.initialized = true;
 
     }
-    updateBillboard(deltatime: number, characterBody: CANNON.Body, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
+    updateBillboard(deltatime: number, character: Character, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
         this.keys.forEach(key => {
-            key.update(deltatime, characterBody, intersects);
+            key.update(deltatime, character, intersects);
         })
     }
     public updateWaveEffect() {

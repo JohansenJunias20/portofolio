@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
+import Character from "../../Character";
 import Wrapper from "../../Wrapper";
 import Contact from "./Contact";
 
@@ -16,9 +17,9 @@ export default class Contacts extends Wrapper<Contact> {
         ];
 
     }
-    public customUpdate(deltatime: number, body: CANNON.Body, intersect: THREE.Intersection<THREE.Object3D<THREE.Event>>[]): void {
+    public customUpdate(deltatime: number, character: Character, intersect: THREE.Intersection<THREE.Object3D<THREE.Event>>[]): void {
         this.keys.forEach(key => {
-            key.customUpdate(deltatime, body, intersect);
+            key.customUpdate(deltatime, character, intersect);
         })
     }
 
