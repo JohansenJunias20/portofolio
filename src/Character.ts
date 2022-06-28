@@ -17,21 +17,23 @@ export default class Character extends PhysicsObject3d {
         w: boolean,
         a: boolean,
         s: boolean,
-        d: boolean
+        d: boolean,
+        " ": boolean
     }
     asset = {
         castShadow: true,
         url: `/assets/character/Ball FBX.fbx`,
         scale: new THREE.Vector3(0.01, 0.01, 0.01)
     }
-    
+
     constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 25) {
         super(world, scene, position, movementSpeed, "SPHERE", 2);
         this.isPress = {
             w: false,
             a: false,
             s: false,
-            d: false
+            d: false,
+            " ": false
         }
         this.on = "lobby";
     }
@@ -55,11 +57,22 @@ export default class Character extends PhysicsObject3d {
 
         //whenever ball stop moving, decreasing velocity of rotation over time to near 0
         if (this.body.velocity.x == 0 && this.body.velocity.z == 0) {
+            this.body.angularVelocity.x += this.body.angularVelocity.x > 0 ? -0.5 : 0.5;
+            this.body.angularVelocity.y += this.body.angularVelocity.y > 0 ? -0.5 : 0.5;
+            this.body.angularVelocity.z += this.body.angularVelocity.z > 0 ? -0.5 : 0.5;
+            if (this.body.angularVelocity.x <= 0.5 && this.body.angularVelocity.x >= -0.5) {
+                this.body.angularVelocity.x = 0;
+            }
+            if (this.body.angularVelocity.y <= 0.5 && this.body.angularVelocity.y >= -0.5) {
+                this.body.angularVelocity.y = 0;
 
-            this.body.angularVelocity.x += this.body.angularVelocity.x > 0 ? -0.1 : 0.1;
-            this.body.angularVelocity.y += this.body.angularVelocity.y > 0 ? -0.1 : 0.1;
-            this.body.angularVelocity.z += this.body.angularVelocity.z > 0 ? -0.1 : 0.1;
+            }
+            if (this.body.angularVelocity.z <= 0.5 && this.body.angularVelocity.z >= -0.5) {
+                this.body.angularVelocity.z = 0;
+            }
         }
+        // console.log({ y: this.body.angularVelocity.y })
+        // console.log({ x: this.body.velocity.x, z: this.body.velocity.z })
 
     }
     //applyforce make it more natural than add velocity. 
@@ -75,14 +88,20 @@ export default class Character extends PhysicsObject3d {
         if (Math.abs(this.body.velocity.z) <= this.movementSpeed) { //belum melebihi
             if (this.isPress.w && this.isPress.s) {
                 this.body.applyForce(new CANNON.Vec3(0, 0, 0), this.body.position);
-
             }
             else if (this.isPress.w) {
-                this.body.applyForce(new CANNON.Vec3(0, 0, -2000 * deltatime), this.body.position);
+                //tidak perlu di * delta time karena jumlah force tidak pengaruh karena batas maksimalnya adalah movementSpeed
+                //yang terpenting adalah kecepatan world.step() itu yang harus di kali deltatime karena kalau
+                //stepnya makin cepat maka hasil position yang dihasilkan dari force akan lebih sering terupdate
+                this.body.applyForce(new CANNON.Vec3(0, 0, -70), this.body.position);
                 // this.body.velocity.z = -this.movementSpeed;
             }
             else if (this.isPress.s) {
-                this.body.applyForce(new CANNON.Vec3(0, 0, 2000 * deltatime), this.body.position);
+                //tidak perlu di * delta time karena jumlah force tidak pengaruh karena batas maksimalnya adalah movementSpeed
+                //yang terpenting adalah kecepatan world.step() itu yang harus di kali deltatime karena kalau
+                //stepnya makin cepat maka hasil position yang dihasilkan dari force akan lebih sering terupdate
+                this.body.applyForce(new CANNON.Vec3(0, 0, 70), this.body.position);
+                // console.log("ADD FORCE")
                 // this.body.velocity.z = this.movementSpeed;
             }
 
@@ -92,15 +111,26 @@ export default class Character extends PhysicsObject3d {
                 this.body.applyForce(new CANNON.Vec3(0, 0, 0), this.body.position);
             }
             else if (this.isPress.a) {
-                this.body.applyForce(new CANNON.Vec3(-2000 * deltatime, 0, 0), this.body.position);
+                //tidak perlu di * delta time karena jumlah force tidak pengaruh karena batas maksimalnya adalah movementSpeed
+                //yang terpenting adalah kecepatan world.step() itu yang harus di kali deltatime karena kalau
+                //stepnya makin cepat maka hasil position yang dihasilkan dari force akan lebih sering terupdate
+                this.body.applyForce(new CANNON.Vec3(-70, 0, 0), this.body.position);
                 // this.body.velocity.x = -this.movementSpeed;
             }
             if (this.isPress.d) {
-                this.body.applyForce(new CANNON.Vec3(2000 * deltatime, 0, 0), this.body.position);
+                //tidak perlu di * delta time karena jumlah force tidak pengaruh karena batas maksimalnya adalah movementSpeed
+                //yang terpenting adalah kecepatan world.step() itu yang harus di kali deltatime karena kalau
+                //stepnya makin cepat maka hasil position yang dihasilkan dari force akan lebih sering terupdate
+                this.body.applyForce(new CANNON.Vec3(70, 0, 0), this.body.position);
                 // this.body.velocity.x = this.movementSpeed;
             }
         }
-
+        // console.log({ posy: this.position.y, velocity: this.body.velocity.y })
+        if (this.isPress[" "] && this.body.position.y <= 1.1) {
+            console.log("SPACE JUMP")
+            this.body.applyForce(new CANNON.Vec3(0, 750, 0), this.body.position);
+            this.isPress[" "] = false;
+        }
     }
 
     //w,a,s,d should be float number 0-1
@@ -225,27 +255,28 @@ export default class Character extends PhysicsObject3d {
             //start animating walk
             this.isWalking = true;
         }
+        // alert("test")
         var result = [];
         const movementSpeed = 15;
         const resistance = 100; //resist movement since the button unpressed
 
-        if (!this.isPress.w) {
-            this.body.velocity.z += resistance * deltatime;
-            this.body.velocity.z = Math.min(this.body.velocity.z, 0);
-        }
+        // if (!this.isPress.w) {
+        //     this.body.velocity.z += resistance * deltatime;
+        //     this.body.velocity.z = Math.min(this.body.velocity.z, 0);
+        // }
 
-        if (!this.isPress.s) {
-            this.body.velocity.z -= resistance * deltatime;
-            this.body.velocity.z = Math.max(this.body.velocity.z, 0);
-        }
+        // if (!this.isPress.s) {
+        //     this.body.velocity.z -= resistance * deltatime;
+        //     this.body.velocity.z = Math.max(this.body.velocity.z, 0);
+        // }
 
-        if (this.isPress.w) {
-            this.body.velocity.z = -movementSpeed;
-        }
+        // if (this.isPress.w) {
+        //     this.body.velocity.z = -movementSpeed;
+        // }
 
-        if (this.isPress.s) {
-            this.body.velocity.z = movementSpeed;
-        }
+        // if (this.isPress.s) {
+        //     this.body.velocity.z = movementSpeed;
+        // }
 
         // if (this.isPress.a) {
         //     this.body.velocity.x = -movementSpeed;
@@ -265,20 +296,22 @@ export default class Character extends PhysicsObject3d {
 
 
 
-        // if (Math.abs(this.body.velocity.z) <= this.movementSpeed) {
-        //     if (this.isPress.w && this.isPress.s) {
-        //         this.body.applyForce(new CANNON.Vec3(0, 0, 0), this.body.position);
+        if (Math.abs(this.body.velocity.z) <= this.movementSpeed) {
+            if (this.isPress.w && this.isPress.s) {
+                this.body.applyForce(new CANNON.Vec3(0, 0, 0), this.body.position);
 
-        //     }
-        //     else if (this.isPress.w) {
-        //         this.body.applyForce(new CANNON.Vec3(0, 0, -2000 * deltatime), this.body.position);
-        //         // this.body.velocity.z = -this.movementSpeed;
-        //     }
-        //     else if (this.isPress.s) {
-        //         this.body.applyForce(new CANNON.Vec3(0, 0, 2000 * deltatime), this.body.position);
-        //         // this.body.velocity.z = this.movementSpeed;
-        //     }
-        // }
+            }
+            else if (this.isPress.w) {
+                // this.body.applyForce(new CANNON.Vec3(0, 0, -2000 * deltatime), this.body.position);
+                // this.body.velocity.z = -this.movementSpeed;
+                this.body.velocity.z = -50;
+            }
+            else if (this.isPress.s) {
+                // this.body.applyForce(new CANNON.Vec3(0, 0, 2000 * deltatime), this.body.position);
+                // this.body.velocity.z = this.movementSpeed;
+                this.body.velocity.z = 50;
+            }
+        }
         // if (Math.abs(this.body.velocity.x) <= this.movementSpeed) {
 
         //     if (this.isPress.a) {

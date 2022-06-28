@@ -143,8 +143,8 @@ export default class PhysicsObject3d {
         }
     }
     //custom update if the update of the object require more arguments than normal update
-    public customUpdate(...args:any[]){
-        
+    public customUpdate(...args: any[]) {
+
     }
     public update(deltatime: number) {
         this.mesh.position.copy(this.position);
@@ -315,13 +315,28 @@ export default class PhysicsObject3d {
         // this.scene.add(model);
 
     }
+    lastTween: gsap.core.Tween;
     private updatePhysics(deltatime: number) {
         if (!this.body) return;
         if (this.body.mass == 0) {
             this.body.position.copy(this.position as any);
         }
         else {
-            this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
+            // this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
+            if(this.lastTween) this.lastTween.kill();
+            this.lastTween = gsap.to(this.position, {
+                duration: 0.05,
+                ...this.body.position,
+                // ease: Back.easeOut.config(Config.waveEffect.overshoot),
+                onComplete: () => {
+                    // ref.addBody();
+                    // ref.body.mass = ref.originMass;
+                    // ref.body.updateMassProperties();
+                    // ref.body.position.copy(ref.position)
+                    // ref.body.updateMassProperties();
+
+                }
+            })
         }
         this.mesh.quaternion.copy(this.body.quaternion as any);
     }

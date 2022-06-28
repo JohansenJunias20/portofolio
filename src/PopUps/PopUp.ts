@@ -2,10 +2,12 @@ import * as THREE from "three";
 import { AlwaysStencilFunc, Raycaster, ShaderMaterial, Vector2, Vector3 } from "three";
 import { clamp, degToRad } from "three/src/math/MathUtils";
 import * as CANNON from "cannon";
-import isintersect from "../utility/isIntersect";
+// import isintersect from "../utility/isIntersect";
+import isintersect from "../utility/isPopUpIntersect";
 import Modal from "../Modal";
 import vertShader from "../../public/assets/shaders/popup.vert"
 import fragShader from "../../public/assets/shaders/popup.frag"
+import Character from "../Character";
 
 export default class PopUp {
     vert: string;
@@ -56,7 +58,7 @@ export default class PopUp {
             mesh: new THREE.Mesh(),
             position: new Vector3(1),
             urlTexture: `/assets/environment/portofolio/border floor.png`,
-            body: new CANNON.Body()
+            // body: new CANNON.Body()
         }
         const canvas = document.querySelector("#bg");
         const raycast = new Raycaster();
@@ -206,7 +208,7 @@ export default class PopUp {
         this.floor.mesh.position.copy(this.floor.position);
         this.borderFloor.position.copy(position);
         this.borderFloor.mesh.position.copy(this.borderFloor.position);
-        this.borderFloor.body.position.copy(this.borderFloor.position as any);
+        // this.borderFloor.body.position.copy(this.borderFloor.position as any);
 
         this.ceilingPosition = new Vector3();
         this.ceilingPosition = this.ceilingPosition.copy(this.fence.originalPosition).add(new Vector3(0, 3, 0));
@@ -244,7 +246,7 @@ export default class PopUp {
         size: THREE.Vector2;
         position: THREE.Vector3;
         urlTexture: string;
-        body: CANNON.Body
+        // body: CANNON.Body
     }
     // borderFloorMesh: THREE.Mesh;
     ceilingPosition: THREE.Vector3;
@@ -287,7 +289,7 @@ export default class PopUp {
         }
 
     }
-    update(deltatime: number, characterBody: CANNON.Body, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
+    update(deltatime: number, character: Character, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
 
         this.fence.material.uniforms.move.value += 1 * deltatime;
         this.fence.material.needsUpdate = true;
@@ -302,7 +304,7 @@ export default class PopUp {
 
             }
 
-            if (isintersect(characterBody, this.borderFloor.body, this.world)) {
+            if (isintersect({position:character.position,size:new Vector2()},{position:this.borderFloor.position,size:this.borderFloor.size})) {
                 this.onMouseHover();
                 return
             }
@@ -342,20 +344,20 @@ export default class PopUp {
         this.borderFloor.mesh = meshBorderFloor;
         this.scene.add(meshBorderFloor)
 
-        const body = new CANNON.Body({
-            shape: new CANNON.Box(new CANNON.Vec3(this.borderFloor.size.x / 2, 0.005, this.borderFloor.size.y / 2)),
-            // shape: new CANNON.Plane().wid,
-            mass: 0
-        })
-        body.position.copy(this.borderFloor.position as any);
-        this.borderFloor.body = body;
-        this.world.addBody(body);
+        // const body = new CANNON.Body({
+        //     shape: new CANNON.Box(new CANNON.Vec3(this.borderFloor.size.x / 2, 0.005, this.borderFloor.size.y / 2)),
+        //     // shape: new CANNON.Plane().wid,
+        //     mass: 0
+        // })
+        // body.position.copy(this.borderFloor.position as any);
+        // this.borderFloor.body = body;
+        // this.world.addBody(body);
     }
     public rotation(x: number, y: number, z: number) {
         this.borderFloor.mesh.rotation.y = degToRad(y)
         this.borderFloor.mesh.rotation.x = degToRad(x - 90)
         this.borderFloor.mesh.rotation.z = degToRad(z)
-        this.borderFloor.body.quaternion.copy(this.borderFloor.mesh.quaternion as any);
+        // this.borderFloor.body.quaternion.copy(this.borderFloor.mesh.quaternion as any);
 
         this.fence.mesh.rotation.x = degToRad(x)
         this.fence.mesh.rotation.y = degToRad(y)

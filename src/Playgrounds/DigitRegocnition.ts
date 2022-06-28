@@ -1,6 +1,7 @@
 import PhysicsObject3d from "../PhysicsObject";
 import Modal from "../Modal";
 import PopUp from "../PopUps/PopUp";
+import Character from "../Character";
 
 
 export default class DigitRecognition {
@@ -42,9 +43,9 @@ export default class DigitRecognition {
         // await super.inist()
         this.initialized = true;
     }
-    public update(deltatime: number, characterBody: CANNON.Body, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]): void {
+    public update(deltatime: number, character: Character, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]): void {
         // super.update();
-        this.PopUp.update(deltatime, characterBody, intersects)
+        this.PopUp.update(deltatime, character, intersects)
     }
 
 

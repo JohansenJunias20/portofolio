@@ -22,7 +22,7 @@ export default class Plane {
         this.position = position;
         this.size = size;
 
-        const groundBody = new CANNON.Body({ mass: 0, material: { friction: 1, restitution: 0.1, id: 1, name: "test" }, shape: new CANNON.Box(new Vec3(size.x, 0.1, size.z)) });
+        const groundBody = new CANNON.Body({ mass: 0, material: { friction: 1, restitution: 3, id: 1, name: "test" }, shape: new CANNON.Box(new Vec3(size.x, 0.1, size.z)) });
         world.addBody(groundBody);
 
         const screenSize = {
@@ -69,7 +69,7 @@ export default class Plane {
         // this.material.uniforms.worldMatrix.value = worldMatrix;
         // this.material.needsUpdate = true;
     }
-    public async init() {
+    public init() {
         var geometry = new THREE.BufferGeometry();
         const vertices = this.createVertices();
         const indices = this.createIndices();
@@ -95,7 +95,7 @@ export default class Plane {
     initialized: boolean;
     update(deltatime: number) {
         //nothing to update
-        this.material.needsUpdate = true;
+        // this.material.needsUpdate = true;
     }
 
 

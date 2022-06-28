@@ -10,6 +10,7 @@ import PopUp from '../../PopUps/PopUp';
 import gsap from "gsap"
 import { Power1, Power2, Power3, Power4, Back } from "gsap"
 import setOpacity from '../../utility/setOpacity';
+import Character from '../../Character';
 
 interface AnimationCharacter {
     walk: THREE.AnimationAction;
@@ -149,10 +150,10 @@ export default class Contact extends PhysicsObject3d {
         }
     }
 
-    public customUpdate(deltatime: number, body: CANNON.Body, intersect: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
+    public customUpdate(deltatime: number, character: Character, intersect: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
         super.update(deltatime);
         if (this.popUp.initialized)
-            this.popUp.update(deltatime, body, intersect);
+            this.popUp.update(deltatime, character, intersect);
     }
 
 
