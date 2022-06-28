@@ -45,7 +45,7 @@ bash prod.sh
 |**Dockerize Coturn**|image coturn/coturn seems to be broken, planning to make own custom coturn image| ✅ |
 |**Chat**|Add chat so players can communicate with each other| |
 |**Nicknames**|Add nickname on top each player's character| |
-|**Smooth Movement P2P**|Make interpolation position between each data sent to peers|In Progress|
+|**Smooth Movement P2P**|Make interpolation position between each data sent to peers| ✅ |
 |**Night Mode**|Change theme to night when night in real life (UTC +7:00) ||
 |**Graphics Settings**|Add options to lower the graphics quality (remove shadow, lights, change characther's model, reduce the number of trees) ||
 <!-- ENDCOPY -->
