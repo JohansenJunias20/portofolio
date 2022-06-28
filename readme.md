@@ -5,21 +5,22 @@ See [Deploy Repository](https://github.com/JohansenJunias20/JohansenJunias20.git
 
 <br>
 <br>
-<!-- ## Development
-Run webpack build watch and nodemon websocket
+Please install [Git bash](https://git-scm.com/downloads) and [Docker](https://docs.docker.com/)  
+
+## Development
 ```sh
-    bash ./dev.sh
+bash dev.sh
 ```
-Please make sure [docker](https://docs.docker.com/) and [node](https://nodejs.org/en/) installed.   -->
+- Run webpack build watch and nodemon websocket
+- Only build files **not serve files**, you still need to serve `public/index.html` file with public folder as relative path. Please use [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)  
 
 ## Production
-Please install [Git bash](https://git-scm.com/downloads) and [Docker](https://docs.docker.com/)  
 
 ```sh
 bash prod.sh
 ```
-- Run Coturn Server, websocker server with forever, and build files  
-- Only build files **not serve files**, you still need to serve `public/index.html` file with public folder as relative path. Use [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)  
+- Run Coturn Server and websocket server and build files  
+- Only build files **not serve files**, you still need to serve `public/index.html` file with public folder as relative path. Please use [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)  
 <hr />
 
 <!-- COPY -->
@@ -46,6 +47,7 @@ bash prod.sh
 |**Nicknames**|Add nickname on top each player's character| |
 |**Smooth Movement P2P**|Make interpolation position between each data sent to peers|In Progress|
 |**Night Mode**|Change theme to night when night in real life (UTC +7:00) ||
+|**Graphics Settings**|Add options to lower the graphics quality (remove shadow, lights, change characther's model, reduce the number of trees) ||
 <!-- ENDCOPY -->
 
 ## Notes

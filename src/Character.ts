@@ -128,7 +128,7 @@ export default class Character extends PhysicsObject3d {
         // console.log({ posy: this.position.y, velocity: this.body.velocity.y })
         if (this.isPress[" "] && this.body.position.y <= 1.1) {
             console.log("SPACE JUMP")
-            this.body.applyForce(new CANNON.Vec3(0, 1000, 0), this.body.position);
+            this.body.applyForce(new CANNON.Vec3(0, 750, 0), this.body.position);
             this.isPress[" "] = false;
         }
     }

@@ -227,7 +227,7 @@ const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 const navigationBoards = new NavigationBoards(world, scene);
 
 const lobby = new Lobby(world, scene);
-const character = new Character(world, scene, new Vector3(0, 50, 5));
+const character = new Character(world, scene, new Vector3(0, 20, 5));
 const roadStones = new RoadStones(scene)
 
 const johansen = new Johansen(world, scene)
@@ -405,7 +405,7 @@ function animate() {
     // if (deltatime < 0.2)
     // world.step(config.world.step,);
     // console.log({ deltatime })
-    if (character.initialized && plane.initialized)
+    if (character.initialized && plane.initialized && initialized)
         world.step((1 / 60) * Math.min(0.1, deltatime) * 100);
     // world.step((1 / 60));
     // else return
@@ -562,7 +562,7 @@ function animate() {
             }
         }
     }
-
+    // console.log({ campos: camera.position });
 
     if (initialized) {
         if (waveEffect.range <= config.waveEffect.range.max) {
@@ -820,6 +820,8 @@ loading.onfull = () => {
     loading.hide()
     initialized = true;
     startHides = true;
+    followCharacter = false;
+    camera.position.set(25, 36.099988, 35);
     setTimeout(() => {
         startWaveEffect = true;
     }, 500);
