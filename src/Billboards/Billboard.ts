@@ -6,7 +6,7 @@ import { Color, Group, MeshPhongMaterial, PositionalAudio, Raycaster, Triangle, 
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { clamp, degToRad } from 'three/src/math/MathUtils';
-import Character from '../Character';
+import Character from '../Character/Character';
 import PopUp from '../PopUps/PopUp';
 import customShader from '../utility/customShader';
 import loadOBJ from '../utility/loadOBJ';

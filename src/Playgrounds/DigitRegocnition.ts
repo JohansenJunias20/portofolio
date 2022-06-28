@@ -1,7 +1,7 @@
 import PhysicsObject3d from "../PhysicsObject";
 import Modal from "../Modal";
 import PopUp from "../PopUps/PopUp";
-import Character from "../Character";
+import Character from "../Character/Character";
 
 
 export default class DigitRecognition {

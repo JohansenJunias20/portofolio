@@ -44,7 +44,7 @@ export default class Connection {
         }
         console.log("protocol")
         console.log(location.protocol)
-        console.log({ config:this.config })
+        console.log({ config: this.config })
 
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
         this.connected = true;
@@ -237,7 +237,8 @@ export default class Connection {
                     }
                     </div>`
             else
-                a = `<div  socketid="${key}" style="cursor:pointer;color:white;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;font-weight:normal;text-align:left;">guest${player.guest_id}
+                a = `<div  socketid="${key}" 
+                class="nickname_inactive">guest${player.guest_id}
                    ${player.countryCode ?
                         `<img
                     src="https://flagcdn.com/16x12/${player.countryCode.toLowerCase()}.png"
@@ -266,7 +267,32 @@ export default class Connection {
             // console.log({ element });
             // console.log("binded");
             (element as HTMLDivElement).onclick = () => {
+                this.setFocus(element.attributes.getNamedItem("socketid").value);
                 this.onPlayerNameClick(this.players[socketid], socketid);
+            }
+        }
+    }
+    //set focus on users board to the active player's nickname set to white
+    public setFocus(socketid: string) {
+        console.log({ socketid })
+        this.playerBoardDOM = document.querySelector("#players_board"); // rebind-ing because updateBillboard delete the old element
+        console.log({playerBoardDOM:this.playerBoardDOM})
+        for (let i = 0; i < this.playerBoardDOM.children.length; i++) {
+            const element = this.playerBoardDOM.children[i];
+            if (element.id == "title_board") continue; // ini bukan player tetapi jumlah player.. kita tidak mau listen ke element ini
+
+            const _socketid = element.getAttribute("socketid");
+            // console.log({ element });
+            // console.log("binded");
+            if (this.id == _socketid) {
+
+            }
+            else if (socketid == _socketid) {
+                (element as HTMLDivElement).className = "nickname_active ";
+                // alert("tke")
+            }
+            else {
+                (element as HTMLDivElement).className = "nickname_inactive ";
             }
         }
     }

@@ -1,7 +1,7 @@
 import { Vec3 } from 'cannon';
 import * as THREE from 'three';
 import { Clock, Group, Material, Mesh, MeshPhongMaterial, Raycaster, Shader, ShaderMaterial, Vector2, Vector3 } from 'three';
-import Character from './Character';
+import Character from './Character/Character';
 import * as CANNON from 'cannon';
 import Hotkeys from './Hotkeys/Hotkeys';
 const canvas: HTMLCanvasElement = document.querySelector("#bg");
@@ -655,7 +655,7 @@ function animate() {
             const { x, y, z } = character.mesh.position;
             var disiredPosition = new Vector3(x, y, z).add(CURRENT_OFFSET_CAMERA)
 
-            alpha += 0.15;
+            alpha += 1.5 * deltatime;
             // bila mau lebih smooth ganti lastPosCamUnfollPlayer dengan camera.position
             // tetapi cara itu tidak rekomen mengingat value camera.position berubah terus (padahal di lerp)
             const finalPosition = new Vector3().copy(lastPosCamUnfollPlayer).lerp(disiredPosition, clamp(alpha, 0, 1));
@@ -824,6 +824,7 @@ loading.onfull = () => {
     camera.position.set(25, 36.099988, 35);
     setTimeout(() => {
         startWaveEffect = true;
+        connection.setFocus(connection.id);
     }, 500);
     connection.connect();
     // waveEffect.range = 5000;

@@ -10,7 +10,7 @@ import PopUp from '../../PopUps/PopUp';
 import gsap from "gsap"
 import { Power1, Power2, Power3, Power4, Back } from "gsap"
 import setOpacity from '../../utility/setOpacity';
-import Character from '../../Character';
+import Character from '../../Character/Character';
 
 interface AnimationCharacter {
     walk: THREE.AnimationAction;

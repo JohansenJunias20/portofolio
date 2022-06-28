@@ -5,8 +5,8 @@ import * as THREE from 'three';
 import { Group, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { clamp } from 'three/src/math/MathUtils';
-import PhysicsObject3d from './PhysicsObject';
-import { WaveEffect } from './waveEffect';
+import PhysicsObject3d from '../PhysicsObject';
+import { WaveEffect } from '../waveEffect';
 declare var followCharacter: boolean;
 
 interface AnimationCharacter {
