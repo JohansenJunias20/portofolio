@@ -93,14 +93,14 @@ export default class Character extends PhysicsObject3d {
                 //tidak perlu di * delta time karena jumlah force tidak pengaruh karena batas maksimalnya adalah movementSpeed
                 //yang terpenting adalah kecepatan world.step() itu yang harus di kali deltatime karena kalau
                 //stepnya makin cepat maka hasil position yang dihasilkan dari force akan lebih sering terupdate
-                this.body.applyForce(new CANNON.Vec3(0, 0, -2000), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(0, 0, -70), this.body.position);
                 // this.body.velocity.z = -this.movementSpeed;
             }
             else if (this.isPress.s) {
                 //tidak perlu di * delta time karena jumlah force tidak pengaruh karena batas maksimalnya adalah movementSpeed
                 //yang terpenting adalah kecepatan world.step() itu yang harus di kali deltatime karena kalau
                 //stepnya makin cepat maka hasil position yang dihasilkan dari force akan lebih sering terupdate
-                this.body.applyForce(new CANNON.Vec3(0, 0, 2000), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(0, 0, 70), this.body.position);
                 // console.log("ADD FORCE")
                 // this.body.velocity.z = this.movementSpeed;
             }
@@ -114,21 +114,21 @@ export default class Character extends PhysicsObject3d {
                 //tidak perlu di * delta time karena jumlah force tidak pengaruh karena batas maksimalnya adalah movementSpeed
                 //yang terpenting adalah kecepatan world.step() itu yang harus di kali deltatime karena kalau
                 //stepnya makin cepat maka hasil position yang dihasilkan dari force akan lebih sering terupdate
-                this.body.applyForce(new CANNON.Vec3(-2000, 0, 0), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(-70, 0, 0), this.body.position);
                 // this.body.velocity.x = -this.movementSpeed;
             }
             if (this.isPress.d) {
                 //tidak perlu di * delta time karena jumlah force tidak pengaruh karena batas maksimalnya adalah movementSpeed
                 //yang terpenting adalah kecepatan world.step() itu yang harus di kali deltatime karena kalau
                 //stepnya makin cepat maka hasil position yang dihasilkan dari force akan lebih sering terupdate
-                this.body.applyForce(new CANNON.Vec3(2000, 0, 0), this.body.position);
+                this.body.applyForce(new CANNON.Vec3(70, 0, 0), this.body.position);
                 // this.body.velocity.x = this.movementSpeed;
             }
         }
         // console.log({ posy: this.position.y, velocity: this.body.velocity.y })
         if (this.isPress[" "] && this.body.position.y <= 1.1) {
             console.log("SPACE JUMP")
-            this.body.applyForce(new CANNON.Vec3(0, 1500, 0), this.body.position);
+            this.body.applyForce(new CANNON.Vec3(0, 1000, 0), this.body.position);
             this.isPress[" "] = false;
         }
     }

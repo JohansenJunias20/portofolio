@@ -26,8 +26,8 @@ const Config = {
         speed: 6
     },
     world: {
-        gravity: new CANNON.Vec3(0, -10, 0),
-        iteration: 40, //fps,
+        gravity: new CANNON.Vec3(0, -20, 0),
+        iteration: 60, //fps,
         step: 1 / 30
     },
     ground: {

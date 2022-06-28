@@ -227,7 +227,7 @@ const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 const navigationBoards = new NavigationBoards(world, scene);
 
 const lobby = new Lobby(world, scene);
-const character = new Character(world, scene, new Vector3(0, 5, 5));
+const character = new Character(world, scene, new Vector3(0, 50, 5));
 const roadStones = new RoadStones(scene)
 
 const johansen = new Johansen(world, scene)
@@ -406,9 +406,10 @@ function animate() {
     // world.step(config.world.step,);
     // console.log({ deltatime })
     if (character.initialized && plane.initialized)
-        // world.step((1 / 60) * Math.min(0.1, deltatime) * 100);
-        world.step((1 / 30) );
+        world.step((1 / 60) * Math.min(0.1, deltatime) * 100);
+    // world.step((1 / 60));
     // else return
+    // console.log((1 / 60) * Math.min(0.1, deltatime) * 80)
 
     raycast.setFromCamera(mouse, camera);
     const intersects = raycast.intersectObjects(scene.children); // diakses oleh floor fence mesh
