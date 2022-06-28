@@ -1,10 +1,12 @@
 # Portofolio
-## Source code of https://johansenjunias20.github.io
-See [Deploy Repository](https://github.com/JohansenJunias20/JohansenJunias20.github.io)  
 
+### Source code of https://johansenjunias20.github.io
+[Go to deploy repository](https://github.com/JohansenJunias20/JohansenJunias20.github.io)  
+## Reviewed by Web Programming Unpas
+https://www.youtube.com/watch?v=pjDYyyMh4rM&t=3997s
+![alt text](https://JohansenJunias20.github.io/thumbnail_wpu.png)
+<br>
 
-<br>
-<br>
 Please install [Git bash](https://git-scm.com/downloads) and [Docker](https://docs.docker.com/)  
 
 ## Development
@@ -13,6 +15,7 @@ bash dev.sh
 ```
 - Run webpack build watch and nodemon websocket
 - Only build files **not serve files**, you still need to serve `public/index.html` file with public folder as relative path. Please use [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)  
+
 
 ## Production
 
