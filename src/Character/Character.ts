@@ -2,11 +2,12 @@
 
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
-import { Group, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
+import { Group, PositionalAudio, ShaderMaterial, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { clamp } from 'three/src/math/MathUtils';
 import PhysicsObject3d from '../PhysicsObject';
 import { WaveEffect } from '../waveEffect';
+import NickName from './Nickname';
 declare var followCharacter: boolean;
 
 interface AnimationCharacter {
@@ -25,8 +26,9 @@ export default class Character extends PhysicsObject3d {
         url: `/assets/character/Ball FBX.fbx`,
         scale: new THREE.Vector3(0.01, 0.01, 0.01)
     }
-
-    constructor(world: CANNON.World, scene: THREE.Scene, position: Vector3, movementSpeed = 25) {
+    nickname: NickName;
+    camera: THREE.PerspectiveCamera;
+    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, position: Vector3, movementSpeed = 25) {
         super(world, scene, position, movementSpeed, "SPHERE", 2);
         this.isPress = {
             w: false,
@@ -35,7 +37,9 @@ export default class Character extends PhysicsObject3d {
             d: false,
             " ": false
         }
+        this.camera = camera;
         this.on = "lobby";
+        this.nickname = new NickName({ text: "" });
     }
     on: "lobby" | "knowledge" | "playground" | "portofolio"
     public async init() {
@@ -44,6 +48,8 @@ export default class Character extends PhysicsObject3d {
     }
     public update(deltatime: number) {
         super.update(deltatime);
+        // (this.mesh.material[0] as ShaderMaterial).
+        this.nickname.update(this.mesh, this.camera);
     }
     private isWalking: boolean;
     addResistance() {

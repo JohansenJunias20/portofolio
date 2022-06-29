@@ -227,7 +227,7 @@ const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 const navigationBoards = new NavigationBoards(world, scene);
 
 const lobby = new Lobby(world, scene);
-const character = new Character(world, scene, new Vector3(0, 20, 5));
+const character = new Character(world, scene, camera, new Vector3(0, 20, 5));
 const roadStones = new RoadStones(scene)
 
 const johansen = new Johansen(world, scene)
@@ -674,11 +674,11 @@ function animate() {
         }
 
         //bila offset posisi kamera sedang berubah maka camera lookAt harus diganti juga
-        if (!isCamUnderTransition) {
+        if (!offsetChanged) {
             // character.position.angleTo(camera.position)
             camera.lookAt(character.position)
         }
-        else{
+        else {
             // camera.get
         }
 
@@ -761,7 +761,7 @@ connection.onPlayerNameClick = (player: any, socketid: string) => {
     gotoPlayer(socketid);
 }
 connection.onnewplayer = async (id: string) => {
-    otherPlayers[id] = (new Character(world, scene, new Vector3(0, 150, 0), 0));
+    otherPlayers[id] = (new Character(world, scene, camera, new Vector3(0, 150, 0), 0));
     otherPlayers[id].followWaveEffect = false;
     await otherPlayers[id].init();
 
