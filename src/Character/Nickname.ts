@@ -36,9 +36,9 @@ export default class NickName {
         this.DOM.style.justifyContent = 'center';
         this.DOM.style.fontFamily = "'Montserrat', sans-serif";
         this.DOM.style.fontWeight = "bold";
-        this.DOM.style.color = "black"
+        this.DOM.style.color = "rgba(0,0,0,1)"
         this.DOM.style.alignItems = 'center';
-        this.DOM.style.border = '2px solid black';
+        this.DOM.style.border = '2px solid rgba(0,0,0,1)';
         this.DOM.style.opacity = `0`;
         // this.DOM.style.height = '50px';
         this.DOM.style.backgroundColor = "#f7b945";
@@ -74,6 +74,7 @@ export default class NickName {
     }
     lastGsap: gsap.core.Tween;
     update(position: THREE.Vector3, camera: THREE.PerspectiveCamera, leftMouseClick: boolean, followCharacter: boolean) {
+        if(this.isMainCharater) return;
         if (this.started) {
             var distance = position.distanceTo(camera.position);
             var minDistance = 37;
