@@ -123,6 +123,7 @@ export default class NickName {
     //start is called when all assets loaded
     //start will start respawn nickname animation
     public start() {
+        if(this.isMainCharater) return;
         gsap.to(this.DOM, {
             opacity: 1,
             ease: Linear.easeNone,
