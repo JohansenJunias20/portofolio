@@ -28,7 +28,7 @@ export default class Character extends PhysicsObject3d {
     }
     nickname: NickName;
     camera: THREE.PerspectiveCamera;
-    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, position: Vector3, movementSpeed = 25) {
+    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, position: Vector3, movementSpeed = 25, isMainCharacter: boolean = false) {
         super(world, scene, position, movementSpeed, "SPHERE", 2);
         this.isPress = {
             w: false,
@@ -39,17 +39,17 @@ export default class Character extends PhysicsObject3d {
         }
         this.camera = camera;
         this.on = "lobby";
-        this.nickname = new NickName();
+        this.nickname = new NickName(isMainCharacter);
     }
     on: "lobby" | "knowledge" | "playground" | "portofolio"
     public async init() {
         this.position.y += 5;
         await super.init()
     }
-    public update(deltatime: number) {
+    public update(deltatime: number, leftMouseClick: boolean = false, followCharacter: boolean = false) {
         super.update(deltatime);
         // (this.mesh.material[0] as ShaderMaterial).
-        this.nickname.update(this.mesh, this.camera);
+        this.nickname.update(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z), this.camera, leftMouseClick, followCharacter);
     }
     private isWalking: boolean;
     addResistance() {

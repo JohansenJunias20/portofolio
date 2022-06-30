@@ -1,13 +1,17 @@
+import * as THREE from "three";
+
 declare var hideModal: () => void;
 declare var showModal: () => void;
 export default class Modal {
     public parentDOM: HTMLDivElement
     private innerDOM: HTMLDivElement
+    public size: "small" | "large";
     public close: () => void
     public open: () => void
     private _Content: HTMLElement | string
-    constructor(content: HTMLElement | string) {
+    constructor(content: HTMLElement | string,size:"small"|"large" = "large") {
         this._Content = content;
+        this.size = size;
         this.parentDOM = document.querySelector("#modal")
         this.innerDOM = document.querySelector("#modal_content")
         this.close = hideModal;
@@ -20,6 +24,18 @@ export default class Modal {
             else
                 ref.innerDOM.appendChild(ref._Content)
             console.log({ content: ref._Content })
+            if(size == "small"){
+                ref.innerDOM.style.minWidth = "300px";
+                ref.innerDOM.style.maxWidth = "600px";
+                ref.innerDOM.style.height = "15%";
+                ref.innerDOM.style.width = "20%";
+            }
+            else if (size == "large"){
+                ref.innerDOM.style.minWidth = "600px";
+                ref.innerDOM.style.maxWidth = "900px";
+                ref.innerDOM.style.height = "75%";
+                ref.innerDOM.style.width = "75%";
+            }
             showModal();
         };
     }

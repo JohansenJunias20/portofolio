@@ -2,6 +2,7 @@ import { PCFShadowMap } from 'three';
 import { io, Socket } from 'socket.io-client';
 import getCountry from '../utility/getCountry';
 import capitalizeFirstLetter from '../utility/UpperCaseFirstLetter';
+import Modal from '../Modal';
 
 interface IHash<T> {
     [details: string]: T;
@@ -26,6 +27,7 @@ export default class Connection {
     pending_candidates: Array<RTCIceCandidateInit>;
     connected: boolean;
     playerBoardDOM: HTMLDivElement;
+    modalChangeNickname: Modal;
     onrecievePlayers: (players: {
         [socketid: string]: {
             guest_id: string;
@@ -43,6 +45,73 @@ export default class Connection {
         this.remoteDataChannels = {}
         this.playerCount = 0;
         this.pending_candidates = []
+
+        var div = document.createElement("div");
+        div.style.display = "flex";
+        div.style.justifyContent = "center";
+        div.style.alignItems = "center";
+        div.style.width = "100%";
+        div.style.height = "100%";
+        var title = document.createElement("h5");
+        //set font to montserrat
+        title.style.fontFamily = "'Montserrat', sans-serif";
+        title.style.fontWeight = "bold";
+        title.style.textAlign = "center";
+        //set margin to 0
+        title.style.margin = "0";
+        title.innerHTML = "Set your nickname";
+        var innerDiv = document.createElement("div");
+
+        innerDiv.appendChild(title);
+        var input = document.createElement("input");
+        //make input style with game theme style
+        input.style.border = "none";
+        input.style.borderRadius = "5px";
+        input.style.padding = "5px";
+        input.style.outline = "1px solid #fac020";
+        input.style.textAlign = "center";
+        input.style.margin = "0";
+        input.style.marginTop = "5px";
+        input.style.fontFamily = "'Montserrat', sans-serif";
+        input.id = "input-nickname"
+        //create button with style=display:block; margin-left: auto; border-color: transparent;cursor: pointer; margin-right: auto; padding: 8px; border-radius: 3px; font-weight: bold; font-size: 1rem; background-color: #F0B93A;
+
+        var button = document.createElement("button");
+        button.style.display = "block";
+        button.style.marginLeft = "auto";
+        button.style.borderColor = "transparent";
+        button.style.cursor = "pointer";
+        button.style.marginRight = "auto";
+        button.style.marginTop = "4px";
+        button.style.padding = "4px";
+        button.style.borderRadius = "3px";
+        // button.style.fontWeight = "bold";
+        // button.style.fontSize = "1rem";
+        button.style.backgroundColor = "#F0B93A";
+        button.innerHTML = "Set";
+        button.addEventListener("click", () => {
+            if (input.value.length > 0) {
+                // ref.myName = input.value;
+                // ref.myName = capitalizeFirstLetter(ref.myName);
+                ref.signalling.emit("nickname", input.value, ({ status, reason }: any) => {
+                    if (status)
+                        ref.modalChangeNickname.close();
+                    else
+                        alert(reason);
+                });
+            }
+            //set outline to red for few seconds
+            input.style.outline = "1px solid red";
+            setTimeout(() => {
+                input.style.outline = "1px solid #fac020";
+            }
+                , 1000);
+        })
+        innerDiv.appendChild(input)
+        innerDiv.appendChild(button);
+        div.appendChild(innerDiv);
+        this.modalChangeNickname = new Modal(div, "small");
+        // this.modalChangeNickname.open()
         this.config = {
             iceServers: [
                 { urls: "stun:stun.budgetphone.nl:3478" },
@@ -172,10 +241,14 @@ export default class Connection {
         ref.signalling.on("initialized", () => {
             ref.initCountry();
         })
-        ref.signalling.on("players", async (players: { [socketid: string]: { guest_id: string, countryCode?: string } }) => { // whenever socket connected to server, server rebroadcast players
+        ref.signalling.on("players", async (players: { [socketid: string]: { guest_id: string, nickname?: string, countryCode?: string } }) => { // whenever socket connected to server, server rebroadcast players
             ref.players = players;
-            ref.nickname = `guest${players[ref.id].guest_id}`;
-            
+            //if nickname is set then automatically set the nickname directly
+            if (players[ref.id].nickname)
+                ref.nickname = `${players[ref.id].nickname}`;
+            else
+                ref.nickname = `guest${players[ref.id].guest_id}`;
+
             console.log({ players: ref.players })
             console.log({ nickname: ref.nickname })
             if (ref.onrecievePlayers)
@@ -216,7 +289,7 @@ export default class Connection {
         this.myCountryCode = response.countryCode; // trigger updateBillboard()
         this.signalling.emit("country", response.countryCode);
     }
-    players: { [socketid: string]: { guest_id: string, countryCode?: string } }
+    players: { [socketid: string]: { guest_id: string, countryCode?: string, nickname?: string } }
     onleft: (id: string) => any;
     onnewplayer: (id: string) => any;
     onrecieve: (e: any) => any;
@@ -235,7 +308,7 @@ export default class Connection {
             if (key == ref.id)
                 a = `<div socketid="${key}"
                     style="cursor:pointer;color:#fff700;font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-                    font-weight:normal;text-align:left;">guest${player.guest_id}
+                    font-weight:normal;text-align:left;">${ref.nickname}
                     ${ref.myCountryCode &&
                     `<img
                         src="https://flagcdn.com/16x12/${this.myCountryCode.toLowerCase()}.png"
@@ -245,10 +318,12 @@ export default class Connection {
                         height="12"
                         alt="indonesia flag">`
                     }
+                    <img  id="edit"
+                    src="/assets/edit.png" style="width:16px;filter: brightness(0) invert(1);" />
                     </div>`
             else
                 a = `<div  socketid="${key}" 
-                class="nickname_inactive">guest${player.guest_id}
+                class="nickname_inactive">${player.nickname ? player.nickname : `guest${player.guest_id}`}
                    ${player.countryCode ?
                         `<img
                     src="https://flagcdn.com/16x12/${player.countryCode.toLowerCase()}.png"
@@ -263,7 +338,13 @@ export default class Connection {
             html = `${html}${a}`;
         }
         html += "</div>"
+        //listen on edit icon click
         ref.boardDOM.innerHTML = html;
+        document.querySelector("#edit").addEventListener("click", () => {
+            ref.modalChangeNickname.open();
+            (document.querySelector("#input-nickname") as HTMLInputElement).value = ref.nickname;
+        }
+        )
         ref.bindDOMlistener();
     }
     bindDOMlistener() {

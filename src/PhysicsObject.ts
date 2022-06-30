@@ -147,9 +147,9 @@ export default class PhysicsObject3d {
 
     }
     public update(deltatime: number) {
-        this.mesh.position.copy(this.position);
         this.resetOpacity(deltatime);
         this.updatePhysics(deltatime);
+        this.mesh.position.copy(this.position);
     }
     protected walk(deltatime: number) {
     }
@@ -322,21 +322,21 @@ export default class PhysicsObject3d {
             this.body.position.copy(this.position as any);
         }
         else {
-            // this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
-            if(this.lastTween) this.lastTween.kill();
-            this.lastTween = gsap.to(this.position, {
-                duration: 0.05,
-                ...this.body.position,
-                // ease: Back.easeOut.config(Config.waveEffect.overshoot),
-                onComplete: () => {
-                    // ref.addBody();
-                    // ref.body.mass = ref.originMass;
-                    // ref.body.updateMassProperties();
-                    // ref.body.position.copy(ref.position)
-                    // ref.body.updateMassProperties();
+            this.position.copy(new Vector3(this.body.position.x, this.body.position.y, this.body.position.z));
+            // if(this.lastTween) this.lastTween.kill();
+            // this.lastTween = gsap.to(this.position, {
+            //     duration: 0.0,
+            //     ...this.body.position,
+            //     // ease: Back.easeOut.config(Config.waveEffect.overshoot),
+            //     onComplete: () => {
+            //         // ref.addBody();
+            //         // ref.body.mass = ref.originMass;
+            //         // ref.body.updateMassProperties();
+            //         // ref.body.position.copy(ref.position)
+            //         // ref.body.updateMassProperties();
 
-                }
-            })
+            //     }
+            // })
         }
         this.mesh.quaternion.copy(this.body.quaternion as any);
     }

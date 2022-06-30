@@ -227,7 +227,7 @@ const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 const navigationBoards = new NavigationBoards(world, scene);
 
 const lobby = new Lobby(world, scene);
-const character = new Character(world, scene, camera, new Vector3(0, 20, 5));
+const character = new Character(world, scene, camera, new Vector3(0, 20, 5), 25, true);
 const roadStones = new RoadStones(scene)
 
 const johansen = new Johansen(world, scene)
@@ -447,7 +447,8 @@ function animate() {
 
         }
         touchPos.isMoved = false; //reset
-        character.update(deltatime);
+        //leftmousedown digunakan nickname untuk mengubah durasi gsap
+        character.update(deltatime, leftMouseDown, followCharacter); //customupdate karena tambah 1 parameter leftmousedown
 
     }
     if (hotkeys.initialized) {
@@ -723,7 +724,7 @@ connection.onrecieve = (e) => {
     switch (message.channel) {
         case "transform":
             message.id = message.id.toString();
-            if(!otherPlayers[message.id]) return;
+            if (!otherPlayers[message.id]) return;
             // otherPlayers[message.id].position.copy(message.position);
             gsap.to(otherPlayers[message.id].position, {
                 duration: 0.3,
@@ -844,7 +845,9 @@ loading.onfull = () => {
         startWaveEffect = true;
         connection.setFocus(connection.id);
     }, 500);
-
+    setTimeout(() => {
+        character.nickname.start();
+    }, 1000);
     connection.connect();
 
     // waveEffect.range = 5000;ads
