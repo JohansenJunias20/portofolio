@@ -1,7 +1,7 @@
 import { Vec3 } from 'cannon';
 import * as THREE from 'three';
 import { Clock, Group, Material, Mesh, MeshPhongMaterial, Raycaster, Shader, ShaderMaterial, Vector2, Vector3 } from 'three';
-import Character from './Character';
+import Character from './Character/Character';
 import * as CANNON from 'cannon';
 import Hotkeys from './Hotkeys/Hotkeys';
 const canvas: HTMLCanvasElement = document.querySelector("#bg");
@@ -11,7 +11,7 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
-console.log("v2.0");//just to make sure on production mode ts compiled correctly (newest version)
+console.log("v2.1");//just to make sure on production mode ts compiled correctly (newest version)
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true,
@@ -65,7 +65,7 @@ const sizeGround = config.ground.size;
 const plane = new Plane(world, scene, new THREE.Vector3(0, 0, 0), sizeGround);
 plane.init()
 
-var followCharacter = true;
+var followCharacter = false;
 var leftMouseDown = false;
 canvas.onmousedown = (e) => {
 
@@ -227,7 +227,7 @@ const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 const navigationBoards = new NavigationBoards(world, scene);
 
 const lobby = new Lobby(world, scene);
-const character = new Character(world, scene, new Vector3(0, 20, 5));
+const character = new Character(world, scene, camera, new Vector3(0, 20, 5), 25, true);
 const roadStones = new RoadStones(scene)
 
 const johansen = new Johansen(world, scene)
@@ -277,6 +277,7 @@ document.onkeydown = (e) => {
     }
     character.isPress[key] = true;
     followCharacter = true;
+    isCamUnderTransition = true;
 
 }
 
@@ -400,6 +401,8 @@ var cameraPos = new THREE.Vector3();
 var cameraDir = new THREE.Vector3();
 var lastPosCamUnfollPlayer = new THREE.Vector3(); // posisi kamera terakhir saat unfollow player
 const raycast2 = new THREE.Raycaster();
+var isCamUnderTransition = false; //saat follow character false -> true ini di set true sehingga kamera lookAt berpindah ke posisi karakter secara pelan-pelan
+var alphaTransition = 0; // alpha used for lerp transition camera lookat target position
 function animate() {
     deltatime = clock.getDelta()
     // if (deltatime < 0.2)
@@ -414,8 +417,10 @@ function animate() {
     raycast.setFromCamera(mouse, camera);
     const intersects = raycast.intersectObjects(scene.children); // diakses oleh floor fence mesh
 
-
-    document.body.style.cursor = "grab";
+    if (!leftMouseDown)
+        document.body.style.cursor = "grab";
+    else
+        document.body.style.cursor = "grabbing";
     //#region update mesh & body
     if (trees.initialized) {
         trees.setWaveEffect(waveEffect)
@@ -442,7 +447,8 @@ function animate() {
 
         }
         touchPos.isMoved = false; //reset
-        character.update(deltatime);
+        //leftmousedown digunakan nickname untuk mengubah durasi gsap
+        character.update(deltatime, leftMouseDown, followCharacter); //customupdate karena tambah 1 parameter leftmousedown
 
     }
     if (hotkeys.initialized) {
@@ -655,13 +661,14 @@ function animate() {
             const { x, y, z } = character.mesh.position;
             var disiredPosition = new Vector3(x, y, z).add(CURRENT_OFFSET_CAMERA)
 
-            alpha += 0.15;
+            alpha += 1.5 * deltatime;
             // bila mau lebih smooth ganti lastPosCamUnfollPlayer dengan camera.position
             // tetapi cara itu tidak rekomen mengingat value camera.position berubah terus (padahal di lerp)
             const finalPosition = new Vector3().copy(lastPosCamUnfollPlayer).lerp(disiredPosition, clamp(alpha, 0, 1));
             camera.position.copy(finalPosition)
             if (clamp(alpha, 0, 1) >= 1) {
                 // camera.lookAt(character.position); // lookAt juga perlu di lerp
+                isCamUnderTransition = false;
             }
             else {
                 // offsetChanged = false; // ini ketriggered membuat saat transisi kamera billbaord langsung rusak
@@ -671,13 +678,18 @@ function animate() {
 
         //bila offset posisi kamera sedang berubah maka camera lookAt harus diganti juga
         if (offsetChanged) {
+            // character.position.angleTo(camera.position)
             camera.lookAt(character.position)
+        }
+        else {
+            // camera.get
         }
 
     }
     else {
         alpha = 0.0;
         lastPosCamUnfollPlayer = camera.position.clone();
+
     }
 
 
@@ -699,6 +711,10 @@ animate();
 
 
 const connection = new Connection();
+connection.onrecievePlayers = (players: any) => {
+    // if (character.initialized)
+    character.nickname.text = connection.nickname;
+}
 // const joinButton: HTMLButtonElement = document.querySelector('#join');
 // joinButton.onclick = () => {
 // }
@@ -708,6 +724,7 @@ connection.onrecieve = (e) => {
     switch (message.channel) {
         case "transform":
             message.id = message.id.toString();
+            if (!otherPlayers[message.id]) return;
             // otherPlayers[message.id].position.copy(message.position);
             gsap.to(otherPlayers[message.id].position, {
                 duration: 0.3,
@@ -752,8 +769,9 @@ connection.onPlayerNameClick = (player: any, socketid: string) => {
     gotoPlayer(socketid);
 }
 connection.onnewplayer = async (id: string) => {
-    otherPlayers[id] = (new Character(world, scene, new Vector3(0, 150, 0), 0));
+    otherPlayers[id] = (new Character(world, scene, camera, new Vector3(0, 150, 0), 0));
     otherPlayers[id].followWaveEffect = false;
+    otherPlayers[id].nickname.text = `guest${connection.players[id].guest_id}`;
     await otherPlayers[id].init();
 
     otherPlayers[id].body.mass = 0;//not affected to gravity
@@ -761,6 +779,7 @@ connection.onnewplayer = async (id: string) => {
 connection.onleft = async (id: string) => {
     scene.remove(otherPlayers[id].mesh);
     world.remove(otherPlayers[id].body);
+    otherPlayers[id].nickname.clear();
     delete otherPlayers[id];
 }
 var startWaveEffect = false;
@@ -824,9 +843,14 @@ loading.onfull = () => {
     camera.position.set(25, 36.099988, 35);
     setTimeout(() => {
         startWaveEffect = true;
+        connection.setFocus(connection.id);
     }, 500);
+    setTimeout(() => {
+        character.nickname.start();
+    }, 1000);
     connection.connect();
-    // waveEffect.range = 5000;
+
+    // waveEffect.range = 5000;ads
     //     setInterval(() => {
     //         waveEffect.range += 10;
     //     }, 500);

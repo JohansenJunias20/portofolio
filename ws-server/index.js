@@ -74,6 +74,11 @@ io.on("connection", (socket) => {
         io.to(id).emit("rm_ready", socket.id);
 
     })
+    socket.on("nickname", (nickname, callback) => {
+        IDs[socket.id].nickname = nickname;
+        io.emit("players", IDs);
+        callback({ status: true });
+    })
     IDs[socket.id] = {
         guest_id: (() => {
             //random until get the unique id
@@ -93,7 +98,7 @@ io.on("connection", (socket) => {
         socket.emit("first?", true)
     }
     io.emit("players", IDs);
-    io.emit("initialized",true);
+    io.emit("initialized", true);
     console.log("emitting IDs", IDs)
     // console.log({ IDs })
     console.log(`someone made connection ${socket.id}`)
@@ -103,7 +108,7 @@ io.on("connection", (socket) => {
 // });
 httpServer.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
     console.log("done1");
-    console.log({ssl,port:process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT})
-    
+    console.log({ ssl, port: process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT })
+
 
 })

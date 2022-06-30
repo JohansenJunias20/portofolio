@@ -2,7 +2,7 @@ import gsap, { normalize } from "gsap/all";
 import isMobile from "is-mobile";
 import { Vector2 } from "three";
 import { clamp } from "three/src/math/MathUtils";
-import Character from "./Character";
+import Character from "./Character/Character";
 declare var production: boolean;
 
 export default class Joystick {

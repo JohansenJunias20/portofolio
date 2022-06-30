@@ -7,7 +7,7 @@ import isintersect from "../utility/isPopUpIntersect";
 import Modal from "../Modal";
 import vertShader from "../../public/assets/shaders/popup.vert"
 import fragShader from "../../public/assets/shaders/popup.frag"
-import Character from "../Character";
+import Character from "../Character/Character";
 
 export default class PopUp {
     vert: string;

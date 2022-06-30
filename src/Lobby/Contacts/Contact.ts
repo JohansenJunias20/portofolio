@@ -10,7 +10,7 @@ import PopUp from '../../PopUps/PopUp';
 import gsap from "gsap"
 import { Power1, Power2, Power3, Power4, Back } from "gsap"
 import setOpacity from '../../utility/setOpacity';
-import Character from '../../Character';
+import Character from '../../Character/Character';
 
 interface AnimationCharacter {
     walk: THREE.AnimationAction;
@@ -111,7 +111,6 @@ export default class Contact extends PhysicsObject3d {
                 },
                 ease: Power1.easeInOut
             }, "end")
-            console.log("begin up!")
 
             if (ref.tldown) {
                 ref.tldown.kill();
@@ -122,7 +121,6 @@ export default class Contact extends PhysicsObject3d {
         }
         this.popUp.onEndDown = () => {
             if (!ref.initialized) return;
-            console.log("end down!")
             if (ref.tl) {
                 ref.tl.pause();
                 ref.tl.clear();

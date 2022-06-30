@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { degToRad } from "three/src/math/MathUtils";
-import Character from "../../Character";
+import Character from "../../Character/Character";
 import Wrapper from "../../Wrapper";
 import Contact from "./Contact";
 
