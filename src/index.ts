@@ -417,8 +417,10 @@ function animate() {
     raycast.setFromCamera(mouse, camera);
     const intersects = raycast.intersectObjects(scene.children); // diakses oleh floor fence mesh
 
-
-    document.body.style.cursor = "grab";
+    if (!leftMouseDown)
+        document.body.style.cursor = "grab";
+    else
+        document.body.style.cursor = "grabbing";
     //#region update mesh & body
     if (trees.initialized) {
         trees.setWaveEffect(waveEffect)
@@ -674,7 +676,7 @@ function animate() {
         }
 
         //bila offset posisi kamera sedang berubah maka camera lookAt harus diganti juga
-        if (!offsetChanged) {
+        if (offsetChanged) {
             // character.position.angleTo(camera.position)
             camera.lookAt(character.position)
         }
@@ -708,6 +710,10 @@ animate();
 
 
 const connection = new Connection();
+connection.onrecievePlayers = (players: any) => {
+    // if (character.initialized)
+    character.nickname.text = connection.nickname;
+}
 // const joinButton: HTMLButtonElement = document.querySelector('#join');
 // joinButton.onclick = () => {
 // }
@@ -717,6 +723,7 @@ connection.onrecieve = (e) => {
     switch (message.channel) {
         case "transform":
             message.id = message.id.toString();
+            if(!otherPlayers[message.id]) return;
             // otherPlayers[message.id].position.copy(message.position);
             gsap.to(otherPlayers[message.id].position, {
                 duration: 0.3,
@@ -763,6 +770,7 @@ connection.onPlayerNameClick = (player: any, socketid: string) => {
 connection.onnewplayer = async (id: string) => {
     otherPlayers[id] = (new Character(world, scene, camera, new Vector3(0, 150, 0), 0));
     otherPlayers[id].followWaveEffect = false;
+    otherPlayers[id].nickname.text = `guest${connection.players[id].guest_id}`;
     await otherPlayers[id].init();
 
     otherPlayers[id].body.mass = 0;//not affected to gravity
@@ -770,6 +778,7 @@ connection.onnewplayer = async (id: string) => {
 connection.onleft = async (id: string) => {
     scene.remove(otherPlayers[id].mesh);
     world.remove(otherPlayers[id].body);
+    otherPlayers[id].nickname.clear();
     delete otherPlayers[id];
 }
 var startWaveEffect = false;
@@ -835,8 +844,10 @@ loading.onfull = () => {
         startWaveEffect = true;
         connection.setFocus(connection.id);
     }, 500);
+
     connection.connect();
-    // waveEffect.range = 5000;
+
+    // waveEffect.range = 5000;ads
     //     setInterval(() => {
     //         waveEffect.range += 10;
     //     }, 500);

@@ -39,7 +39,7 @@ export default class Character extends PhysicsObject3d {
         }
         this.camera = camera;
         this.on = "lobby";
-        this.nickname = new NickName({ text: "" });
+        this.nickname = new NickName();
     }
     on: "lobby" | "knowledge" | "playground" | "portofolio"
     public async init() {

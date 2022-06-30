@@ -26,6 +26,12 @@ export default class Connection {
     pending_candidates: Array<RTCIceCandidateInit>;
     connected: boolean;
     playerBoardDOM: HTMLDivElement;
+    onrecievePlayers: (players: {
+        [socketid: string]: {
+            guest_id: string;
+            countryCode?: string;
+        };
+    }) => void;
     constructor() {
         const ref = this;
         this.AM_I_RM = false;
@@ -44,7 +50,6 @@ export default class Connection {
         }
         console.log("protocol")
         console.log(location.protocol)
-        console.log({ config: this.config })
 
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
         this.connected = true;
@@ -169,6 +174,12 @@ export default class Connection {
         })
         ref.signalling.on("players", async (players: { [socketid: string]: { guest_id: string, countryCode?: string } }) => { // whenever socket connected to server, server rebroadcast players
             ref.players = players;
+            ref.nickname = `guest${players[ref.id].guest_id}`;
+            
+            console.log({ players: ref.players })
+            console.log({ nickname: ref.nickname })
+            if (ref.onrecievePlayers)
+                ref.onrecievePlayers(ref.players);
             ref.updateBillboard();
             // ref.playerCount = count;
         })
@@ -176,6 +187,7 @@ export default class Connection {
             ref.id = id;
         })
     }
+    public nickname: string;
     public boardDOM: HTMLDivElement;
     public AM_I_RM: boolean;
     public playerCount: number;
@@ -190,8 +202,6 @@ export default class Connection {
     }
     public connect() {
         this.connectSignal = true; //memberi tahu kpd signal "first?" bahwa fungsi connect() sudah kepanggil
-        // console.log("fs from connect", this.firstSignal)
-        // console.log("1connecting...")
 
         if (this.AM_I_RM) return; //jika RM maka tidak perlu emit join, biarkan CL(client) yang join
         this.signalling.emit("join");
@@ -264,8 +274,6 @@ export default class Connection {
             if (element.id == "title_board") continue; // ini bukan player tetapi jumlah player.. kita tidak mau listen ke element ini
 
             const socketid = element.getAttribute("socketid");
-            // console.log({ element });
-            // console.log("binded");
             (element as HTMLDivElement).onclick = () => {
                 this.setFocus(element.attributes.getNamedItem("socketid").value);
                 this.onPlayerNameClick(this.players[socketid], socketid);
@@ -274,16 +282,12 @@ export default class Connection {
     }
     //set focus on users board to the active player's nickname set to white
     public setFocus(socketid: string) {
-        console.log({ socketid })
         this.playerBoardDOM = document.querySelector("#players_board"); // rebind-ing because updateBillboard delete the old element
-        console.log({playerBoardDOM:this.playerBoardDOM})
         for (let i = 0; i < this.playerBoardDOM.children.length; i++) {
             const element = this.playerBoardDOM.children[i];
             if (element.id == "title_board") continue; // ini bukan player tetapi jumlah player.. kita tidak mau listen ke element ini
 
             const _socketid = element.getAttribute("socketid");
-            // console.log({ element });
-            // console.log("binded");
             if (this.id == _socketid) {
 
             }
@@ -313,7 +317,6 @@ export default class Connection {
         }
 
         // this.DataChannels.send(message);
-        // console.log({ length: this.remoteDataChannels.length })
         // for (let i = 0; i < this.remoteDataChannels.length; i++) {
         //     const element = this.remoteDataChannels[i];
         //     element.send(message)
