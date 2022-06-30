@@ -111,7 +111,6 @@ export default class Contact extends PhysicsObject3d {
                 },
                 ease: Power1.easeInOut
             }, "end")
-            console.log("begin up!")
 
             if (ref.tldown) {
                 ref.tldown.kill();
@@ -122,7 +121,6 @@ export default class Contact extends PhysicsObject3d {
         }
         this.popUp.onEndDown = () => {
             if (!ref.initialized) return;
-            console.log("end down!")
             if (ref.tl) {
                 ref.tl.pause();
                 ref.tl.clear();

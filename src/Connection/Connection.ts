@@ -249,7 +249,6 @@ export default class Connection {
             else
                 ref.nickname = `guest${players[ref.id].guest_id}`;
 
-            console.log({ players: ref.players })
             console.log({ nickname: ref.nickname })
             if (ref.onrecievePlayers)
                 ref.onrecievePlayers(ref.players);
