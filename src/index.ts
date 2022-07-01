@@ -778,7 +778,7 @@ connection.onPlayerNameClick = (player: any, socketid: string) => {
 connection.onnewplayer = async (id: string) => {
     otherPlayers[id] = (new Character(world, scene, camera, new Vector3(0, 150, 0), 0));
     otherPlayers[id].followWaveEffect = false;
-    otherPlayers[id].nickname.text = `guest${connection.players[id].guest_id}`;
+    otherPlayers[id].nickname.text = connection.players[id].nickname ? connection.players[id].nickname : `guest${connection.players[id].guest_id}`;
     await otherPlayers[id].init();
 
     otherPlayers[id].body.mass = 0;//not affected to gravity
