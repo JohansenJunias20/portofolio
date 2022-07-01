@@ -692,18 +692,19 @@ function animate() {
 
     }
 
-
-
-    if (connection && connection.connected && character.body && connection.id && Math.floor(ticks) >= 10) {
+    if (connection && connection.connected && character.body && connection.id && ticks >= 0.1) {
+        console.log({ duration: _clock.getDelta().toFixed(4) })
         connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
-        ticks = 0;
+        ticks = 0.0;
     }
-    ticks += 300 * (1 - Math.pow(0.001, deltatime));
+    ticks += deltatime;
     if (initialized)
         renderer.render(scene, camera)
     requestAnimationFrame(animate);
 
 }
+const _clock = new Clock()
+
 var ticks = 0.0;
 // import { TweenLite } from 'gsap/all';
 // const test = TweenLite.fromTo({x:0,y:0,z:0},durat)
@@ -725,6 +726,7 @@ connection.onrecievePlayers = (players: IHash<any>) => {
 // const joinButton: HTMLButtonElement = document.querySelector('#join');
 // joinButton.onclick = () => {
 // }
+// var lastTween
 connection.onrecieve = (e) => {
     // console.log(e.data)
     const message = JSON.parse(e.data);
@@ -732,11 +734,19 @@ connection.onrecieve = (e) => {
         case "transform":
             message.id = message.id.toString();
             if (!otherPlayers[message.id]) return;
+            if(otherPlayers[message.id].lastTweenPos){
+                otherPlayers[message.id].lastTweenPos.pause();
+                otherPlayers[message.id].lastTweenPos.kill();
+            }
+            if(otherPlayers[message.id].lastTweenRot){
+                otherPlayers[message.id].lastTweenRot.pause();
+                otherPlayers[message.id].lastTweenRot.kill();
+            }
             // otherPlayers[message.id].position.copy(message.position);
-            gsap.to(otherPlayers[message.id].position, {
-                duration: 0.3,
+            otherPlayers[message.id].lastTweenPos = gsap.to(otherPlayers[message.id].position, {
+                duration: 0.095,
                 ...message.position,
-                // ease: Back.easeOut.config(Config.waveEffect.overshoot),
+                ease:Linear.easeNone,// ease: Back.easeOut.config(Config.waveEffect.overshoot),
                 onComplete: () => {
                     // ref.addBody();
                     // ref.body.mass = ref.originMass;
@@ -746,12 +756,13 @@ connection.onrecieve = (e) => {
 
                 }
             })
-            gsap.to(otherPlayers[message.id].body.quaternion, {
-                duration: 0.3,
+            otherPlayers[message.id].lastTweenRot = gsap.to(otherPlayers[message.id].body.quaternion, {
+                duration: 0.095,
                 ...message.quaternion,
                 onUpdate: () => {
                     otherPlayers[message.id].body.angularVelocity.setZero()
                 },
+                ease:Linear.easeNone,
                 // ease: Back.easeOut.config(Config.waveEffect.overshoot),
                 onComplete: () => {
                     // ref.addBody();
@@ -865,7 +876,7 @@ loading.onfull = () => {
 var startHides = false;
 init();
 
-import gsap from "gsap"
+import gsap, { Linear } from "gsap"
 import Contacts from './Lobby/Contacts/Contacts';
 function gotoPlayer(socketid: string) {
     if (socketid == connection.id) return; // yang dipencet username diri sendiri.

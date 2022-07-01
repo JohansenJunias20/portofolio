@@ -21,6 +21,8 @@ export default class Character extends PhysicsObject3d {
         d: boolean,
         " ": boolean
     }
+    lastTweenPos:gsap.core.Tween
+    lastTweenRot:gsap.core.Tween
     asset = {
         castShadow: true,
         url: `/assets/character/Ball FBX.fbx`,
