@@ -711,9 +711,16 @@ animate();
 
 
 const connection = new Connection();
-connection.onrecievePlayers = (players: any) => {
+connection.onrecievePlayers = (players: IHash<any>) => {
     // if (character.initialized)
     character.nickname.text = connection.nickname;
+    //rename each nickname otherplayer based on players
+    for (let key in players) {
+        if (key != connection.id) {
+            otherPlayers[key].nickname.text = players[key].nickname ? players[key].nickname : `guest${players[key].guest_id}`;
+        }
+    }
+
 }
 // const joinButton: HTMLButtonElement = document.querySelector('#join');
 // joinButton.onclick = () => {

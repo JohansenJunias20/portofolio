@@ -94,8 +94,9 @@ export default class Connection {
                 // ref.myName = input.value;
                 // ref.myName = capitalizeFirstLetter(ref.myName);
                 ref.signalling.emit("nickname", input.value, ({ status, reason }: any) => {
-                    if (status)
+                    if (status) {
                         ref.modalChangeNickname.close();
+                    }
                     else
                         alert(reason);
                 });
