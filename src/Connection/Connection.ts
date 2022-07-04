@@ -1,8 +1,9 @@
-import { PCFShadowMap } from 'three';
+import { PCFShadowMap, Vector3 } from 'three';
 import { io, Socket } from 'socket.io-client';
 import getCountry from '../utility/getCountry';
 import capitalizeFirstLetter from '../utility/UpperCaseFirstLetter';
 import Modal from '../Modal';
+import { Quaternion } from 'cannon';
 
 interface IHash<T> {
     [details: string]: T;
@@ -289,7 +290,7 @@ export default class Connection {
         this.myCountryCode = response.countryCode; // trigger updateBillboard()
         this.signalling.emit("country", response.countryCode);
     }
-    players: { [socketid: string]: { guest_id: string, countryCode?: string, nickname?: string } }
+    players: { [socketid: string]: { guest_id: string, countryCode?: string, nickname?: string, lastPos?: CANNON.Vec3, lastQuaternion?: Quaternion } }
     onleft: (id: string) => any;
     onnewplayer: (id: string) => any;
     onrecieve: (e: any) => any;
@@ -406,5 +407,8 @@ export default class Connection {
         //     dc.send(message);
         // })
 
+    }
+    public emit(channel: string, message: any) {
+        this.signalling.emit(channel, message);
     }
 }
