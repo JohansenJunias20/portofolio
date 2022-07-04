@@ -1,9 +1,10 @@
 //taken from bruno simon folio-2019
 #define PI 3.141592653589793
 
-uniform vec3 uColor;
+const vec3 uColor = vec3(208.0/255.0, 69.0/255.0, 0.0);
 uniform float uAlpha;
-uniform float uFadeRadius;
+// uniform float uFadeRadius;
+const float uFadeRadius = 0.35;
 
 varying vec2 vUv;
 
