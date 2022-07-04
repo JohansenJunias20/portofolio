@@ -74,6 +74,12 @@ io.on("connection", (socket) => {
         io.to(id).emit("rm_ready", socket.id);
 
     })
+    socket.on("blur", ({ position, quartenion }) => {
+        // socket.broadcast.emit("blur",{position,quartenion})
+        console.log("someone blurred")
+        IDs[socket.id].lastPos = position;
+        IDs[socket.id].lastQuaternion = quartenion;
+    })
     socket.on("nickname", (nickname, callback) => {
         IDs[socket.id].nickname = nickname;
         io.emit("players", IDs);

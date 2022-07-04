@@ -710,8 +710,12 @@ var ticks = 0.0;
 // const test = TweenLite.fromTo({x:0,y:0,z:0},durat)
 animate();
 
-
 const connection = new Connection();
+window.onblur = () => {
+    if (initialized && connection.connected) {
+        connection.emit("blur", ({ position: character.body.position, quaternion: character.body.quaternion }));
+    }
+};
 connection.onrecievePlayers = (players: IHash<any>) => {
     // if (character.initialized)
     character.nickname.text = connection.nickname;
@@ -734,11 +738,11 @@ connection.onrecieve = (e) => {
         case "transform":
             message.id = message.id.toString();
             if (!otherPlayers[message.id]) return;
-            if(otherPlayers[message.id].lastTweenPos){
+            if (otherPlayers[message.id].lastTweenPos) {
                 otherPlayers[message.id].lastTweenPos.pause();
                 otherPlayers[message.id].lastTweenPos.kill();
             }
-            if(otherPlayers[message.id].lastTweenRot){
+            if (otherPlayers[message.id].lastTweenRot) {
                 otherPlayers[message.id].lastTweenRot.pause();
                 otherPlayers[message.id].lastTweenRot.kill();
             }
@@ -746,7 +750,7 @@ connection.onrecieve = (e) => {
             otherPlayers[message.id].lastTweenPos = gsap.to(otherPlayers[message.id].position, {
                 duration: 0.095,
                 ...message.position,
-                ease:Linear.easeNone,// ease: Back.easeOut.config(Config.waveEffect.overshoot),
+                ease: Linear.easeNone,// ease: Back.easeOut.config(Config.waveEffect.overshoot),
                 onComplete: () => {
                     // ref.addBody();
                     // ref.body.mass = ref.originMass;
@@ -762,7 +766,7 @@ connection.onrecieve = (e) => {
                 onUpdate: () => {
                     otherPlayers[message.id].body.angularVelocity.setZero()
                 },
-                ease:Linear.easeNone,
+                ease: Linear.easeNone,
                 // ease: Back.easeOut.config(Config.waveEffect.overshoot),
                 onComplete: () => {
                     // ref.addBody();
@@ -791,6 +795,16 @@ connection.onnewplayer = async (id: string) => {
     otherPlayers[id].followWaveEffect = false;
     otherPlayers[id].nickname.text = connection.players[id].nickname ? connection.players[id].nickname : `guest${connection.players[id].guest_id}`;
     await otherPlayers[id].init();
+    // otherPlayers[id].
+    if (connection.players[id].lastPos) {
+        const { x, y, z } = connection.players[id].lastPos;
+        otherPlayers[id].position.set(x, y, z);
+    }
+    //do same with quaternion
+    if (connection.players[id].lastQuaternion) {
+        const { x: qx, y: qy, z: qz, w: qw } = connection.players[id].lastQuaternion;
+        otherPlayers[id].body.quaternion.set(qx, qy, qz, qw);
+    }
 
     otherPlayers[id].body.mass = 0;//not affected to gravity
 }
