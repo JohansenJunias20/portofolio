@@ -117,11 +117,12 @@ export default class Connection {
         this.config = {
             iceServers: [
                 { urls: "stun:stun.budgetphone.nl:3478" },
-                { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https:" ? TURN_PORT_TLS : TURN_PORT}`, secure: location.protocol == "https:", credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }]
+                { urls: `turn:${TURN_DOMAIN}:${location.protocol == "https:" ? TURN_PORT_TLS : TURN_PORT}`, secure: location.protocol == "https:", credential: TURN_PASSWORD, username: TURN_USERNAME, user: TURN_USERNAME }
+            ]
         }
         console.log("protocol")
         console.log(location.protocol)
-
+        console.log({ WS_DOMAIN, WS_PORT })
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
         this.connected = true;
         this.signalling = signalling;

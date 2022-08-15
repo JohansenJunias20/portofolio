@@ -41,7 +41,7 @@ bash prod.sh
 |**Bots to _playground_**  |implement bots so players can play alone  |
 |**Advanced Multiplayer**  |implement Multiplayer to _playground_  (play connect 4 with other players)  |
 |**Add more _knowledges_**  | [nginx](https://www.nginx.com/), [node.js](https://nodejs.org/en/), [adobe](https://www.adobe.com/), [docker](https://www.docker.com/), [expo](https://expo.dev/), [aws](https://aws.amazon.com/), [laravel](https://laravel.com/), [threejs](https://threejs.org/), [opengl](https://en.wikipedia.org/wiki/OpenGL)|✅|
-|**Add more _billboard projects_**  | [minecraft-clone](https://github.com/JohansenJunias20/minecraft-clone), Accounting Web, [Laughing Clown](https://github.com/JohansenJunias20/laughing-clown)|
+|**Add more _billboard projects_**  | [minecraft-clone](https://github.com/JohansenJunias20/minecraft-clone), Accounting Web, [Laughing Clown](https://github.com/JohansenJunias20/laughing-clown)|In Progress|
 |**Contact Person**| [Github](https://github.com/JohansenJunias20), and LinkedIn at *lobby* Area|✅|
 |**Shadows on Movable Object**|shadows on movable object like character(ball), johansen mesh, and hotkeys|In Progress|
 |**Add Documentation**|Write readme file in every directory|In Progress|

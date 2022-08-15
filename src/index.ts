@@ -693,8 +693,8 @@ function animate() {
     }
 
     if (connection && connection.connected && character.body && connection.id && ticks >= 0.1) {
-        console.log({ duration: _clock.getDelta().toFixed(4) })
-        connection.send({ channel: "transform", id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
+        // console.log({ duration: _clock.getDelta().toFixed(4) })
+        connection.send({ channel: "transform", timestamp: Date.now(), id: connection.id, position: character.body.position, quaternion: character.body.quaternion });
         ticks = 0.0;
     }
     ticks += deltatime;
@@ -734,6 +734,8 @@ connection.onrecievePlayers = (players: IHash<any>) => {
 connection.onrecieve = (e) => {
     // console.log(e.data)
     const message = JSON.parse(e.data);
+    if (debug)
+        console.log(`latency: :${Date.now() - message.timestamp}ms`);
     switch (message.channel) {
         case "transform":
             message.id = message.id.toString();
