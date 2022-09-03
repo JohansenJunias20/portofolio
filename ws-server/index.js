@@ -7,8 +7,8 @@ const ssl = production ? process.env.PROD_WS_SSL == "TRUE" ? true : false : proc
 const domain = production ? process.env.PROD_WS_DOMAIN : process.env.DEV_WS_DOMAIN;
 const express = require('express');
 const httpServer = ssl ? require("https").createServer({
-    key: fs.readFileSync(`/etc/letsencrypt/archive/${domain}/privkey1.pem`),
-    cert: fs.readFileSync(`/etc/letsencrypt/archive/${domain}/cert1.pem`)
+    key: fs.readFileSync(`/etc/letsencrypt/live/${domain}/privkey.pem`),
+    cert: fs.readFileSync(`/etc/letsencrypt/live/${domain}/cert.pem`)
 }) :
     require("http").createServer()
     ;
