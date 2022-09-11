@@ -223,6 +223,8 @@ import ProLangs from './Knowledges/ProLang/ProLangs';
 const HOTKEYSPOSITION = new Vector3(-15, 1, 0);
 
 const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
+import Showcase from "./Showcase/Main";
+const showcase = new Showcase({ scene, world, position: new Vector3(-50, 10.5, -5) });
 
 const navigationBoards = new NavigationBoards(world, scene);
 
@@ -450,6 +452,10 @@ function animate() {
         //leftmousedown digunakan nickname untuk mengubah durasi gsap
         character.update(deltatime, leftMouseDown, followCharacter); //customupdate karena tambah 1 parameter leftmousedown
 
+    }
+
+    if (showcase.initialized) {
+        showcase.update(deltatime);
     }
     if (hotkeys.initialized) {
         hotkeys.setWaveEffect(waveEffect)
@@ -835,6 +841,9 @@ async function init() {
     lobby.init().then(() => {
         loading.addProgress(10);
     });
+
+
+
     roadStones.init().then(() => {
         loading.addProgress(3);
     })
@@ -877,6 +886,9 @@ loading.onfull = () => {
     camera.position.set(25, 36.099988, 35);
     setTimeout(() => {
         startWaveEffect = true;
+        showcase.init().then(() => {
+
+        })
         connection.setFocus(connection.id);
     }, 500);
     setTimeout(() => {
