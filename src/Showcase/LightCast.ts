@@ -49,8 +49,8 @@ export default class LightCast extends MeshOnlyObject3d {
         super(parameters.scene, parameters.position);
         this.clock = new Clock(true);
         this.asset.scale = parameters.scale;
-        this.asset.url = `/assets/environment/projector/lightcast.obj`;
-        this.asset.mtl = `/assets/environment/projector/lightcast.mtl`;
+        this.asset.url = `/assets/environment/projector/lightCast.obj`;
+        this.asset.mtl = `/assets/environment/projector/lightCast.mtl`;
         this.asset.shader.uniforms = {
             intensity: {
                 value: 1

@@ -36,6 +36,7 @@ bash prod.sh
 |[**Post Processing**](https://threejs.org/examples/#webgl_postprocessing_dof2) | [Bloom](https://threejs.org/examples/#webgl_postprocessing_unreal_bloom) on Billboards Image, [Blur](https://threejs.org/examples/#webgl_postprocessing_dof2) Camera's Edges, [Selective Outline](https://threejs.org/examples/#webgl_postprocessing_outline) on _knowledge_ |
 |**Responsive Mobile UI**|Add Joystick & fix blury noise when screen resized|✅|
 |**Desc on _knowledges_**|Whenever user click a _knowledge_, it will show it's description on html modal|
+|**Add Showcase WPU**  |Add 3D showcase by Web Programming Unpas Channel  |In Progress|
 |**Player List UI**  |Draw list of players & move camera to specific player when user click player's name |✅|
 |**more _playground_**  |boardgame that can be played with bots or other players like [_connect 4_](https://en.wikipedia.org/wiki/Connect_Four)  |
 |**Bots to _playground_**  |implement bots so players can play alone  |
