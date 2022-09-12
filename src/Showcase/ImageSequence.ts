@@ -43,6 +43,7 @@ export default class ImageSequence {
         plane.position.copy(this.position);
         plane.rotateY(degToRad(90));
         this.mesh = plane;
+        (this.mesh as any).isBlooming = true;
         this.scene.add(plane);
         this.initialized = true;
     }

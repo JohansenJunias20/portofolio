@@ -48,6 +48,7 @@ export default class Projector extends PhysicsObject3d {
             Mesh: new THREE.Group(),
             preload: false,
         }
+        this.selectiveOutline = true;
         // this.asset.floorShadow.textureUrl = `/assets/environment/trees/floorShadow_${type}_deg${rotationDeg}.png`;
         // this.asset.floorShadow.modelUrl = ``;
         // this.asset.floorShadow.scale = new Vector3(10, 0, 10);

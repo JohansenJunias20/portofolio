@@ -27,10 +27,12 @@ import isOBJ from "./utility/isOBJ";
 import { Back, Bounce, Elastic, Power2, Sine } from "gsap/all";
 import Config from "./config/config.common";
 import { WaveEffect } from "./waveEffect";
+import setSelectiveOutline from "./utility/setSelectiveOutline";
 //please load default custom shader here (only once)
 
 export default class PhysicsObject3d {
     public waveEffect: WaveEffect
+    public selectiveOutline: boolean = false;
     public asset: {
         url: string;
         scale: THREE.Vector3;
@@ -89,6 +91,10 @@ export default class PhysicsObject3d {
     public async init() {
         await this.loadAsset();
         this.prepare();
+        if (this.selectiveOutline) {
+            console.log({ mesh: this.mesh })
+            setSelectiveOutline((this.mesh as Group), this.scene.uuid)
+        }
         this.initialized = true;
     }
     public updateWaveEffect(deltatime: number) {
@@ -298,6 +304,9 @@ export default class PhysicsObject3d {
                 },
                 _opacity: {
                     value: 1
+                },
+                darkenBloom: {
+                    value: false
                 }
             },
             transparent: true

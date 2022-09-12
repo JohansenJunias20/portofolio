@@ -7,7 +7,12 @@ import isintersect from "../utility/isPopUpIntersect";
 import Modal from "../Modal";
 import vertShader from "../../public/assets/shaders/popup.vert"
 import fragShader from "../../public/assets/shaders/popup.frag"
+import defaultVert from "../../public/assets/shaders/default.vert"
+import defaultFrag from "../../public/assets/shaders/default.frag"
+import floorFrag from "../../public/assets/shaders/floorMesh.frag";
+import floorVert from "../../public/assets/shaders/floorMesh.vert";
 import Character from "../Character/Character";
+import customShader from "../utility/customShader";
 
 export default class PopUp {
     vert: string;
@@ -190,6 +195,9 @@ export default class PopUp {
                 },
                 opacity: {
                     value: 0.8
+                },
+                darkenBloom: {
+                    value: false
                 }
             },
             depthTest: true,
@@ -304,7 +312,7 @@ export default class PopUp {
 
             }
 
-            if (isintersect({position:character.position,size:new Vector2()},{position:this.borderFloor.position,size:this.borderFloor.size})) {
+            if (isintersect({ position: character.position, size: new Vector2() }, { position: this.borderFloor.position, size: this.borderFloor.size })) {
                 this.onMouseHover();
                 return
             }
@@ -318,11 +326,49 @@ export default class PopUp {
         const planeFloorGeom = new THREE.PlaneGeometry(this.floor.size.x, this.floor.size.y);
 
         const textureFloor = await new THREE.TextureLoader().loadAsync(`/assets/environment/PopUp Floor/${this.floorText}.png`);
-        const planeFloorMaterial = new THREE.MeshLambertMaterial({
-            lightMap: textureFloor,
-            map: textureFloor,
-            transparent: true
-        })
+        // const planeFloorMaterial = new THREE.MeshLambertMaterial({
+        //     lightMap: textureFloor,
+        //     map: textureFloor,
+        //     transparent: true
+        // })
+        // planeFloorMaterial.onBeforeCompile = (shader) => {
+        //     shader.uniforms.darkenBloom = {
+        //         value: true
+        //     };
+        //     shader.fragmentShader = `
+        //     uniform bool darkenBloom;
+        //     ${shader.fragmentShader}
+        //     `.replace("#include <dithering_fragment>",
+        //         `#include <dithering_fragment>
+
+        //     if (darkenBloom) {
+        //         gl_FragColor = vec4(vec3(0.),1.);
+        //         return;
+        //     }
+        //     `)
+
+        // }
+
+        const planeFloorMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                _opacity: {
+                    value: 1
+                },
+                darkenBloom: {
+                    value: false
+                },
+                mapTexture: {
+                    value: textureFloor
+                }
+            },
+            // lights: true,
+            transparent: true,
+            depthTest: true,
+            depthWrite: false,
+            vertexShader: floorVert,
+            fragmentShader: floorFrag,
+
+        });
         const mesh = new THREE.Mesh(planeFloorGeom, planeFloorMaterial);
         mesh.rotateX(degToRad(-90))
         mesh.position.copy(this.floor.position)
@@ -332,15 +378,56 @@ export default class PopUp {
     async initBorderFloor() {
         const borderFloorGeom = new THREE.PlaneGeometry(this.borderFloor.size.x, this.borderFloor.size.y);
         const textureBorderFloor = await new THREE.TextureLoader().loadAsync(this.borderFloor.urlTexture);
-        const borderFloorMaterial = new THREE.MeshLambertMaterial({
-            lightMap: textureBorderFloor,
-            map: textureBorderFloor,
-            transparent: true
-        })
+        // const borderFloorMaterial = new THREE.MeshLambertMaterial({
+        //     lightMap: textureBorderFloor,
+        //     map: textureBorderFloor,
+        //     transparent: true,
+        //     depthTest: true,
+        //     depthWrite: false,
+        // })
+
+        // borderFloorMaterial.onBeforeCompile = (shader) => {
+        //     shader.uniforms.darkenBloom = {
+        //         value: true
+        //     };
+        //     shader.fragmentShader = `
+        //     uniform bool darkenBloom;
+        //     ${shader.fragmentShader}
+        //     `.replace("#include <dithering_fragment>",
+        //         `#include <dithering_fragment>
+
+        //     if (darkenBloom) {
+        //         gl_FragColor = vec4(vec3(0.),1.);
+        //         return;
+        //     }
+        //     `)
+
+        // }
+        //GANTI DARI LAMBERTMATERIAL JADI SHADERMATERIAL KARENA LAMBERT TIDAK BISA DISET UNIFORM SAAT UPDATE
+        var borderFloorMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                _opacity: {
+                    value: 1
+                },
+                darkenBloom: {
+                    value: false
+                },
+                mapTexture: {
+                    value: textureBorderFloor
+                }
+            },
+            // lights: true,
+            transparent: true,
+            depthTest: true,
+            depthWrite: false,
+            vertexShader: floorVert,
+            fragmentShader: floorFrag,
+
+        });
         const meshBorderFloor = new THREE.Mesh(borderFloorGeom, borderFloorMaterial);
         meshBorderFloor.rotateX(degToRad(-90))
         meshBorderFloor.position.copy(this.borderFloor.position)
-        this.borderFloor.mesh = meshBorderFloor;
+        meshBorderFloor.name = "meshborderfloor"
         this.borderFloor.mesh = meshBorderFloor;
         this.scene.add(meshBorderFloor)
 

@@ -11,6 +11,11 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
+// const cameraO = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 0.1, 1000);
+const fov = THREE.MathUtils.degToRad(camera.fov);
+const hyperfocus = (camera.near + camera.far) / 2;
+const _height = 2 * Math.tan(fov / 2) * hyperfocus;
+// cameraO.zoom = window.innerHeight / _height;
 console.log("v2.1");//just to make sure on production mode ts compiled correctly (newest version)
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
@@ -391,9 +396,24 @@ interface IHash<T> {
 const otherPlayers: IHash<Character> = {};
 window.onresize = (e) => {
     camera.aspect = window.innerWidth / window.innerHeight
+    camera.setViewOffset(window.innerWidth, window.innerHeight, 0, 0, window.innerWidth, window.innerHeight);
     camera.updateProjectionMatrix()
+
+    // cameraO.left = - window.innerHeight * aspect;
+    // cameraO.right = window.innerHeight * aspect;
+    // cameraO.top = window.innerHeight;
+    // cameraO.bottom = -window.innerHeight;
+    // cameraO.updateProjectionMatrix();
+    outlinePass.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(2);
+    // fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * renderer.getPixelRatio());
+    // fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * renderer.getPixelRatio());
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(2)
+    composer.setSize(window.innerWidth, window.innerHeight);
+    // composer.setPixelRatio(2);
+    // bloomComposer.setPixelRatio(2);
+    bloomComposer.setSize(window.innerWidth, window.innerHeight);
+    // smaaPass.setSize(window.innerWidth,window.innerHeight)
     if (isMobile()) {
         joystick.show()
     }
@@ -418,7 +438,8 @@ function animate() {
 
     raycast.setFromCamera(mouse, camera);
     const intersects = raycast.intersectObjects(scene.children); // diakses oleh floor fence mesh
-
+    outlinePass.selectedObjects = intersects.map(i => i.object).filter((o: any) => o.selectiveOutline);
+    // outlinePass.selectedObjects = intersects.map(i => i.object).filter((o: any) => o.selectiveOutline);
     if (!leftMouseDown)
         document.body.style.cursor = "grab";
     else
@@ -704,16 +725,93 @@ function animate() {
         ticks = 0.0;
     }
     ticks += deltatime;
-    if (initialized)
+    if (initialized) {
+        if (!testqq) {
+            testqq = true;
+            console.log({ children: scene.children.find(c => c.name == "meshborderfloor") })
+        }
+        // scene.children.forEach(group => {
+        //     if ((group as any).isBlooming) return;
+        //     group.traverse(mesh => {
+        //         if ((mesh as any).isMesh) {
+        //             if (((mesh as Mesh).material as ShaderMaterial)?.uniforms?.darkenBloom) {
+        //                 ((mesh as Mesh).material as ShaderMaterial).uniforms.darkenBloom.value = true;
+        //                 ((mesh as Mesh).material as ShaderMaterial).needsUpdate = true;
+        //             }
+        //         }
+        //     })
+        // })
+        // bloomComposer.render()
+
         renderer.render(scene, camera)
+
+
+        scene.children.forEach(group => {
+            if ((group as any).isBlooming) return;
+            group.traverse(mesh => {
+                if ((mesh as any).isMesh) {
+                    if (((mesh as Mesh).material as ShaderMaterial)?.uniforms?.darkenBloom) {
+                        ((mesh as Mesh).material as ShaderMaterial).uniforms.darkenBloom.value = false;
+                        ((mesh as Mesh).material as ShaderMaterial).needsUpdate = true;
+                    }
+                }
+            })
+        })
+
+
+        composer.render();
+    }
     requestAnimationFrame(animate);
 
 }
-const _clock = new Clock()
+var testqq = false;
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
+const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+const renderPass = new RenderPass(scene, camera);
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { SMAAPass } from "three/examples/jsm/postprocessing/SMAAPass";
+import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
+import { BloomPass } from "three/examples/jsm/postprocessing/BloomPass";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
+import { SSAARenderPass } from "three/examples/jsm/postprocessing/SSAARenderPass";
+const unrealBloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.1, 0);
+const bloomComposer = new EffectComposer(renderer);
+bloomComposer.renderToScreen = false;
+bloomComposer.addPass(renderPass);
+bloomComposer.addPass(unrealBloomPass);
+
+import bloomVert from "../public/assets/shaders/bloomPass.vert";
+import bloomFrag from "../public/assets/shaders/bloomPass.frag";
+const finalPass = new ShaderPass(new THREE.ShaderMaterial({
+    uniforms: {
+        baseTexture: { value: null },
+        bloomTexture: { value: bloomComposer.renderTarget2.texture }
+    },
+    vertexShader: bloomVert,
+    fragmentShader: bloomFrag,
+    defines: {}
+}), "baseTexture");
+finalPass.needsSwap = true;
+const composer = new EffectComposer(renderer);
+composer.setPixelRatio(2);
+composer.addPass(renderPass);
+//SSAA source code taken from: https://threejs.org/examples/webgl_postprocessing_ssaa.html
+//why use SSAA? not FXAA? MSAA? reason: https://www.quora.com/What-are-the-differences-between-types-of-anti-aliasing-such-as-TXAA-MSAA-SSAA-and-MFAA
+const ssaaRenderPassP = new SSAARenderPass(scene, camera, new THREE.Color("rgb(0,0,0)"), 1);
+ssaaRenderPassP.sampleLevel = 2;
+ssaaRenderPassP.unbiased = true;
+
+composer.addPass(ssaaRenderPassP);
+
+import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
+const copyPass = new ShaderPass(CopyShader);
+composer.addPass(outlinePass);
+// composer.addPass(copyPass);
+composer.addPass(finalPass);
 
 var ticks = 0.0;
-// import { TweenLite } from 'gsap/all';
-// const test = TweenLite.fromTo({x:0,y:0,z:0},durat)
 animate();
 
 const connection = new Connection();
@@ -851,6 +949,7 @@ async function init() {
     character.followWaveEffect = false;
     character.init().then(() => {
         loading.addProgress(2);
+        outlinePass.selectedObjects = [character.mesh];
         console.log({ uuidcharacter: character.mesh.uuid })
     });
     johansen.init().then(() => {

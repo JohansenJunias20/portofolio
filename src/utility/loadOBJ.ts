@@ -19,6 +19,7 @@ export default async function loadOBJ(objUrl: string, _mtl: string | THREE.Shade
                     if (c.isMesh) {
                         c.castShadow = castShadow;
                         c.material = customShader((c.material as MeshPhongMaterial).color);
+                   
                     }
                     // return c;
                 })

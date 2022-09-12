@@ -11,7 +11,8 @@ import PopUp from '../PopUps/PopUp';
 import customShader from '../utility/customShader';
 import loadOBJ from '../utility/loadOBJ';
 import setOpacity from '../utility/setOpacity';
-
+import floorFrag from "../../public/assets/shaders/floorMesh.frag";
+import floorVert from "../../public/assets/shaders/floorMesh.vert";
 export default class Billboard {
     public isBillboard: boolean;
     private asset: {
@@ -35,7 +36,7 @@ export default class Billboard {
     private lightIntensity: number;
     text: string;
     urlRef: Array<string>;
-    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, position: Vector3, text: "laughing clown" |"miles madness" | "tokopedia integration" = "miles madness",
+    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, position: Vector3, text: "laughing clown" | "miles madness" | "tokopedia integration" = "miles madness",
         scale: THREE.Vector3 = new THREE.Vector3(1, 1, 1), rotation: number = 100, urlRef: Array<string> = [],
         lightIntensity: number = 1, floorText: "download" | "open" = "download") {
         this.lightIntensity = lightIntensity;
@@ -151,6 +152,25 @@ export default class Billboard {
 
         const geometry = new THREE.PlaneGeometry(27 * this.asset.scale.x, 16 * this.asset.scale.y);
 
+        // const material = new THREE.ShaderMaterial({
+        //     uniforms: {
+        //         _opacity: {
+        //             value: 1
+        //         },
+        //         darkenBloom: {
+        //             value: false
+        //         },
+        //         mapTexture: {
+        //             value: texture
+        //         }
+        //     },
+        //     // lights: true,
+        //     transparent: true,
+        //     depthTest: true,
+        //     depthWrite: false,
+        //     vertexShader: floorVert,
+        //     fragmentShader: floorFrag,
+        // });
         const material = new THREE.MeshLambertMaterial({
             map: texture,
             side: THREE.FrontSide,
@@ -179,10 +199,29 @@ export default class Billboard {
         }
         const descGeometry = new THREE.PlaneGeometry(sizePlaneDescText.x, sizePlaneDescText.y);
 
-        const desc_text_material = new THREE.MeshBasicMaterial({
-            alphaMap: desc_text_texture,
-            transparent: true
-        })
+        // const desc_text_material = new THREE.MeshBasicMaterial({
+        //     alphaMap: desc_text_texture,
+        //     transparent: true
+        // })
+        const desc_text_material = new THREE.ShaderMaterial({
+            uniforms: {
+                _opacity: {
+                    value: 1
+                },
+                darkenBloom: {
+                    value: false
+                },
+                mapTexture: {
+                    value: desc_text_texture
+                }
+            },
+            // lights: true,
+            transparent: true,
+            depthTest: true,
+            depthWrite: false,
+            vertexShader: floorVert,
+            fragmentShader: floorFrag,
+        });
         const planeDescText = new THREE.Mesh(descGeometry, desc_text_material);
         planeDescText.position.copy(this.position);
         planeDescText.receiveShadow = false;

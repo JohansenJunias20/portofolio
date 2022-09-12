@@ -6,4 +6,5 @@ private/*.mod
 ws-server/visitor.json
 # ssl/main/live/*
 dump
-ssl
+ssl/main/archive/*.pem
+ssl/main/live/*.pem

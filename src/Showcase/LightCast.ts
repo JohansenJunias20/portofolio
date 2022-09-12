@@ -145,7 +145,7 @@ export default class LightCast extends MeshOnlyObject3d {
 
     }
     private flickLight() {
-        var intensity = randInt(75, 100) / 100;
+        var intensity = randInt(65, 75) / 100;
         ((this.mesh.children[0] as THREE.Mesh).material as ShaderMaterial).uniforms.intensity.value = intensity;
         ((this.mesh.children[0] as THREE.Mesh).material as ShaderMaterial).needsUpdate = true;
     }
