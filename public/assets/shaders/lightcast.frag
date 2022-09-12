@@ -18,6 +18,6 @@ void main(){
     // vec3 finalPos=pos;
     //pos.x tidak minus value 0/10
     // gl_FragColor=vec4(255./255.,255./255.,255./255.,clamp(pos.x-minX,0.,maxX)/(maxX-minX)*intensity);
-    gl_FragColor=vec4(color*0.5,(1.-final)*intensity);
+    gl_FragColor=vec4(color*0.6,(1.-final)*intensity);
     // gl_FragColor=vec4(color,0.);
 }

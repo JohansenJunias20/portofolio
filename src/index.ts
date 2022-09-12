@@ -83,6 +83,7 @@ canvas.onmousedown = (e) => {
 //     panCameraStart();
 // }
 canvas.ontouchstart = (e) => {
+    if ((window as any).disableInput) return;
     MouselastPos.x = e.touches[0].pageX;
     MouselastPos.y = e.touches[0].pageY;
     panCameraStart();
@@ -126,6 +127,7 @@ var leftCam = new Vector3()
 const CameraPanSpeed = 0.035;
 const raycast = new Raycaster();
 canvas.onmousemove = (e) => {
+    if ((window as any).disableInput) return;
     // mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     // mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
     // deltaPos.x = MouselastPos.x - e.pageX;
@@ -157,6 +159,7 @@ canvas.onmousemove = (e) => {
 //karena dragCamera pada ontouchmove hanya dipanggil saat user touch
 //kalau  dragCamera pada onmousemove dipanggil terus walaupun tidak mouse down
 document.ontouchmove = (e) => {
+    if ((window as any).disableInput) return;
     dragCamera(e.touches[0]);
 }
 var touchPos = {
@@ -213,7 +216,6 @@ function dragCamera(e: Touch | MouseEvent) {
     }
 }
 
-
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 // renderer.shadowMap = true;
@@ -229,7 +231,7 @@ const HOTKEYSPOSITION = new Vector3(-15, 1, 0);
 
 const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 import Showcase from "./Showcase/Main";
-const showcase = new Showcase({ scene, world, position: new Vector3(-50, 10.5, -5) });
+const showcase = new Showcase({ scene, world, position: new Vector3(-50, 10.5, -5), camera });
 
 const navigationBoards = new NavigationBoards(world, scene);
 
@@ -252,6 +254,7 @@ const contacts = new Contacts(world, scene, camera)
 
 var key: string;
 document.onkeydown = (e) => {
+    if ((window as any).disableInput) return;
     key = e.key.toLowerCase();
     if (key == "w") {
     }
@@ -310,6 +313,7 @@ document.onkeyup = (e) => {
 
 
 canvas.onmousedown = (e) => {
+    if ((window as any).disableInput) return;
     // document.body.style.cursor = "grabbing";
     if (e.which == 1) {
         panCameraStart()
@@ -425,8 +429,17 @@ var lastPosCamUnfollPlayer = new THREE.Vector3(); // posisi kamera terakhir saat
 const raycast2 = new THREE.Raycaster();
 var isCamUnderTransition = false; //saat follow character false -> true ini di set true sehingga kamera lookAt berpindah ke posisi karakter secara pelan-pelan
 var alphaTransition = 0; // alpha used for lerp transition camera lookat target position
+var fps = 0;
+var elapsedTime = 0;
 function animate() {
     deltatime = clock.getDelta()
+    elapsedTime += deltatime;
+    if (elapsedTime >= 1) {
+        elapsedTime = 0;
+        console.log({ fps });
+        fps = 0;
+    }
+    fps++;
     // if (deltatime < 0.2)
     // world.step(config.world.step,);
     // console.log({ deltatime })
@@ -439,11 +452,15 @@ function animate() {
     raycast.setFromCamera(mouse, camera);
     const intersects = raycast.intersectObjects(scene.children); // diakses oleh floor fence mesh
     outlinePass.selectedObjects = intersects.map(i => i.object).filter((o: any) => o.selectiveOutline);
+
     // outlinePass.selectedObjects = intersects.map(i => i.object).filter((o: any) => o.selectiveOutline);
     if (!leftMouseDown)
         document.body.style.cursor = "grab";
     else
         document.body.style.cursor = "grabbing";
+    if (intersects.map(i => i.object).filter((o: any) => o.selectiveOutline).length) {
+        document.body.style.cursor = "pointer";
+    }
     //#region update mesh & body
     if (trees.initialized) {
         trees.setWaveEffect(waveEffect)
@@ -726,22 +743,33 @@ function animate() {
     }
     ticks += deltatime;
     if (initialized) {
-        if (!testqq) {
-            testqq = true;
-            console.log({ children: scene.children.find(c => c.name == "meshborderfloor") })
-        }
-        // scene.children.forEach(group => {
-        //     if ((group as any).isBlooming) return;
-        //     group.traverse(mesh => {
-        //         if ((mesh as any).isMesh) {
-        //             if (((mesh as Mesh).material as ShaderMaterial)?.uniforms?.darkenBloom) {
-        //                 ((mesh as Mesh).material as ShaderMaterial).uniforms.darkenBloom.value = true;
-        //                 ((mesh as Mesh).material as ShaderMaterial).needsUpdate = true;
-        //             }
-        //         }
-        //     })
-        // })
-        // bloomComposer.render()
+
+        scene.children.forEach(group => {
+            if ((group as any).isBlooming) return;
+            group.traverse(mesh => {
+                if ((mesh as any).isMesh || mesh.type.toLowerCase() == "mesh") {
+                    if (group.uuid == character.mesh.uuid) {
+                        // console.log("masuk kok")
+                    }
+                    if (Array.isArray((mesh as Mesh).material)) {
+                        for (let i = 0; i < ((mesh as Mesh).material as ShaderMaterial[]).length; i++) {
+                            if (((mesh as Mesh).material as ShaderMaterial[])[i]?.uniforms?.darkenBloom) {
+
+                                ((mesh as Mesh).material as ShaderMaterial[])[i].uniforms.darkenBloom.value = true;
+                                ((mesh as Mesh).material as ShaderMaterial[])[i].needsUpdate = true;
+                            }
+                        }
+                        return;
+                    }
+                    if (((mesh as Mesh).material as ShaderMaterial)?.uniforms?.darkenBloom) {
+
+                        ((mesh as Mesh).material as ShaderMaterial).uniforms.darkenBloom.value = true;
+                        ((mesh as Mesh).material as ShaderMaterial).needsUpdate = true;
+                    }
+                }
+            })
+        })
+        bloomComposer.render()
 
         renderer.render(scene, camera)
 
@@ -749,7 +777,17 @@ function animate() {
         scene.children.forEach(group => {
             if ((group as any).isBlooming) return;
             group.traverse(mesh => {
-                if ((mesh as any).isMesh) {
+                if ((mesh as any).isMesh || mesh.type.toLowerCase() == "mesh") {
+                    if (Array.isArray((mesh as Mesh).material)) {
+                        for (let i = 0; i < ((mesh as Mesh).material as ShaderMaterial[]).length; i++) {
+                            if (((mesh as Mesh).material as ShaderMaterial[])[i]?.uniforms?.darkenBloom) {
+
+                                ((mesh as Mesh).material as ShaderMaterial[])[i].uniforms.darkenBloom.value = false;
+                                ((mesh as Mesh).material as ShaderMaterial[])[i].needsUpdate = true;
+                            }
+                        }
+                        return;
+                    }
                     if (((mesh as Mesh).material as ShaderMaterial)?.uniforms?.darkenBloom) {
                         ((mesh as Mesh).material as ShaderMaterial).uniforms.darkenBloom.value = false;
                         ((mesh as Mesh).material as ShaderMaterial).needsUpdate = true;
@@ -764,9 +802,13 @@ function animate() {
     requestAnimationFrame(animate);
 
 }
-var testqq = false;
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
 const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+outlinePass.edgeStrength = 15;
+outlinePass.edgeGlow = 0;
+outlinePass.visibleEdgeColor = new THREE.Color("#0048ff")
+outlinePass.hiddenEdgeColor = new THREE.Color("#0048ff")
+outlinePass.edgeThickness = 4;
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 const renderPass = new RenderPass(scene, camera);
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -949,7 +991,7 @@ async function init() {
     character.followWaveEffect = false;
     character.init().then(() => {
         loading.addProgress(2);
-        outlinePass.selectedObjects = [character.mesh];
+        console.log({ meshchar: character.mesh });
         console.log({ uuidcharacter: character.mesh.uuid })
     });
     johansen.init().then(() => {

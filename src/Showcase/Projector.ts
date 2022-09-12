@@ -2,7 +2,7 @@
 
 import * as CANNON from 'cannon';
 import * as THREE from 'three';
-import { Group, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
+import { BufferGeometryUtils, Group, Mesh, PositionalAudio, Triangle, Vector, Vector3, WebGLRenderer } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { clamp, degToRad } from 'three/src/math/MathUtils';
 import PhysicsObject3d from '../PhysicsObject';
@@ -48,11 +48,15 @@ export default class Projector extends PhysicsObject3d {
             Mesh: new THREE.Group(),
             preload: false,
         }
-        this.selectiveOutline = true;
+        // this.selectiveOutline = true;
         // this.asset.floorShadow.textureUrl = `/assets/environment/trees/floorShadow_${type}_deg${rotationDeg}.png`;
         // this.asset.floorShadow.modelUrl = ``;
         // this.asset.floorShadow.scale = new Vector3(10, 0, 10);
     }
+    // public async init(): Promise<void> {
+    //     await super.init();
+    //     console.log({ mesh: this.mesh })
+    // }
 
 
 }

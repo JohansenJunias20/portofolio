@@ -1,4 +1,4 @@
-import { Mesh } from "three";
+import { Mesh, ShaderMaterial } from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import customShader from "./customShader";
 
@@ -6,15 +6,18 @@ export default async function loadFBX(url: string, scale: THREE.Vector3, castSha
     const fbx = await new Promise<THREE.Group>((res, rej) => {
         const loader = new FBXLoader();
         loader.load(url, (f) => {
+            if (url == "/assets/character/Ball FBX.fbx") {
+                console.log({ f })
+            }
             for (let i = 0; i < f.children.length; i++) {
                 const c: Mesh = f.children[i] as any;
                 if (c.isMesh) {
                     c.castShadow = castShadow;
                     const oldMat: any = c.material;
-                    if (Array.isArray(oldMat)) {
+                    if (Array.isArray(c.material)) {
                         for (let i = 0; i < oldMat.length; i++) {
                             var element: any = oldMat[i];
-                            element = customShader(element.color);
+                            (c.material[i] as any) = customShader(element.color);
                         }
                     }
                     else
