@@ -405,8 +405,17 @@ var lastPosCamUnfollPlayer = new THREE.Vector3(); // posisi kamera terakhir saat
 const raycast2 = new THREE.Raycaster();
 var isCamUnderTransition = false; //saat follow character false -> true ini di set true sehingga kamera lookAt berpindah ke posisi karakter secara pelan-pelan
 var alphaTransition = 0; // alpha used for lerp transition camera lookat target position
+var elapsedTime =0;
+var fps = 0;
 function animate() {
     deltatime = clock.getDelta()
+    elapsedTime+=deltatime;
+    fps++;
+    if(elapsedTime>=1){
+        console.log({fps})
+        fps = 0;
+        elapsedTime = 0;
+    }
     // if (deltatime < 0.2)
     // world.step(config.world.step,);
     // console.log({ deltatime })
