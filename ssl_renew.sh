@@ -40,7 +40,7 @@ for i in "${domains[@]}"; do
 done
 sleep 5;
 echo "renew all ssl certificates...";
-docker run -it -v "/$(pwd)/ssl/main:/etc/letsencrypt" -p 80:80 \
+docker run -v "/$(pwd)/ssl/main:/etc/letsencrypt" -p 80:80 \
     certbot/certbot renew --standalone --email johansen.gumbal@gmail.com --agree-tos --no-eff-email
 
 
