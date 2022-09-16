@@ -359,6 +359,9 @@ export default class PopUp {
                 },
                 mapTexture: {
                     value: textureFloor
+                },
+                color: {
+                    value: new THREE.Color(1, 1, 1)
                 }
             },
             // lights: true,

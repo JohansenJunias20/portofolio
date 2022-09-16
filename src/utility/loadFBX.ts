@@ -6,9 +6,6 @@ export default async function loadFBX(url: string, scale: THREE.Vector3, castSha
     const fbx = await new Promise<THREE.Group>((res, rej) => {
         const loader = new FBXLoader();
         loader.load(url, (f) => {
-            if (url == "/assets/character/Ball FBX.fbx") {
-                console.log({ f })
-            }
             for (let i = 0; i < f.children.length; i++) {
                 const c: Mesh = f.children[i] as any;
                 if (c.isMesh) {

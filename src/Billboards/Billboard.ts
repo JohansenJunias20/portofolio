@@ -149,7 +149,6 @@ export default class Billboard {
         // this.mesh = fbx;
 
 
-
         const geometry = new THREE.PlaneGeometry(27 * this.asset.scale.x, 16 * this.asset.scale.y);
 
         // const material = new THREE.ShaderMaterial({
@@ -180,6 +179,8 @@ export default class Billboard {
         const plane = new THREE.Mesh(geometry, material);
         plane.position.copy(this.position)
         plane.rotateY(degToRad(10));
+        (plane as any).isBlooming = true;
+
         this.scene.add(plane);
         new THREE.Box3().setFromObject(object).getSize(size);
         this.body = new CANNON.Body({
@@ -213,6 +214,9 @@ export default class Billboard {
                 },
                 mapTexture: {
                     value: desc_text_texture
+                },
+                color: {
+                    value: new THREE.Vector3(1, 1, 1)
                 }
             },
             // lights: true,

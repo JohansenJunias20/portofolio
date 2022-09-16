@@ -3,6 +3,7 @@ uniform float _opacity;
 varying vec2 vUv;
 uniform bool darkenBloom;
 const vec3 shadowColor=vec3(.8588,.3686,.0392);
+// const vec3 shadowColor=vec3(0.,0.,.0);
 void main(){
     if(darkenBloom){
         gl_FragColor=vec4(0.,0.,0.,0.);

@@ -115,6 +115,7 @@ export default class Trees extends Wrapper<Tree> {
             const newModel = ref.loadedShadowModel.clone();
             (newModel.children[0] as THREE.Mesh).material = ((newModel.children[0] as THREE.Mesh).material as ShaderMaterial).clone();
             ((newModel.children[0] as THREE.Mesh).material as ShaderMaterial).uniforms.textureMap.value = texture;
+            ((newModel.children[0] as THREE.Mesh).material as ShaderMaterial).uniforms.darkenBloom.value  = true;
             ((newModel.children[0] as THREE.Mesh).material as ShaderMaterial).needsUpdate = true;
             ((newModel.children[0] as THREE.Mesh).material as ShaderMaterial).transparent = true;
             ((newModel.children[0] as THREE.Mesh).material as ShaderMaterial).uniformsNeedUpdate = true;
@@ -130,6 +131,9 @@ export default class Trees extends Wrapper<Tree> {
             uniforms: {
                 textureMap: {
                     value:null
+                },
+                darkenBloom:{
+                    value:true
                 }
 
             },

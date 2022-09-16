@@ -52,7 +52,7 @@ export default class ImageSequence {
                     //disable all input keyboard
                     (window as any).disableInput = true;
                     const modal = new Modal(
-                        `<button id="closeModal" style="cursor:pointer;position:fixed;top:0;right:0;z-index:3;margin:2rem;padding:5px;font-weight:bold;font-size:3rem; background-color:rgb(245,206,66)">CLOSE</button><iframe style="width:100%;height:100%" src="https://www.youtube.com/embed/pjDYyyMh4rM?start=3997" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`,
+                        `<button id="closeModal" style="cursor:pointer;position:fixed;top:0;right:0;z-index:3;margin:2rem;padding:5px;font-weight:bold;font-size:3rem; background-color:rgb(245,206,66)">CLOSE</button><iframe style="width:100%;height:100%" src="https://www.youtube.com/embed/pjDYyyMh4rM?start=3997&autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`,
                         "full");
                     const ref = this;
                     this.camera = {
