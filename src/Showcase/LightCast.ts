@@ -11,6 +11,9 @@ import PhysicsObject3d from '../PhysicsObject';
 import shaderVert from "../../public/assets/shaders/lightcast.vert";
 import shaderFrag from "../../public/assets/shaders/lightcast.frag";
 import Loading from '../Loading/Loading';
+import isFBX from '../utility/isFBX';
+import loadFBX from '../utility/loadFBX';
+import loadOBJ from '../utility/loadOBJ';
 interface AnimationCharacter {
     walk: THREE.AnimationAction;
 }
@@ -74,7 +77,7 @@ export default class LightCast extends MeshOnlyObject3d {
     clock: Clock;
     nextFlicker: number;
     public async init(loading: Loading): Promise<void> {
-        await super.init(loading);
+        await this.loadAsset();
         var mesh = (this.mesh.children[0] as THREE.Mesh);
         var geom = (mesh.geometry as THREE.BufferGeometry)
         const position = geom.attributes.position;
@@ -144,8 +147,31 @@ export default class LightCast extends MeshOnlyObject3d {
         }
 
     }
+    //ini di rewrite karena lightcast selalu muncul dulu sebelum semua image pada ImageSequence ke load
+    //dikarenakan loodAsset akan memanggil this.scene.add(object) saat proses load obj selesai
+    //jadi independen, sehingga dimodif supaya this.scene.add(object) tidak dipanggil saat masing2 object selesai tetapi saat semua object pada Main.ts selesai ke load semua menggunakan Promise.all()
+    public async loadAsset() {
+        var material: string | THREE.ShaderMaterial;
+        var { url, scale, mtl } = this.asset;
+        material = mtl;
+        if (this.asset.shader) {
+            material = new THREE.ShaderMaterial({
+                vertexShader: this.asset.shader.vertex,
+                fragmentShader: this.asset.shader.fragment,
+                transparent: true,
+                uniforms: this.asset.shader.uniforms,
+                depthWrite: false
+            })
+            material.transparent = true;
+        }
+
+        var object: THREE.Group = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, material, scale));
+        this.position.y += 5;
+        object.position.copy(this.position);
+        this.mesh = object;
+    }
     private flickLight() {
-        var intensity = randInt(75, 100) / 100;
+        var intensity = randInt(65, 75) / 100;
         ((this.mesh.children[0] as THREE.Mesh).material as ShaderMaterial).uniforms.intensity.value = intensity;
         ((this.mesh.children[0] as THREE.Mesh).material as ShaderMaterial).needsUpdate = true;
     }

@@ -1,0 +1,49 @@
+#define LAMBERT
+varying vec3 vLightFront;
+varying vec3 vIndirectFront;
+#ifdef DOUBLE_SIDED
+	varying vec3 vLightBack;
+	varying vec3 vIndirectBack;
+#endif
+#include <common>
+#include <uv_pars_vertex>
+#include <uv2_pars_vertex>
+#include <envmap_pars_vertex>
+#include <bsdfs>
+#include <lights_pars_begin>
+#include <color_pars_vertex>
+#include <fog_pars_vertex>
+#include <morphtarget_pars_vertex>
+#include <skinning_pars_vertex>
+#include <shadowmap_pars_vertex>
+#include <logdepthbuf_pars_vertex>
+#include <clipping_planes_pars_vertex>
+varying vec3 finalPos;
+const float offset = -5.;
+uniform float waveRange;
+uniform vec3 originPos;
+void main() {
+	finalPos =( modelMatrix * vec4(position,1.)).xyz;
+	
+	#include <uv_vertex>
+	#include <uv2_vertex>
+	#include <color_vertex>
+	#include <beginnormal_vertex>
+	#include <morphnormal_vertex>
+	#include <skinbase_vertex>
+	#include <skinnormal_vertex>
+	#include <defaultnormal_vertex>
+	#include <begin_vertex>
+	#include <morphtarget_vertex>
+	#include <skinning_vertex>
+	#include <project_vertex>
+	#include <logdepthbuf_vertex>
+	#include <clipping_planes_vertex>
+	#include <worldpos_vertex>
+	#include <envmap_vertex>
+	#include <lights_lambert_vertex>
+	#include <shadowmap_vertex>
+	#include <fog_vertex>
+	// gl_Position = projectionMatrix * modelViewMatrix * vec4( _position, 1.0 );
+	// gl_Position = projectionMatrix * viewMatrix  * vec4( finalPos, 1.);
+}

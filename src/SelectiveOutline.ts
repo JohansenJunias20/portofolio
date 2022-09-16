@@ -9,16 +9,14 @@ import loadFBX from "./utility/loadFBX";
 import loadOBJ from "./utility/loadOBJ";
 import getVertices from "./utility/getVertices";
 import toChunks from "./utility/toChucks";
+import vertShader from "../public/assets/shaders/selectiveOutline.vert";
+import fragShader from "../public/assets/shaders/selectiveOutline.frag";
 //default parent for Mesh Only Object (without physics & collision on it)
-export default class MeshOnlyObject3d {
+export default class SelectiveOutline {
     waveEffect: WaveEffect
-    selectiveOutline:boolean = false;
     protected asset: {
         url: string;
         scale: THREE.Vector3;
-        recieveShadow?: boolean;
-        castShadow: boolean;
-        mtl?: string;
         shader?: {
             vertex: string;
             fragment: string;
@@ -37,38 +35,38 @@ export default class MeshOnlyObject3d {
             originPos: new Vector3(),
             range: 0
         }
+        this.asset = {
+            scale: new Vector3(1, 1, 1),
+            url: "",
+            shader: {
+                vertex: vertShader,
+                fragment: fragShader,
+            }
+        }
     }
-    public async init(loading: Loading) {
+    public async init() {
         await this.loadAsset();
     }
-    public prepare() {
-        // await this.loadAsset();
-    }
+   
     public update(deltatime: number) {
         this.mesh.position.copy(this.position);
-        this.updateWaveEffect()
     }
-    public updateWaveEffect() {
 
-    }
     public async loadAsset() {
         var material: string | THREE.ShaderMaterial;
-        var { url, scale, mtl } = this.asset;
-        material = mtl;
-        if (this.asset.shader) {
-            material = new THREE.ShaderMaterial({
-                vertexShader: this.asset.shader.vertex,
-                fragmentShader: this.asset.shader.fragment,
-                transparent: true,
-                uniforms: this.asset.shader.uniforms,
-                depthWrite:false
-            })
-            material.transparent = true;
-        }
+        var { url, scale } = this.asset;
+        material = new THREE.ShaderMaterial({
+            vertexShader: this.asset.shader.vertex,
+            fragmentShader: this.asset.shader.fragment,
+            transparent: true,
+            uniforms: this.asset.shader.uniforms,
+            depthWrite: false
+        })
 
+        material.transparent = true;
         var object: THREE.Group = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, material, scale));
         // console.log({ object })
-      
+
 
         // const fbx = await new Promise<Group>((res, rej) => {
         //     const loader = new FBXLoader();

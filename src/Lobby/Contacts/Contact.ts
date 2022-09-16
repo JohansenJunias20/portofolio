@@ -81,7 +81,7 @@ export default class Contact extends PhysicsObject3d {
                 duration: 1,
                 ease: Power1.easeInOut
             }, "start");
-            console.log({ floorShadowModel: this.floorShadowModel })
+            // console.log({ floorShadowModel: this.floorShadowModel })
 
             ref.tl.to(((this.floorShadowModel as any).material as ShaderMaterial).uniforms._opacity, {
                 ...{ value: 0.7 },

@@ -80,6 +80,11 @@ export default class Plane {
             vertexShader: vertShader,
             // pakai syntax import, jangan fetch
             fragmentShader: fragShader,
+            uniforms: {
+                darkenBloom: {
+                    value: false
+                }
+            }
             // side: THREE.FrontSide
         });
         this.material = material;

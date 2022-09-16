@@ -1,3 +1,4 @@
+uniform bool darkenBloom;
 const vec3 leftTop=vec3(245./255.,136./255.,60./255.);
 const vec3 rightTop=vec3(255./255.,144./255.,67./255.);
 const vec3 leftBottom=vec3(252./255.,207./255.,146./255.);
@@ -10,7 +11,10 @@ void main(){
     normalizedPos.x+=1.;
     normalizedPos.y+=1.;
     // normalizedPos.z+=1.;
-    
+    if(darkenBloom){
+        gl_FragColor=vec4(0.,0.,0.,1.);
+        return;
+    }
     vec2 normalizedSize=vec2(2.,2.);
     // percentagePos adalah persentase berapa persen posisi fragment terhadap ukuran width mesh. value: 0-1 (bila posisi frag paling kanan maka value pasti 1)
     float percentagePosHorizontal=normalizedPos.x/normalizedSize.x;

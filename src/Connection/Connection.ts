@@ -122,7 +122,7 @@ export default class Connection {
         }
         console.log("protocol")
         console.log(location.protocol)
-        console.log({ WS_DOMAIN, WS_PORT })
+        // console.log({ WS_DOMAIN, WS_PORT })
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
         this.connected = true;
         this.signalling = signalling;

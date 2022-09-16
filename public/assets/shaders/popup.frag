@@ -5,11 +5,15 @@ uniform float borderWidth;
 uniform float opacity;
 varying vec3 modelPos;
 varying vec3 vPosition;
-
+uniform bool darkenBloom;
 void main(){
     if(modelPos.y<0.){
         discard;
         // return;
+    }
+    if(darkenBloom){
+        gl_FragColor=vec4(vec3(0.),1.);
+        return;
     }
     float fenceAlpha;
     fenceAlpha=mod(vPosition.x+vPosition.y+vPosition.z+move,1.);

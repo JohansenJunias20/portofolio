@@ -2,6 +2,7 @@ uniform vec3 diffuse;
 uniform vec3 emissive;
 uniform float opacity;
 uniform float _opacity;
+uniform bool darkenBloom;
 varying vec3 vLightFront;
 varying vec3 vIndirectFront;
 #ifdef DOUBLE_SIDED
@@ -39,6 +40,11 @@ uniform vec3 originPos;
 void main() {
 	if(finalPos.y<0.){
 		discard;
+	}
+	if(darkenBloom){
+		//set to black
+		gl_FragColor = vec4(0.,0.,0., 1.);
+		return;
 	}
 	#include <clipping_planes_fragment>
 	vec4 diffuseColor = vec4( diffuse, opacity );
@@ -80,5 +86,6 @@ void main() {
 	// 	_opacity = 0.2;
 	// }
 	// gl_FragColor = vec4(gl_FragColor.xyz,abs(distance(finalPos,originPos)) > waveRange ? 0. : _opacity);
+	
 	gl_FragColor = vec4(gl_FragColor.xyz, _opacity);
 }

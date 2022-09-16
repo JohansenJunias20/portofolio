@@ -11,6 +11,11 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
+// const cameraO = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 0.1, 1000);
+const fov = THREE.MathUtils.degToRad(camera.fov);
+const hyperfocus = (camera.near + camera.far) / 2;
+const _height = 2 * Math.tan(fov / 2) * hyperfocus;
+// cameraO.zoom = window.innerHeight / _height;
 console.log("v2.1");//just to make sure on production mode ts compiled correctly (newest version)
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
@@ -18,7 +23,14 @@ const renderer = new THREE.WebGLRenderer({
     alpha: true
 
 })
-
+enum GraphicQuality {
+    VeryLow,
+    Low,
+    Medium,
+    High,
+    Null
+};
+var graphicQuality = GraphicQuality.Null;
 // console.log("%c This website inspired by Bruno Simon Web https://bruno-simon.com", 'background: #222; color: #bada55; font-size:20px; font-weight:bold;')
 declare var production: boolean; // from webpack config file.
 
@@ -78,6 +90,7 @@ canvas.onmousedown = (e) => {
 //     panCameraStart();
 // }
 canvas.ontouchstart = (e) => {
+    if ((window as any).disableInput) return;
     MouselastPos.x = e.touches[0].pageX;
     MouselastPos.y = e.touches[0].pageY;
     panCameraStart();
@@ -121,6 +134,7 @@ var leftCam = new Vector3()
 const CameraPanSpeed = 0.035;
 const raycast = new Raycaster();
 canvas.onmousemove = (e) => {
+    if ((window as any).disableInput) return;
     // mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     // mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
     // deltaPos.x = MouselastPos.x - e.pageX;
@@ -152,6 +166,7 @@ canvas.onmousemove = (e) => {
 //karena dragCamera pada ontouchmove hanya dipanggil saat user touch
 //kalau  dragCamera pada onmousemove dipanggil terus walaupun tidak mouse down
 document.ontouchmove = (e) => {
+    if ((window as any).disableInput) return;
     dragCamera(e.touches[0]);
 }
 var touchPos = {
@@ -208,7 +223,6 @@ function dragCamera(e: Touch | MouseEvent) {
     }
 }
 
-
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 // renderer.shadowMap = true;
@@ -224,7 +238,7 @@ const HOTKEYSPOSITION = new Vector3(-15, 1, 0);
 
 const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
 import Showcase from "./Showcase/Main";
-const showcase = new Showcase({ scene, world, position: new Vector3(-50, 10.5, -5) });
+const showcase = new Showcase({ scene, world, position: new Vector3(-50, 10.5, -5), camera });
 
 const navigationBoards = new NavigationBoards(world, scene);
 
@@ -247,6 +261,7 @@ const contacts = new Contacts(world, scene, camera)
 
 var key: string;
 document.onkeydown = (e) => {
+    if ((window as any).disableInput) return;
     key = e.key.toLowerCase();
     if (key == "w") {
     }
@@ -305,6 +320,7 @@ document.onkeyup = (e) => {
 
 
 canvas.onmousedown = (e) => {
+    if ((window as any).disableInput) return;
     // document.body.style.cursor = "grabbing";
     if (e.which == 1) {
         panCameraStart()
@@ -314,7 +330,8 @@ canvas.onmousedown = (e) => {
     raycast.setFromCamera(mouse, camera);
     const intsCenterScreen = raycast.intersectObjects(scene.children);
     if (intsCenterScreen.length != 0) {
-        console.log({ intsCenterScreen })
+        if (debug)
+            console.log({ intsCenterScreen })
         return;
         // for (let i = 0; i < intsCenterScreen.length; i++) {
         //     const obj = intsCenterScreen[i];
@@ -391,9 +408,19 @@ interface IHash<T> {
 const otherPlayers: IHash<Character> = {};
 window.onresize = (e) => {
     camera.aspect = window.innerWidth / window.innerHeight
+    camera.setViewOffset(window.innerWidth, window.innerHeight, 0, 0, window.innerWidth, window.innerHeight);
     camera.updateProjectionMatrix()
+
+    outlinePass.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(2);
+    fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * renderer.getPixelRatio());
+    fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * renderer.getPixelRatio());
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(2)
+    composer.setSize(window.innerWidth, window.innerHeight);
+    // composer.setPixelRatio(2);
+    // bloomComposer.setPixelRatio(2);
+    bloomComposer.setSize(window.innerWidth, window.innerHeight);
+    // smaaPass.setSize(window.innerWidth,window.innerHeight)
     if (isMobile()) {
         joystick.show()
     }
@@ -405,16 +432,96 @@ var lastPosCamUnfollPlayer = new THREE.Vector3(); // posisi kamera terakhir saat
 const raycast2 = new THREE.Raycaster();
 var isCamUnderTransition = false; //saat follow character false -> true ini di set true sehingga kamera lookAt berpindah ke posisi karakter secara pelan-pelan
 var alphaTransition = 0; // alpha used for lerp transition camera lookat target position
-var elapsedTime =0;
 var fps = 0;
+var averageFPS = 0;
+var elapsedTime = 0;
+var fpsCounter = 0;
+var hadHigher = false;
+var averageFPSbefore = 0;
+//when should fpscounter reach a value to check the averagefps to change the quality
+const checkingCounter = 5;
 function animate() {
     deltatime = clock.getDelta()
-    elapsedTime+=deltatime;
-    fps++;
-    if(elapsedTime>=1){
-        console.log({fps})
-        fps = 0;
-        elapsedTime = 0;
+    //jangan lupa saat unfocus, fps berkurang jadi tidak dihitung kedalam average FPS
+    if (initialized) {
+        elapsedTime += deltatime;
+        if (elapsedTime >= 1) {
+            if (fpsCounter != 0)
+                averageFPS = parseFloat(((((fpsCounter - 1) * averageFPS) + fps) / fpsCounter).toFixed(2));
+            if (debug)
+                console.log({ fps, averageFPS })
+            fpsCounter++;
+            elapsedTime = 0;
+            if (fpsCounter == 5)
+                if (averageFPS < 59) {
+                    if (!hadHigher)
+                        hadHigher = false;
+                    console.log("setting lower quality...")
+                    //SET LOWER QUALITY
+                    // switch (graphicQuality) {
+                    //     case GraphicQuality.High:
+                    //         updateGraphicQuality(GraphicQuality.Medium);
+                    //         console.log("to medium");
+                    //         break;
+                    //     case GraphicQuality.Medium:
+                    //         updateGraphicQuality(GraphicQuality.Low);
+                    //         console.log("to low");
+                    //         console.log({ graphicQuality });
+                    //         break;
+                    //     case GraphicQuality.Low:
+                    //         updateGraphicQuality(GraphicQuality.VeryLow);
+                    //         console.log("to verylow");
+                    //         console.log({ graphicQuality });
+                    //         break;
+                    // }
+                    //reset for checking the next quality
+                    averageFPS = 0;
+                    fpsCounter = 0;
+                }
+                else if (averageFPS > 59 && !hadHigher) {
+                    //SET LOWER QUALITY
+                    // switch (graphicQuality) {
+                    //     case GraphicQuality.Medium:
+                    //         updateGraphicQuality(GraphicQuality.High);
+                    //         hadHigher = true;
+                    //         console.log("setting higher quality...")
+                    //         console.log("to high");
+                    //         console.log({ graphicQuality });
+                    //         averageFPS = 0;
+                    //         fpsCounter = 0;
+                    //         break;
+                    //     case GraphicQuality.Low:
+                    //         updateGraphicQuality(GraphicQuality.Medium);
+                    //         hadHigher = true;
+                    //         console.log("setting higher quality...")
+                    //         console.log("to medium");
+                    //         console.log({ graphicQuality });
+                    //         console.log({ graphicQuality });
+                    //         averageFPS = 0;
+                    //         fpsCounter = 0;
+                    //         break;
+                    //     case GraphicQuality.VeryLow:
+                    //         updateGraphicQuality(GraphicQuality.Low);
+                    //         hadHigher = true;
+                    //         console.log("setting higher quality...")
+                    //         console.log("to low");
+                    //         console.log({ graphicQuality });
+                    //         console.log({ graphicQuality });
+                    //         averageFPS = 0;
+                    //         fpsCounter = 0;
+                    //         break;
+                    // }
+                    //reset for checking the next quality
+
+                }
+            fps = 0;
+            if (fpsCounter == 5) {
+                averageFPSbefore = averageFPS;
+                fpsCounter = 0;
+                averageFPS = 0;
+            }
+        }
+        fps++;
     }
     // if (deltatime < 0.2)
     // world.step(config.world.step,);
@@ -427,11 +534,16 @@ function animate() {
 
     raycast.setFromCamera(mouse, camera);
     const intersects = raycast.intersectObjects(scene.children); // diakses oleh floor fence mesh
+    outlinePass.selectedObjects = intersects.map(i => i.object).filter((o: any) => o.selectiveOutline);
 
+    // outlinePass.selectedObjects = intersects.map(i => i.object).filter((o: any) => o.selectiveOutline);
     if (!leftMouseDown)
         document.body.style.cursor = "grab";
     else
         document.body.style.cursor = "grabbing";
+    if (intersects.map(i => i.object).filter((o: any) => o.selectiveOutline).length) {
+        document.body.style.cursor = "pointer";
+    }
     //#region update mesh & body
     if (trees.initialized) {
         trees.setWaveEffect(waveEffect)
@@ -466,6 +578,7 @@ function animate() {
     if (showcase.initialized) {
         showcase.update(deltatime);
     }
+
     if (hotkeys.initialized) {
         hotkeys.setWaveEffect(waveEffect)
         hotkeys.updateWaveEffect(deltatime)
@@ -599,6 +712,7 @@ function animate() {
                 //first time character hit knowledge area
                 START_OFFSET_CAMERA.copy(CURRENT_OFFSET_CAMERA);
                 alphaOffsetCamera_knowledge = 0;
+                updateGraphicQuality(GraphicQuality.Low);
                 character.on = "knowledge";
             }
             alphaOffsetCamera_portofolio = 0;
@@ -621,6 +735,7 @@ function animate() {
                 //first time character hit portofolio area
                 START_OFFSET_CAMERA.copy(CURRENT_OFFSET_CAMERA);
                 character.on = "portofolio";
+                updateGraphicQuality(GraphicQuality.High);
                 alphaOffsetCamera_portofolio = 0;
             }
             alphaOffsetCamera_knowledge = 0;
@@ -636,6 +751,7 @@ function animate() {
             if (character.on != "playground") {
                 //first time character hit playground area
                 START_OFFSET_CAMERA.copy(CURRENT_OFFSET_CAMERA);
+                updateGraphicQuality(GraphicQuality.High);
                 character.on = "playground";
                 alphaOffsetCamera_playground = 0;
             }
@@ -657,6 +773,7 @@ function animate() {
                 //first time character hit lobby area
                 START_OFFSET_CAMERA.copy(CURRENT_OFFSET_CAMERA);
                 character.on = "lobby";
+                updateGraphicQuality(GraphicQuality.High);
                 alphaOffsetCamera_lobby = 0;
             }
             alphaOffsetCamera_portofolio = 0;
@@ -713,16 +830,169 @@ function animate() {
         ticks = 0.0;
     }
     ticks += deltatime;
-    if (initialized)
-        renderer.render(scene, camera)
+    if (initialized) {
+        if (graphicQuality != GraphicQuality.VeryLow && graphicQuality != GraphicQuality.Low) {
+            //bloom post process purposes
+            scene.children.forEach(group => {
+                if ((group as any).isBlooming) return;
+                group.traverse(mesh => {
+                    if ((mesh as any).isMesh || mesh.type.toLowerCase() == "mesh") {
+                        if (group.uuid == character.mesh.uuid) {
+                            // console.log("masuk kok")
+                        }
+                        if (Array.isArray((mesh as Mesh).material)) {
+                            for (let i = 0; i < ((mesh as Mesh).material as ShaderMaterial[]).length; i++) {
+                                if (((mesh as Mesh).material as ShaderMaterial[])[i]?.uniforms?.darkenBloom) {
+
+                                    ((mesh as Mesh).material as ShaderMaterial[])[i].uniforms.darkenBloom.value = true;
+                                    ((mesh as Mesh).material as ShaderMaterial[])[i].needsUpdate = true;
+                                }
+                            }
+                            return;
+                        }
+                        if (((mesh as Mesh).material as ShaderMaterial)?.uniforms?.darkenBloom) {
+
+                            ((mesh as Mesh).material as ShaderMaterial).uniforms.darkenBloom.value = true;
+                            ((mesh as Mesh).material as ShaderMaterial).needsUpdate = true;
+                        }
+                    }
+                })
+            })
+            bloomComposer.render()
+
+            scene.children.forEach(group => {
+                if ((group as any).isBlooming) return;
+                group.traverse(mesh => {
+                    if ((mesh as any).isMesh || mesh.type.toLowerCase() == "mesh") {
+                        if (Array.isArray((mesh as Mesh).material)) {
+                            for (let i = 0; i < ((mesh as Mesh).material as ShaderMaterial[]).length; i++) {
+                                if (((mesh as Mesh).material as ShaderMaterial[])[i]?.uniforms?.darkenBloom) {
+
+                                    ((mesh as Mesh).material as ShaderMaterial[])[i].uniforms.darkenBloom.value = false;
+                                    ((mesh as Mesh).material as ShaderMaterial[])[i].needsUpdate = true;
+                                }
+                            }
+                            return;
+                        }
+                        if (((mesh as Mesh).material as ShaderMaterial)?.uniforms?.darkenBloom) {
+                            ((mesh as Mesh).material as ShaderMaterial).uniforms.darkenBloom.value = false;
+                            ((mesh as Mesh).material as ShaderMaterial).needsUpdate = true;
+                        }
+                    }
+                })
+            })
+        }
+
+
+
+
+
+
+        composer.render();
+    }
     requestAnimationFrame(animate);
 
 }
-const _clock = new Clock()
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
+const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
+outlinePass.edgeStrength = 16;
+outlinePass.edgeGlow = 0;
+outlinePass.visibleEdgeColor = new THREE.Color("#ffffff")
+outlinePass.hiddenEdgeColor = new THREE.Color("#ffffff")
+outlinePass.edgeThickness = 4;
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+const renderPass = new RenderPass(scene, camera);
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { SMAAPass } from "three/examples/jsm/postprocessing/SMAAPass";
+import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
+import { BloomPass } from "three/examples/jsm/postprocessing/BloomPass";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
+import { SSAARenderPass } from "three/examples/jsm/postprocessing/SSAARenderPass";
 
+function updateGraphicQuality(nextValue: GraphicQuality) {
+    if (nextValue == graphicQuality) return;
+    var newComposer = new EffectComposer(renderer);
+    newComposer.setPixelRatio(2);
+    newComposer.addPass(renderPass);
+    switch (nextValue) {
+        // case GraphicQuality.VeryHigh:
+        //     ssaaRenderPassP.sampleLevel = 2;
+        //     newComposer.addPass(ssaaRenderPassP);
+        //     newComposer.addPass(finalPass);
+        //     break;
+        case GraphicQuality.High:
+            ssaaRenderPassP.unbiased = true;
+            renderer.setPixelRatio(2);
+            ssaaRenderPassP.sampleLevel = 2;
+            newComposer.addPass(ssaaRenderPassP);
+            newComposer.addPass(finalPass);
+            break;
+        case GraphicQuality.Medium:
+            // ssaaRenderPassP.sampleLevel = 1;
+            // newComposer.addPass(ssaaRenderPassP);
+            renderer.setPixelRatio(2);
+            newComposer.addPass(finalPass);
+            newComposer.addPass(fxaaPass);
+            break;
+        case GraphicQuality.Low:
+            renderer.setPixelRatio(2);
+            newComposer.addPass(fxaaPass);
+            // newComposer.addPass(finalPass);
+            //add nothing
+            break;
+        case GraphicQuality.VeryLow:
+            renderer.setPixelRatio(1);
+            // newComposer.addPass(fxaaPass);
+            break;
+        default:
+
+    }
+    newComposer.addPass(outlinePass);
+    composer = newComposer;
+    graphicQuality = nextValue;
+
+};
+const fxaaPass = new ShaderPass(FXAAShader);
+fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * renderer.getPixelRatio());
+fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * renderer.getPixelRatio());
+const unrealBloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.1, 0);
+const bloomComposer = new EffectComposer(renderer);
+bloomComposer.renderToScreen = false;
+bloomComposer.addPass(renderPass);
+bloomComposer.addPass(unrealBloomPass);
+
+import bloomVert from "../public/assets/shaders/bloomPass.vert";
+import bloomFrag from "../public/assets/shaders/bloomPass.frag";
+const finalPass = new ShaderPass(new THREE.ShaderMaterial({
+    uniforms: {
+        baseTexture: { value: null },
+        bloomTexture: { value: bloomComposer.renderTarget2.texture }
+    },
+    vertexShader: bloomVert,
+    fragmentShader: bloomFrag,
+    defines: {}
+}), "baseTexture");
+finalPass.needsSwap = true;
+var composer = new EffectComposer(renderer);
+composer.setPixelRatio(2);
+composer.addPass(renderPass);
+//SSAA source code taken from: https://threejs.org/examples/webgl_postprocessing_ssaa.html
+//why use SSAA? not FXAA? MSAA? reason: https://www.quora.com/What-are-the-differences-between-types-of-anti-aliasing-such-as-TXAA-MSAA-SSAA-and-MFAA
+const ssaaRenderPassP = new SSAARenderPass(scene, camera, new THREE.Color("rgb(0,0,0)"), 1);
+ssaaRenderPassP.sampleLevel = 2;
+ssaaRenderPassP.unbiased = true;
+
+// composer.addPass(ssaaRenderPassP);
+// composer.addPass(fxaaPass);
+
+import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
+const copyPass = new ShaderPass(CopyShader);
+// composer.addPass(outlinePass);
+// composer.addPass(copyPass);
+// composer.addPass(finalPass);
+updateGraphicQuality(GraphicQuality.High);
 var ticks = 0.0;
-// import { TweenLite } from 'gsap/all';
-// const test = TweenLite.fromTo({x:0,y:0,z:0},durat)
 animate();
 
 const connection = new Connection();
@@ -860,7 +1130,6 @@ async function init() {
     character.followWaveEffect = false;
     character.init().then(() => {
         loading.addProgress(2);
-        console.log({ uuidcharacter: character.mesh.uuid })
     });
     johansen.init().then(() => {
         // loading.addProgress(5);
