@@ -18,9 +18,12 @@ const io = require("socket.io")(httpServer, {
         origin: "*"
     }
 });
-
+const fetch = require('node-fetch');
 const IDs = {};
 io.on("connection", (socket) => {
+    socket.on("spotify",(e)=>{
+
+    })
     socket.emit("id", socket.id);
     socket.on("offer", (e) => {
         const { id, sdp } = e;
@@ -110,7 +113,12 @@ io.on("connection", (socket) => {
     // console.log({ IDs })
     console.log(`someone made connection ${socket.id}`)
 });
-app.get()
+
+//to do:
+setInterval(() => {
+    //await requst spotify
+    // broadcast to all sockets
+}, 10000);
 // io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
 //     console.log("test")
 // });

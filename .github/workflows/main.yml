@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: set refresh token spotify API to .txt file
-        run: echo "" >> refreshtoken.spotfy.txt; echo "${{ secrets.refresh_token_spotify }}" >> refreshtoken.spotfy.txt;
+        run: rm -f refreshtoken.spotfy.txt; echo "${{ secrets.refresh_token_spotify }}" >> refreshtoken.spotfy.txt;
       - name: Build Files
         run: bash ./build.sh -m PROD --use-docker
         continue-on-error: true
