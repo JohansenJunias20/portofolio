@@ -243,7 +243,7 @@ const showcase = new Showcase({ scene, world, position: new Vector3(-50, 10.5, -
 const navigationBoards = new NavigationBoards(world, scene);
 
 const lobby = new Lobby(world, scene);
-const character = new Character(world, scene, camera, new Vector3(0, 20, 5), 25, true);
+const character = new Character(world, scene, camera, new Vector3(0, 45, 5), 25, true);
 const roadStones = new RoadStones(scene)
 
 const johansen = new Johansen(world, scene)
@@ -281,7 +281,6 @@ document.onkeydown = (e) => {
         // for placing trees purposes.
         console.log(`${character.position.x.toFixed(0)}, -5, ${character.position.z.toFixed(0)}`);
         return;
-
     }
     else if (key == "g") {
         const raycast3 = new Raycaster();
@@ -458,59 +457,60 @@ function animate() {
                         hadHigher = false;
                     console.log("setting lower quality...")
                     //SET LOWER QUALITY
-                    // switch (graphicQuality) {
-                    //     case GraphicQuality.High:
-                    //         updateGraphicQuality(GraphicQuality.Medium);
-                    //         console.log("to medium");
-                    //         break;
-                    //     case GraphicQuality.Medium:
-                    //         updateGraphicQuality(GraphicQuality.Low);
-                    //         console.log("to low");
-                    //         console.log({ graphicQuality });
-                    //         break;
-                    //     case GraphicQuality.Low:
-                    //         updateGraphicQuality(GraphicQuality.VeryLow);
-                    //         console.log("to verylow");
-                    //         console.log({ graphicQuality });
-                    //         break;
-                    // }
+                    switch (graphicQuality) {
+                        case GraphicQuality.High:
+                            updateGraphicQuality(GraphicQuality.Medium);
+                            console.log("to medium");
+                            break;
+                        case GraphicQuality.Medium:
+                            updateGraphicQuality(GraphicQuality.Low);
+                            console.log("to low");
+                            console.log({ graphicQuality });
+                            break;
+                        case GraphicQuality.Low:
+                            updateGraphicQuality(GraphicQuality.VeryLow);
+                            console.log("to verylow");
+                            console.log({ graphicQuality });
+                            break;
+                    }
                     //reset for checking the next quality
                     averageFPS = 0;
                     fpsCounter = 0;
                 }
                 else if (averageFPS > 59 && !hadHigher) {
                     //SET LOWER QUALITY
-                    // switch (graphicQuality) {
-                    //     case GraphicQuality.Medium:
-                    //         updateGraphicQuality(GraphicQuality.High);
-                    //         hadHigher = true;
-                    //         console.log("setting higher quality...")
-                    //         console.log("to high");
-                    //         console.log({ graphicQuality });
-                    //         averageFPS = 0;
-                    //         fpsCounter = 0;
-                    //         break;
-                    //     case GraphicQuality.Low:
-                    //         updateGraphicQuality(GraphicQuality.Medium);
-                    //         hadHigher = true;
-                    //         console.log("setting higher quality...")
-                    //         console.log("to medium");
-                    //         console.log({ graphicQuality });
-                    //         console.log({ graphicQuality });
-                    //         averageFPS = 0;
-                    //         fpsCounter = 0;
-                    //         break;
-                    //     case GraphicQuality.VeryLow:
-                    //         updateGraphicQuality(GraphicQuality.Low);
-                    //         hadHigher = true;
-                    //         console.log("setting higher quality...")
-                    //         console.log("to low");
-                    //         console.log({ graphicQuality });
-                    //         console.log({ graphicQuality });
-                    //         averageFPS = 0;
-                    //         fpsCounter = 0;
-                    //         break;
-                    // }
+                    console.log("masuk setting higher")
+                    switch (graphicQuality) {
+                        case GraphicQuality.Medium:
+                            updateGraphicQuality(GraphicQuality.High);
+                            hadHigher = true;
+                            console.log("setting higher quality...")
+                            console.log("to high");
+                            console.log({ graphicQuality });
+                            averageFPS = 0;
+                            fpsCounter = 0;
+                            break;
+                        case GraphicQuality.Low:
+                            updateGraphicQuality(GraphicQuality.Medium);
+                            hadHigher = true;
+                            console.log("setting higher quality...")
+                            console.log("to medium");
+                            console.log({ graphicQuality });
+                            console.log({ graphicQuality });
+                            averageFPS = 0;
+                            fpsCounter = 0;
+                            break;
+                        case GraphicQuality.VeryLow:
+                            updateGraphicQuality(GraphicQuality.Low);
+                            hadHigher = true;
+                            console.log("setting higher quality...")
+                            console.log("to low");
+                            console.log({ graphicQuality });
+                            console.log({ graphicQuality });
+                            averageFPS = 0;
+                            fpsCounter = 0;
+                            break;
+                    }
                     //reset for checking the next quality
 
                 }
@@ -712,7 +712,7 @@ function animate() {
                 //first time character hit knowledge area
                 START_OFFSET_CAMERA.copy(CURRENT_OFFSET_CAMERA);
                 alphaOffsetCamera_knowledge = 0;
-                updateGraphicQuality(GraphicQuality.Low);
+                // updateGraphicQuality(GraphicQuality.Low);
                 character.on = "knowledge";
             }
             alphaOffsetCamera_portofolio = 0;
@@ -735,7 +735,11 @@ function animate() {
                 //first time character hit portofolio area
                 START_OFFSET_CAMERA.copy(CURRENT_OFFSET_CAMERA);
                 character.on = "portofolio";
-                updateGraphicQuality(GraphicQuality.High);
+                // if (isMobile()) {
+                //     updateGraphicQuality(GraphicQuality.Medium);
+                // }
+                // else
+                //     updateGraphicQuality(GraphicQuality.High);
                 alphaOffsetCamera_portofolio = 0;
             }
             alphaOffsetCamera_knowledge = 0;
@@ -751,7 +755,11 @@ function animate() {
             if (character.on != "playground") {
                 //first time character hit playground area
                 START_OFFSET_CAMERA.copy(CURRENT_OFFSET_CAMERA);
-                updateGraphicQuality(GraphicQuality.High);
+                // if (isMobile()) {
+                //     updateGraphicQuality(GraphicQuality.Medium);
+                // }
+                // else
+                //     updateGraphicQuality(GraphicQuality.High);
                 character.on = "playground";
                 alphaOffsetCamera_playground = 0;
             }
@@ -773,7 +781,11 @@ function animate() {
                 //first time character hit lobby area
                 START_OFFSET_CAMERA.copy(CURRENT_OFFSET_CAMERA);
                 character.on = "lobby";
-                updateGraphicQuality(GraphicQuality.High);
+                // if (isMobile()) {
+                //     updateGraphicQuality(GraphicQuality.Medium);
+                // }
+                // else
+                //     updateGraphicQuality(GraphicQuality.High);
                 alphaOffsetCamera_lobby = 0;
             }
             alphaOffsetCamera_portofolio = 0;
@@ -924,6 +936,7 @@ function updateGraphicQuality(nextValue: GraphicQuality) {
         case GraphicQuality.High:
             ssaaRenderPassP.unbiased = true;
             renderer.setPixelRatio(2);
+            trees.reAdd();
             ssaaRenderPassP.sampleLevel = 2;
             newComposer.addPass(ssaaRenderPassP);
             newComposer.addPass(finalPass);
@@ -931,18 +944,21 @@ function updateGraphicQuality(nextValue: GraphicQuality) {
         case GraphicQuality.Medium:
             // ssaaRenderPassP.sampleLevel = 1;
             // newComposer.addPass(ssaaRenderPassP);
-            renderer.setPixelRatio(2);
+            trees.reAdd();
+            renderer.setPixelRatio(1);
             newComposer.addPass(finalPass);
             newComposer.addPass(fxaaPass);
             break;
         case GraphicQuality.Low:
             renderer.setPixelRatio(2);
+            trees.reAdd();
             newComposer.addPass(fxaaPass);
             // newComposer.addPass(finalPass);
             //add nothing
             break;
         case GraphicQuality.VeryLow:
             renderer.setPixelRatio(1);
+            trees.removeAll();
             // newComposer.addPass(fxaaPass);
             break;
         default:
@@ -991,7 +1007,7 @@ const copyPass = new ShaderPass(CopyShader);
 // composer.addPass(outlinePass);
 // composer.addPass(copyPass);
 // composer.addPass(finalPass);
-updateGraphicQuality(GraphicQuality.High);
+updateGraphicQuality(GraphicQuality.Medium);
 var ticks = 0.0;
 animate();
 
@@ -1146,6 +1162,7 @@ async function init() {
     trees.init().then(() => {
         loading.addProgress(15);
     })
+    // loading.addProgress(15);
     loading.setText("Loading Billboards");
     billboards.init().then(() => {
         loading.addProgress(15);

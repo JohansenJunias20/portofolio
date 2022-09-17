@@ -8,3 +8,4 @@ ws-server/visitor.json
 dump
 ssl/main/archive/*.pem
 ssl/main/live/*.pem
+refreshtoken.spotify.txt

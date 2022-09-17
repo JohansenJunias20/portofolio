@@ -22,7 +22,7 @@ export default class Plane {
         this.position = position;
         this.size = size;
 
-        const groundBody = new CANNON.Body({ mass: 0, material: { friction: 1, restitution: 3, id: 1, name: "test" }, shape: new CANNON.Box(new Vec3(size.x, 0.1, size.z)) });
+        const groundBody = new CANNON.Body({ position: new Vec3(0, -0.9, 0), mass: 0, material: { friction: 1, restitution: 3, id: 1, name: "test" }, shape: new CANNON.Box(new Vec3(size.x, 1, size.z)) });
         world.addBody(groundBody);
 
         const screenSize = {

@@ -6,11 +6,12 @@ const production = process.env.PRODUCTION ? true : false;
 const ssl = production ? process.env.PROD_WS_SSL == "TRUE" ? true : false : process.env.DEV_WS_SSL == "TRUE" ? true : false;
 const domain = production ? process.env.PROD_WS_DOMAIN : process.env.DEV_WS_DOMAIN;
 const express = require('express');
+const app = new express();
 const httpServer = ssl ? require("https").createServer({
     key: fs.readFileSync(`/etc/letsencrypt/live/${domain}/privkey.pem`),
     cert: fs.readFileSync(`/etc/letsencrypt/live/${domain}/cert.pem`)
 }) :
-    require("http").createServer()
+    require("http").createServer(app)
     ;
 const io = require("socket.io")(httpServer, {
     cors: {
@@ -109,6 +110,7 @@ io.on("connection", (socket) => {
     // console.log({ IDs })
     console.log(`someone made connection ${socket.id}`)
 });
+app.get()
 // io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
 //     console.log("test")
 // });
