@@ -6,6 +6,8 @@ private/*.mod
 ws-server/visitor.json
 # ssl/main/live/*
 dump
-ssl/main/archive/*.pem
-ssl/main/live/*.pem
+ssl/main/archive/portfolio.orbitskomputer.com/*.pem
+ssl/main/live/portfolio.orbitskomputer.com/*.pem
 refreshtoken.spotify.txt
+ws-server/.env
+ssl

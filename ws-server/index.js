@@ -117,13 +117,13 @@ io.on("connection", (socket) => {
 //to do:
 setInterval(() => {
     //await requst spotify
+    
     // broadcast to all sockets
 }, 10000);
 // io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
 //     console.log("test")
 // });
 httpServer.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
-    console.log("done1");
     console.log({ ssl, port: process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT })
 
 

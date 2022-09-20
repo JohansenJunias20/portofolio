@@ -21,26 +21,26 @@ done
 domains=("portofolio.orbitskomputer.com")
 for i in "${domains[@]}"; do
     echo "check $i is exist in ssl directory?"
-    if [ -d "./ssl/main/archive/$i" ]; then
+    if [ -d "../ssl/main/archive/$i" ]; then
         # check if exist in directoriy live too
-        if [ ! -d "./ssl/main/live/$i" ]; then
+        if [ ! -d "../ssl/main/live/$i" ]; then
             echo "not exist in live directory, removing from archive"
-            rm -r -f ./ssl/main/archive/$i
-            rm -r -f ./ssl/main/live/$i
+            rm -r -f ../ssl/main/archive/$i
+            rm -r -f ../ssl/main/live/$i
         fi
         echo "exist in archive directory, skipping request certificate..";
     fi
     # check if directory archive exist
-    if [ ! -d "./ssl/main/archive/$i" ]; then
+    if [ ! -d "../ssl/main/archive/$i" ]; then
         echo "requesting certificate for $i";
         # request a certificate
-        docker run -it -v "/$(pwd)/ssl/main:/etc/letsencrypt" -p 80:80 certbot/certbot certonly --standalone --email johansen.gumbal@gmail.com --agree-tos --no-eff-email -d $i --keep-until-expiring
+        docker run -it -v "/$(pwd)/../ssl/main:/etc/letsencrypt" -p 80:80 certbot/certbot certonly --standalone --email johansen.gumbal@gmail.com --agree-tos --no-eff-email -d $i --keep-until-expiring
     fi
     sleep 3;
 done
 sleep 5;
 echo "renew all ssl certificates...";
-docker run -v "/$(pwd)/ssl/main:/etc/letsencrypt" -p 80:80 \
+docker run -v "/$(pwd)/../ssl/main:/etc/letsencrypt" -p 80:80 \
     certbot/certbot renew --standalone --email johansen.gumbal@gmail.com --agree-tos --no-eff-email
 
 

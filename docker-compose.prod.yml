@@ -11,12 +11,12 @@ services:
     command: sh /usr/src/app/prod.sh
     volumes:
       - "./ws-server:/usr/src/app"
-      - "./ssl/main:/etc/letsencrypt"
-      - "./ssl/lib:/var/lib/letsencrypt"
+      - "../ssl/main:/etc/letsencrypt"
+      - "../ssl/lib:/var/lib/letsencrypt"
   coturn:
     image: instrumentisto/coturn
     network_mode: host
     volumes:
       - "./turnserver.conf:/etc/coturn/turnserver.conf" 
-      - "./ssl/main/:/etc/letsencrypt/" 
+      - "../ssl/main/:/etc/letsencrypt/" 
 

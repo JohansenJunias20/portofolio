@@ -4,10 +4,12 @@ import getCountry from '../utility/getCountry';
 import capitalizeFirstLetter from '../utility/UpperCaseFirstLetter';
 import Modal from '../Modal';
 import { Quaternion } from 'cannon';
+import { ISpotify } from '../Spotify/Spotify';
 
 interface IHash<T> {
     [details: string]: T;
 }
+
 declare var production: boolean;
 declare var TURN_PORT_TLS: number;
 declare var TURN_PORT: number;
@@ -121,6 +123,11 @@ export default class Connection {
             ]
         }
         console.log("protocol")
+        window.addEventListener("spotify", () => {
+            console.log("called!! spotify");
+
+        });
+        const ev = new Event('spotify');
         console.log(location.protocol)
         // console.log({ WS_DOMAIN, WS_PORT })
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
@@ -164,7 +171,9 @@ export default class Connection {
         })
 
 
-
+        ref.signalling.on("spotify", (data: ISpotify) => {
+            window.dispatchEvent(new CustomEvent<ISpotify>('spotify', { detail: data }));
+        });
         ref.signalling.on("candidate", async ({ id, candidate }) => {
             if (!candidate) return;
             if (ref.remotePeers.hasOwnProperty(id)) { //mencegah console error saja, tanpa if ini sebenarnya juga bisa tapi entah knapa error
