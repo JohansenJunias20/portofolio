@@ -130,6 +130,7 @@ export default class Connection {
         const ev = new Event('spotify');
         console.log(location.protocol)
         // console.log({ WS_DOMAIN, WS_PORT })
+        console.log(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`)
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
         this.connected = true;
         this.signalling = signalling;
@@ -270,6 +271,9 @@ export default class Connection {
         ref.signalling.on("id", id => {
             ref.id = id;
         })
+        // ref.signalling.on("spotify", (spotify: any) => {
+        //     console.log({ spotify })
+        // })
     }
     public nickname: string;
     public boardDOM: HTMLDivElement;

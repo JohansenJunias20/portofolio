@@ -5,6 +5,7 @@ import { ShaderMaterial } from "three";
 import vertexShader from "../../public/assets/shaders/floorMesh.vert";
 import fragShader from "../../public/assets/shaders/floorMesh.frag";
 import customShader from "../utility/customShader";
+import wrapText from "../utility/WrapText";
 export interface ISpotify {
     image_url: string;
     song: {
@@ -18,6 +19,7 @@ export interface ISpotify {
 }
 export default class Spotify extends MeshOnlyObject3d {
     currentSpotify: ISpotify;
+    canvas: HTMLCanvasElement = document.querySelector("#debug");
     // mesh: THREE.Mesh;
     changeTexture: boolean = false;
     constructor(scene: THREE.Scene, position: THREE.Vector3) {
@@ -26,8 +28,14 @@ export default class Spotify extends MeshOnlyObject3d {
         window.addEventListener("spotify", (e: any) => {
             var data = (e.detail as ISpotify);
             this.currentSpotify = data;
+            // console.log("recieve from spotify.ts file!")
+            console.log({ data });
             this.changeTexture = true;
         })
+        this.canvas.width = 600;
+        this.canvas.height = 250;
+        this.canvas.style.width = `${600}px`;
+        this.canvas.style.height = `${250}px`;
     };
     public async loadAsset() {
         // var desc_text_texture = await new THREE.TextureLoader().loadAsync(this.pathTexture)
@@ -38,27 +46,70 @@ export default class Spotify extends MeshOnlyObject3d {
             uniforms: {
                 mapTexture: {
                     value: null,
+                },
+                darkenBloom: {
+                    value: false
                 }
             },
         });
         var geometry = new THREE.PlaneGeometry();
         this.mesh = new THREE.Mesh(geometry, material);
+        this.scene.add(this.mesh);
+        this.initialized = true;
     }
+    imageCache: HTMLImageElement;
     public update() {
         if (this.changeTexture) {
             this.changeTexture = false;
-            generateTexture({
-                layers: [
-                    { type: "image", image: this.currentSpotify.image_url, position: { x: 5, y: 5 } }, //cover image
-                    { type: "text", text: this.currentSpotify.song.name, position: { x: 50, y: 5 } }, //cover image
-                    { type: "text", text: this.currentSpotify.song.artist, position: { x: 50, y: 35 } }, //cover image
-                    // { type: "image", image: this.currentSpotify.image_url, position: { x: 5, y: 5 } }, //cover image
-                ], width: 300, height: 150
-            }).then((result) => {
-                ((this.mesh as Mesh).material as ShaderMaterial).uniforms.textureMap.value = result;
-                ((this.mesh as Mesh).material as ShaderMaterial).needsUpdate = true;
+            if (!this.currentSpotify) return; //currently not playing because value is {}
 
-            });
+            // const canvas = document.createElement("canvas");
+            // canvas.
+            const ctx = this.canvas.getContext("2d");
+            if (!ctx) {
+                throw "context not found"
+            }
+            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+            if (this.imageCache?.src != this.currentSpotify.image_url) {
+
+                const img = new Image(200, 200);
+                img.crossOrigin = "anonymous"
+                img.src = this.currentSpotify.image_url;
+                const ref = this;
+                img.onload = () => {
+                    ref.imageCache = img;
+                    ctx.drawImage(img, 5, 5, 200, 200);
+                    ((this.mesh as Mesh).material as ShaderMaterial).uniforms.mapTexture.value = new THREE.CanvasTexture(this.canvas);
+                    ((this.mesh as Mesh).material as ShaderMaterial).needsUpdate = true;
+                }
+            }
+            else {
+                ctx.drawImage(this.imageCache, 5, 5, 200, 200);
+            }
+
+            ctx.font = "900 30px Montserrat";
+            // ctx.font
+            ctx.fillStyle = "rgba(255,255,255,1)";
+            var wrappedText = wrapText(ctx, this.currentSpotify.song.name, 210, 45, this.canvas.width - 305, 30);
+            console.log({ wrappedText });
+            for (let i = 0; i < wrappedText.length; i++) {
+                const txt = wrappedText[i];
+                ctx.fillText(txt[0].toString(), parseInt(txt[1]), parseInt(txt[2]));
+
+            }
+            ctx.fill();
+            ctx.fillText(this.currentSpotify.song.artist, 210, wrappedText.at(-1)[2] + 50);
+            ctx.fill();
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillRect(5, this.canvas.height - 40, this.canvas.width - 10, 10);
+            ctx.fillStyle = "rgba(0,0,0,1)";
+            ctx.fillRect(5, this.canvas.height - 40, (this.currentSpotify.currentDuration / this.currentSpotify.song.length) * (this.canvas.width - 10), 10);
+            ctx.fillStyle = "rgba(1,1,1,1)";
+            ctx.font = "600 20px Montserrat";
+            ctx.fillText(
+                `${Math.round(Math.round(this.currentSpotify.currentDuration) / 60)}:${Math.round(this.currentSpotify.currentDuration % 60).toString().padStart(2,"0")} / ${Math.round(Math.round(this.currentSpotify.song.length) / 60)}:${Math.round(this.currentSpotify.song.length % 60).toString().padStart(2,"0")}`,
+                5, this.canvas.height - 10);
+
         }
     }
 }

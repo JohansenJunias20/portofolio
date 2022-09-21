@@ -257,6 +257,8 @@ const billboards = new Billboards(world, scene, camera)
 const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Vector3(-50, 0.2, 50))
 
 const contacts = new Contacts(world, scene, camera)
+
+const spotify = new Spotify(scene, new Vector3(20, 10, 0));
 //#endregion
 
 var key: string;
@@ -441,6 +443,7 @@ var averageFPSbefore = 0;
 const checkingCounter = 5;
 function animate() {
     deltatime = clock.getDelta()
+
     //jangan lupa saat unfocus, fps berkurang jadi tidak dihitung kedalam average FPS
     if (initialized) {
         elapsedTime += deltatime;
@@ -559,6 +562,11 @@ function animate() {
 
         // console.log({ x, y, z });
     }
+
+    if (spotify.initialized) {
+        spotify.update();
+    }
+
     if (character.initialized) {
         // alert(camera.position.distanceTo(character.position))
         // character.setWaveEffect(waveEffect)
@@ -1147,6 +1155,8 @@ async function init() {
     character.init().then(() => {
         loading.addProgress(2);
     });
+
+    spotify.init(loading);
     johansen.init().then(() => {
         // loading.addProgress(5);
 
@@ -1201,6 +1211,7 @@ init();
 
 import gsap, { Linear } from "gsap"
 import Contacts from './Lobby/Contacts/Contacts';
+import Spotify from './Spotify/Spotify';
 function gotoPlayer(socketid: string) {
     if (socketid == connection.id) return; // yang dipencet username diri sendiri.
     const targetPosition = otherPlayers[socketid].position.clone();

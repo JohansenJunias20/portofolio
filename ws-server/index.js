@@ -21,7 +21,7 @@ const io = require("socket.io")(httpServer, {
 const fetch = require('node-fetch');
 const IDs = {};
 io.on("connection", (socket) => {
-    socket.on("spotify",(e)=>{
+    socket.on("spotify", (e) => {
 
     })
     socket.emit("id", socket.id);
@@ -114,12 +114,93 @@ io.on("connection", (socket) => {
     console.log(`someone made connection ${socket.id}`)
 });
 
+
+function LogError(error, location) {
+    var result = [];
+    if (!fs.existsSync("./log.json")) {
+        fs.writeFileSync("./log.json", "[]", "utf-8");
+    }
+    result = fs.readFileSync("./log.json", "utf-8");
+    result.push({ error, location });
+    fs.writeFileSync("./log.json", JSON.stringify(result), "utf-8");
+
+}
+const spotify = {
+    token: ""
+}
+setInterval(async () => {
+    spotify.token = await getToken();
+}, 3550 * 1000);
+const refresh_token = fs.readFileSync("./refreshtoken.spotify.txt", "utf-8");
+async function getToken() {
+    const url = "https://accounts.spotify.com/api/token";
+    var details = {
+        'refresh_token': refresh_token,
+        'grant_type': 'refresh_token'
+    };
+
+    var formBody = [];
+    for (var property in details) {
+        var encodedKey = encodeURIComponent(property);
+        var encodedValue = encodeURIComponent(details[property]);
+        formBody.push(encodedKey + "=" + encodedValue);
+    }
+    formBody = formBody.join("&");
+    var response = await (await fetch(url, {
+        method: "POST",
+        headers: {
+            "Authorization": "Basic MTgxY2RlNjM3MDNjNGU4YTgxMDMyNTQ4ODM5ZDA1NDQ6ZTc2Zjg0Zjg0Y2Q2NDk3NmExYzg4Y2U2MDQ1M2E5NTk=",
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formBody
+    })).text();
+    console.log({ response })
+    response = JSON.parse(response)
+    if (response.access_token) {
+        spotify.token = response.access_token;
+        return response.access_token;
+    }
+    else {
+        // throw JSON.stringify(response);
+        LogError(response, "150 index.js");
+    }
+}
+
+async function requestSpotify() {
+    // ait requst spotify
+    var response = await (await fetch("https://api.spotify.com/v1/me/player", {
+        headers: {
+            "Authorization": `Bearer ${spotify.token ? spotify.token : await getToken()}`,
+        }
+    })).text()
+    if (response == "") {
+        //currently not playing anything
+        broadcastSpotify({ is_playing: false })
+        return;
+    }
+    response = JSON.parse(response)
+    if (response.error) {
+        LogError(response, "162 index.js");
+        return;
+    }
+    // console.log({response});
+    try{
+
+        broadcastSpotify({ song_name: response.item.name, artist: response.item.artists[0].name, song_length: response.item.duration_ms / 1000, currentDuration: response.progress_ms / 1000, image_url: response.item.album.images[0].url, is_playing: true });
+    }
+    catch(ex){
+        LogError(response,"192 index.js");
+    }
+    await new Promise(res => setTimeout(res, 1000));
+    requestSpotify();
+}
 //to do:
-setInterval(() => {
-    //await requst spotify
-    
-    // broadcast to all sockets
-}, 10000);
+requestSpotify();
+
+function broadcastSpotify({ song_name, artist, song_length, currentDuration, image_url, is_playing }) {
+    //no song played
+    io.emit("spotify", is_playing ? { image_url, song: { name: song_name, artist, length: song_length }, is_playing, currentDuration } : {});
+}
 // io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
 //     console.log("test")
 // });
