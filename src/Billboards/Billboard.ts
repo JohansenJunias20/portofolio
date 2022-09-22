@@ -217,7 +217,7 @@ export default class Billboard {
                 },
                 useTexture:{
                     value:false
-                }
+                },
                 color: {
                     value: new THREE.Vector3(1, 1, 1)
                 }

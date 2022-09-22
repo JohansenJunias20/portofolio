@@ -59,7 +59,7 @@ export default class SpotifyFloor extends MeshOnlyObject3d {
 
         });
         var geometry = new THREE.PlaneGeometry(12, 5)
-        this.mesh = new THREE.Mesh(geometry, material);
+        this.mesh = (new THREE.Mesh(geometry, material)) as any;
         this.mesh.rotateX(degToRad(-90))
         this.mesh.scale.x  = 2;
         this.mesh.scale.y = 2;
@@ -90,8 +90,8 @@ export default class SpotifyFloor extends MeshOnlyObject3d {
                 img.onload = () => {
                     ref.imageCache = img;
                     ctx.drawImage(img, 5, 5, 200, 200);
-                    ((this.mesh as Mesh).material as ShaderMaterial).uniforms.mapTexture.value = new THREE.CanvasTexture(this.canvas);
-                    ((this.mesh as Mesh).material as ShaderMaterial).needsUpdate = true;
+                    ((this.mesh as any).material as ShaderMaterial).uniforms.mapTexture.value = new THREE.CanvasTexture(this.canvas);
+                    ((this.mesh as any).material as ShaderMaterial).needsUpdate = true;
                     console.log("set")
                 }
             }
@@ -106,11 +106,11 @@ export default class SpotifyFloor extends MeshOnlyObject3d {
             console.log({ wrappedText });
             for (let i = 0; i < wrappedText.length; i++) {
                 const txt = wrappedText[i];
-                ctx.fillText(txt[0].toString(), parseInt(txt[1]), parseInt(txt[2]));
+                ctx.fillText(txt[0].toString(), parseInt((txt[1] as any)), parseInt((txt[2] as any)));
 
             }
             ctx.fill();
-            ctx.fillText(this.currentSpotify.song.artist, 210, wrappedText.at(-1)[2] + 50);
+            ctx.fillText(this.currentSpotify.song.artist, 210, (wrappedText.at(-1)[2] as any) + 50);
             ctx.fill();
 
             ctx.fillStyle = "rgba(250,211,174,1)";
@@ -124,8 +124,8 @@ export default class SpotifyFloor extends MeshOnlyObject3d {
                 `${Math.round(Math.round(this.currentSpotify.currentDuration) / 60)}:${Math.round(this.currentSpotify.currentDuration % 60).toString().padStart(2, "0")} / ${Math.round(Math.round(this.currentSpotify.song.length) / 60)}:${Math.round(this.currentSpotify.song.length % 60).toString().padStart(2, "0")}`,
                 this.canvas.width - 150, this.canvas.height - 50);
             if (!alreadyChange) {
-                ((this.mesh as Mesh).material as ShaderMaterial).uniforms.mapTexture.value = new THREE.CanvasTexture(this.canvas);
-                ((this.mesh as Mesh).material as ShaderMaterial).needsUpdate = true;
+                ((this.mesh as any).material as ShaderMaterial).uniforms.mapTexture.value = new THREE.CanvasTexture(this.canvas);
+                ((this.mesh as any).material as ShaderMaterial).needsUpdate = true;
             }
         }
     }

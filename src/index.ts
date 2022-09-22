@@ -16,7 +16,7 @@ const fov = THREE.MathUtils.degToRad(camera.fov);
 const hyperfocus = (camera.near + camera.far) / 2;
 const _height = 2 * Math.tan(fov / 2) * hyperfocus;
 // cameraO.zoom = window.innerHeight / _height;
-console.log("v2.1");//just to make sure on production mode ts compiled correctly (newest version)
+console.log("v2.2: spotify added");//just to make sure on production mode ts compiled correctly (newest version)
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true,
