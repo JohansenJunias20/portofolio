@@ -131,7 +131,8 @@ const spotify = {
 setInterval(async () => {
     spotify.token = await getToken();
 }, 3550 * 1000);
-const refresh_token = fs.readFileSync("./refreshtoken.spotify.txt", "utf-8");
+const refresh_token = fs.readFileSync("./refreshtoken.spotify.txt", "utf-8").replace(/(\r\n|\n|\r)/gm, "");
+console.log({refresh_token});
 async function getToken() {
     const url = "https://accounts.spotify.com/api/token";
     var details = {
