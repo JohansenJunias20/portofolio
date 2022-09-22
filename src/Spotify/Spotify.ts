@@ -1,3 +1,4 @@
+import { Vector3 } from "three";
 import Wrapper from "../Wrapper";
 import DJMixer from "./DJMixer";
 import SpotifyFloor from "./SpotifyFloor";
@@ -8,7 +9,7 @@ export default class Spotify extends Wrapper<SpotifyFloor | DJMixer>{
         super();
         this.keys = [
             new SpotifyFloor(scene, position),
-            new DJMixer(world, scene, position)
+            new DJMixer(world, scene, position.clone())
         ]
     }
 }

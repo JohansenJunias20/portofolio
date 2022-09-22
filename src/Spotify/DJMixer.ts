@@ -5,7 +5,8 @@ import * as CANNON from 'cannon';
 
 export default class DJMixer extends PhysicsObject3d {
     constructor(world: CANNON.World, scene: THREE.Scene, position: THREE.Vector3) {
-        super(world, scene, position.clone().setY(7), 0, "BOX", 0);
+        super(world, scene, position.clone(), 0, "BOX", 0);
+        this.followWaveEffect = true;
         this.asset = {
             url: "/assets/environment/Spotify/dj_mixer.glb",
             // mtl: "/assets/environment/Spotify/dj_mixer.mtl",
@@ -14,7 +15,7 @@ export default class DJMixer extends PhysicsObject3d {
             scale: new Vector3(2, 2, 2),
             floorShadow: {
                 // textureUrl: "/assets/environment/Spotify/floorShadow.png",
-                textureUrl: "/assets/environment/projector/floorShadow.png",
+                textureUrl: "/assets/environment/Spotify/floorShadow.png",
                 modelUrl: "/assets/floorShadow.obj",
                 scale: new Vector3(8.3, 0, 8.3),
                 offset: new Vector3(),
