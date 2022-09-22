@@ -11,7 +11,7 @@ services:
     command: sh /usr/src/app/prod.sh
     volumes:
       - "./ws-server:/usr/src/app"
-      - "./refreshtoken.spotify.txt:/usr/src/app/refreshtoken.spotify.txt"
+      - "${PWD}/refreshtoken.spotify.txt:/usr/src/app/refreshtoken.spotify.txt"
       - "../ssl/main:/etc/letsencrypt"
       - "../ssl/lib:/var/lib/letsencrypt"
   coturn:
