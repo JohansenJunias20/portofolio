@@ -120,7 +120,7 @@ function LogError(error, location) {
     if (!fs.existsSync("./log.json")) {
         fs.writeFileSync("./log.json", "[]", "utf-8");
     }
-    result = fs.readFileSync("./log.json", "utf-8");
+    result = JSON.parse(fs.readFileSync("./log.json", "utf-8"));
     result.push({ error, location });
     fs.writeFileSync("./log.json", JSON.stringify(result), "utf-8");
 
@@ -132,7 +132,7 @@ setInterval(async () => {
     spotify.token = await getToken();
 }, 3550 * 1000);
 const refresh_token = fs.readFileSync("./refreshtoken.spotify.txt", "utf-8").replace(/(\r\n|\n|\r)/gm, "");
-console.log({refresh_token});
+console.log({ refresh_token });
 async function getToken() {
     const url = "https://accounts.spotify.com/api/token";
     var details = {
@@ -169,6 +169,7 @@ async function getToken() {
 
 async function requestSpotify() {
     // ait requst spotify
+    console.log("request spotify")
     var response = await (await fetch("https://api.spotify.com/v1/me/player", {
         headers: {
             "Authorization": `Bearer ${spotify.token ? spotify.token : await getToken()}`,
@@ -177,30 +178,44 @@ async function requestSpotify() {
     if (response == "") {
         //currently not playing anything
         broadcastSpotify({ is_playing: false })
+        await new Promise(res => setTimeout(res, 1000));
+        requestSpotify();
         return;
     }
-    response = JSON.parse(response)
+    try {
+
+        response = JSON.parse(response)
+    }
+    catch (ex) {
+        LogError(response, "188 index.js");
+        await new Promise(res => setTimeout(res, 1000));
+        requestSpotify();
+        return;
+    }
     if (response.error) {
-        LogError(response, "162 index.js");
+        LogError(response, "192 index.js");
+        await new Promise(res => setTimeout(res, 1000));
+        requestSpotify();
         return;
     }
     // console.log({response});
-    try{
+    try {
 
         broadcastSpotify({ song_name: response.item.name, artist: response.item.artists[0].name, song_length: response.item.duration_ms / 1000, currentDuration: response.progress_ms / 1000, image_url: response.item.album.images[0].url, is_playing: true });
     }
-    catch(ex){
-        LogError(response,"192 index.js");
+    catch (ex) {
+        LogError(response, "192 index.js");
     }
     await new Promise(res => setTimeout(res, 1000));
     requestSpotify();
+
 }
 //to do:
 requestSpotify();
-
 function broadcastSpotify({ song_name, artist, song_length, currentDuration, image_url, is_playing }) {
+    console.log("broadcastSpotify")
     //no song played
-    io.emit("spotify", is_playing ? { image_url, song: { name: song_name, artist, length: song_length }, is_playing, currentDuration } : {});
+    io.emit("spotify", is_playing ? { image_url, song: { name: song_name, artist, length: song_length }, is_playing, currentDuration } : null);
 }
 // io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
 //     console.log("test")

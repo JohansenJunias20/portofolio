@@ -92,10 +92,10 @@ if [ "$DOCKER" == "true" ]; then
         --env=TURN_PORT=$TURN_PORT --env=TURN_PORT_TLS=$TURN_PORT_TLS --env=TURN_MIN_PORT=$TURN_MIN_PORT --env=TURN_MAX_PORT=$TURN_MAX_PORT
     elif [ "$MODE" == "DEV" ]; then
         # build dist js
-        docker run -p 8080:8080 -v "/$(pwd)/:/usr/src/app" customnode:latest \
+        docker run -v "/$(pwd)/:/usr/src/app" customnode:latest \
         npx webpack-dev-server --config webpack.dev.js \
         --env=TURN_DOMAIN=$TURN_DOMAIN --env=WEBSOCKET_DOMAIN=$DEV_WS_DOMAIN \
-        --env=TURN_USERNAME=$TURN_USERNAME --env=TURN_PASSWORD=$TURN_PASSWORD \
+        --env=TURN_USERNAME=$TURN_USERNAME --env=TURN_PASSWORD=$TURN_PASSWORD --env=WEBSOCKET_PORT=$DEV_WS_PORT \
         --env=TURN_PORT=$TURN_PORT --env=TURN_PORT_TLS=$TURN_PORT_TLS --env=TURN_MIN_PORT=$TURN_MIN_PORT --env=TURN_MAX_PORT=$TURN_MAX_PORT
     else
         echo "please specifiy mode DEV or PROD for example ./internal_start-turn.sh -m (PROD/DEV)"

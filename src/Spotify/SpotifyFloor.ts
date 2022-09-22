@@ -19,15 +19,16 @@ export interface ISpotify {
     url: string;
 }
 export default class SpotifyFloor extends MeshOnlyObject3d {
-    currentSpotify: ISpotify;
+    currentSpotify: ISpotify | null;
     canvas: HTMLCanvasElement = document.querySelector("#debug");
     // mesh: THREE.Mesh;
     changeTexture: boolean = false;
     constructor(scene: THREE.Scene, position: THREE.Vector3) {
-        super(scene, position.clone().add(new THREE.Vector3(0,0,10)));
+        super(scene, position.clone().add(new THREE.Vector3(0, 0, 10)));
         const ref = this;
         window.addEventListener("spotify", (e: any) => {
             var data = (e.detail as ISpotify);
+            console.log({ data })
             this.currentSpotify = data;
             // console.log("recieve from spotify.ts file!")
             this.changeTexture = true;
@@ -61,9 +62,9 @@ export default class SpotifyFloor extends MeshOnlyObject3d {
         var geometry = new THREE.PlaneGeometry(12, 5)
         this.mesh = (new THREE.Mesh(geometry, material)) as any;
         this.mesh.rotateX(degToRad(-90))
-        this.mesh.scale.x  = 2;
+        this.mesh.scale.x = 2;
         this.mesh.scale.y = 2;
-        this.mesh.position.copy( this.position.clone().setY(0));
+        this.mesh.position.copy(this.position.clone().setY(0));
         this.scene.add(this.mesh);
         this.initialized = true;
     }
@@ -96,14 +97,15 @@ export default class SpotifyFloor extends MeshOnlyObject3d {
                 }
             }
             else {
-                ctx.drawImage(this.imageCache, 5, 5, 200, 200);
+                if (this.imageCache)
+                    ctx.drawImage(this.imageCache, 5, 5, 200, 200);
             }
 
             ctx.font = "700 30px Montserrat";
             // ctx.font
             ctx.fillStyle = "rgba(255,255,255,1)";
             var wrappedText = wrapText(ctx, this.currentSpotify.song.name, 210, 45, this.canvas.width - 305, 30);
-            console.log({ wrappedText });
+            // console.log({ wrappedText });
             for (let i = 0; i < wrappedText.length; i++) {
                 const txt = wrappedText[i];
                 ctx.fillText(txt[0].toString(), parseInt((txt[1] as any)), parseInt((txt[2] as any)));
