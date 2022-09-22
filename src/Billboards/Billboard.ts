@@ -215,6 +215,9 @@ export default class Billboard {
                 mapTexture: {
                     value: desc_text_texture
                 },
+                useTexture:{
+                    value:false
+                }
                 color: {
                     value: new THREE.Vector3(1, 1, 1)
                 }

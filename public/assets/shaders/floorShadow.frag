@@ -16,6 +16,5 @@ void main(){
     // }
     alpha-=.05;
     gl_FragColor=vec4(shadowColor,_opacity*clamp(alpha,0.,1.));
-    // gl_FragColor=vec4(shadowColor,clamp(alpha,0.,1.));
-    // gl_FragColor=vec4(shadowColor,0.2);
+    // gl_FragColor=vec4(textureColor,alpha);
 }

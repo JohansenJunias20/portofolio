@@ -41,6 +41,9 @@ export default class Desc extends MeshOnlyObject3d {
                 mapTexture: {
                     value: desc_text_texture
                 },
+                useTexture:{
+                    value:false
+                },
                 color: {
                     value: this.color
                 }

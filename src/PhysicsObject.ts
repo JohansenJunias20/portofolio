@@ -28,6 +28,8 @@ import { Back, Bounce, Elastic, Power2, Sine } from "gsap/all";
 import Config from "./config/config.common";
 import { WaveEffect } from "./waveEffect";
 import setSelectiveOutline from "./utility/setSelectiveOutline";
+import isGLB from "./utility/isGLB";
+import loadGLB from "./utility/loadGLB";
 //please load default custom shader here (only once)
 
 export default class PhysicsObject3d {
@@ -165,8 +167,7 @@ export default class PhysicsObject3d {
         const ref = this;
         var promises = [];
         // var object: THREE.Group;
-        var object: THREE.Group = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale));
-
+        var object: THREE.Group = await (isFBX(url) ? loadFBX(url, scale) : isGLB(url) ? loadGLB(url) : loadOBJ(url, mtl, scale));
         // promises.push((async () => { object = await (isFBX(url) ? loadFBX(url, scale) : loadOBJ(url, mtl, scale)) })())
         //todo: floorshadow ini harus dibuat concurrent saat loadFBX atau loadOBJ
         var floorShadowModel: THREE.Group;
@@ -175,6 +176,7 @@ export default class PhysicsObject3d {
         }
         await Promise.all(promises);
         this.mesh = object;
+        // this.scene.add(ref.floorShadowModel);
 
 
 
@@ -227,6 +229,11 @@ export default class PhysicsObject3d {
         this.scene.add(this.mesh);
         if (this.floorShadowModel) // ini ditaruh setelah create body karena bila tidak maka floorshadowmodel akan juga dibuatkan body
             this.scene.add(this.floorShadowModel);
+        if (this.floorShadowModel && isGLB(this.asset.url)) {
+            console.log({ floorshadowmodel: this.floorShadowModel })
+            // this.floorShadowModel.position.y = 10;
+            // this.floorShadowModel.position.z = -10;
+        }
 
         //#region load floorShadow
         if (this.asset.floorShadow) {
@@ -318,6 +325,7 @@ export default class PhysicsObject3d {
         model.children.forEach((c: Mesh) => {
             if (c.isMesh) {
                 (c.material as ShaderMaterial).uniforms.textureMap.value = texture;
+                (c.material as ShaderMaterial).needsUpdate = true;
             }
         })
         return model;

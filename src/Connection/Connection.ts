@@ -4,7 +4,7 @@ import getCountry from '../utility/getCountry';
 import capitalizeFirstLetter from '../utility/UpperCaseFirstLetter';
 import Modal from '../Modal';
 import { Quaternion } from 'cannon';
-import { ISpotify } from '../Spotify/Spotify';
+import { ISpotify } from '../Spotify/SpotifyFloor';
 
 interface IHash<T> {
     [details: string]: T;
@@ -124,7 +124,7 @@ export default class Connection {
         }
         console.log("protocol")
         window.addEventListener("spotify", () => {
-            console.log("called!! spotify");
+            // console.log("called!! spotify");
 
         });
         const ev = new Event('spotify');

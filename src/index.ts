@@ -258,7 +258,7 @@ const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Ve
 
 const contacts = new Contacts(world, scene, camera)
 
-const spotify = new Spotify(scene, new Vector3(20, 10, 0));
+const spotify = new Spotify(scene,world, new Vector3(0, 10, -60));
 //#endregion
 
 var key: string;
@@ -564,7 +564,7 @@ function animate() {
     }
 
     if (spotify.initialized) {
-        spotify.update();
+        spotify.update(deltatime);
     }
 
     if (character.initialized) {
