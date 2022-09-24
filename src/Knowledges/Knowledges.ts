@@ -2,7 +2,7 @@ import { Vec3 } from "cannon"
 import * as THREE from "three"
 import { Group, Material, ShaderMaterial, TextureLoader, Vector3 } from "three"
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader"
-import Loading from "../Loading/Loading"
+import Loading from "../Loading/Loading"    
 import createBody from "../utility/createBody"
 import customShader from "../utility/customShader"
 import loadFBX from "../utility/loadFBX"
@@ -70,6 +70,7 @@ export default class Knowledge {
             (this.prolang.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
             this.prolang.keys[i].asset.floorShadow.preload = true;
             this.prolang.keys[i].asset.floorShadow.Mesh = this.floorModel;
+            // (this.prolang.keys[i].mesh as any).selectiveOutline = true;
 
         }
 

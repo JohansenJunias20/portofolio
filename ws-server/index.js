@@ -204,7 +204,7 @@ async function requestSpotify() {
         broadcastSpotify({ song_name: response.item.name, artist: response.item.artists[0].name, song_length: response.item.duration_ms / 1000, currentDuration: response.progress_ms / 1000, image_url: response.item.album.images[0].url, is_playing: true });
     }
     catch (ex) {
-        LogError(response, "192 index.js");
+        LogError(ex, "207 index.js");
     }
     await new Promise(res => setTimeout(res, 1000));
     requestSpotify();
