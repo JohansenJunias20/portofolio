@@ -70,6 +70,7 @@ export default class Knowledge {
             (this.prolang.keys[i].shape as any).setScale(new Vec3(10, 10, 10) as any) //because obj 10 times bigger
             this.prolang.keys[i].asset.floorShadow.preload = true;
             this.prolang.keys[i].asset.floorShadow.Mesh = this.floorModel;
+            (this.prolang.keys[i].asset.floorShadow.Mesh as any).selectiveOutline = true;
 
         }
 

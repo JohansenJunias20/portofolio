@@ -10,6 +10,7 @@ interface IHash<T> {
     [details: string]: T;
 }
 
+
 declare var production: boolean;
 declare var TURN_PORT_TLS: number;
 declare var TURN_PORT: number;
@@ -173,6 +174,7 @@ export default class Connection {
 
 
         ref.signalling.on("spotify", (data: ISpotify) => {
+            // if(debug){}
             window.dispatchEvent(new CustomEvent<ISpotify>('spotify', { detail: data }));
         });
         ref.signalling.on("candidate", async ({ id, candidate }) => {

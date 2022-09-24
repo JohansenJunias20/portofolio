@@ -168,6 +168,7 @@ async function getToken() {
 }
 
 async function requestSpotify() {
+    console.log("request spotify")
     // ait requst spotify
     var response = await (await fetch("https://api.spotify.com/v1/me/player", {
         headers: {
@@ -199,6 +200,7 @@ async function requestSpotify() {
 requestSpotify();
 
 function broadcastSpotify({ song_name, artist, song_length, currentDuration, image_url, is_playing }) {
+    console.log("broadcasted..")
     //no song played
     io.emit("spotify", is_playing ? { image_url, song: { name: song_name, artist, length: song_length }, is_playing, currentDuration } : {});
 }

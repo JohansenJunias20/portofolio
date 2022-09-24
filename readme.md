@@ -50,6 +50,8 @@ bash prod.sh
 |**Smooth Movement P2P**|Make interpolation position between each data sent to peers| ✅ |
 |**Spotify Activity**|Show spotify profile, activity, and playlist|In Progress|
 |**Graphics Settings**|Add options to lower the graphics quality (disable few post-processing) |✅|
+|**Easter Egg**|Add Easter Egg||
+
 <!-- ENDCOPY -->
 
 ## Notes
