@@ -48,6 +48,10 @@ export default class ImageSequence {
                 const intersect = intersects[i];
                 if (intersect.object.uuid == this.mesh.uuid) {
                     if (this.isAnimating) return;
+                    // document.onblur(e);
+                    var audio: HTMLAudioElement = document.querySelector("#sound");
+                    // console.log("audio play")
+                    audio.volume = 0;
                     this.isAnimating = true;
                     //disable all input keyboard
                     (window as any).disableInput = true;
@@ -103,6 +107,9 @@ export default class ImageSequence {
     private closeVideo() {
         const ref = this;
         this.modal.Content = "";
+        var audio: HTMLAudioElement = document.querySelector("#sound");
+        // console.log("audio play")
+        audio.volume = 0.2;
         this.modal.close();
         gsap.to(this.refCamera.position, {
             ...this.camera.originalPos,

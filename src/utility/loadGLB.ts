@@ -8,7 +8,7 @@ export default async function loadGLB(url: string) {
         loader.load(
             url,
             function (gltf) {
-                console.log({ gltf: gltf.scene })
+                // console.log({ gltf: gltf.scene })
                 gltf.scene.scale.x = 2;
                 gltf.scene.scale.y = 2;
                 gltf.scene.scale.z = 2;

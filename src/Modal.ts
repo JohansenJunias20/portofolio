@@ -23,7 +23,7 @@ export default class Modal {
                 ref.innerDOM.innerHTML = ref._Content;
             else
                 ref.innerDOM.appendChild(ref._Content)
-            console.log({ content: ref._Content })
+            // console.log({ content: ref._Content })
             if (size == "small") {
                 ref.innerDOM.style.minWidth = "300px";
                 ref.innerDOM.style.maxWidth = "600px";

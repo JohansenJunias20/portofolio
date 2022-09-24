@@ -79,13 +79,14 @@ plane.init()
 
 var followCharacter = false;
 var leftMouseDown = false;
-canvas.onmousedown = (e) => {
+canvas.onmousedown = async (e) => {
 
 
 
+    // console.log("testtt")
 
 }
-
+// canvas
 // document.onpointerdown = (e) => {
 //     panCameraStart();
 // }
@@ -320,7 +321,13 @@ document.onkeyup = (e) => {
 }
 
 
-canvas.onmousedown = (e) => {
+canvas.onmousedown = async (e) => {
+    // var audio: HTMLAudioElement = document.querySelector("#sound");
+
+    // console.log("audio play")
+    // await audio.play();
+    // console.log("audio setted")
+    // audio.volume = 0.3;
     if ((window as any).disableInput) return;
     // document.body.style.cursor = "grabbing";
     if (e.which == 1) {
@@ -482,7 +489,6 @@ function animate() {
                 }
                 else if (averageFPS > 59 && !hadHigher) {
                     //SET LOWER QUALITY
-                    console.log("masuk setting higher")
                     switch (graphicQuality) {
                         case GraphicQuality.Medium:
                             updateGraphicQuality(GraphicQuality.High);
@@ -955,7 +961,7 @@ function updateGraphicQuality(nextValue: GraphicQuality) {
             // ssaaRenderPassP.sampleLevel = 1;
             // newComposer.addPass(ssaaRenderPassP);
             trees.reAdd();
-            renderer.setPixelRatio(1);
+            renderer.setPixelRatio(2);
             newComposer.addPass(finalPass);
             newComposer.addPass(fxaaPass);
             break;
@@ -1022,7 +1028,11 @@ var ticks = 0.0;
 animate();
 
 const connection = new Connection();
-window.onblur = () => {
+window.onblur = async () => {
+    var audio: HTMLAudioElement = document.querySelector("#sound");
+    // console.log("audio play")
+    audio.volume = 0;
+    // await audio.pause();
     if (initialized && connection.connected) {
         connection.emit("blur", ({ position: character.body.position, quaternion: character.body.quaternion }));
     }

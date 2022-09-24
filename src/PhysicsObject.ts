@@ -229,11 +229,11 @@ export default class PhysicsObject3d {
         this.scene.add(this.mesh);
         if (this.floorShadowModel) // ini ditaruh setelah create body karena bila tidak maka floorshadowmodel akan juga dibuatkan body
             this.scene.add(this.floorShadowModel);
-        if (this.floorShadowModel && isGLB(this.asset.url)) {
-            console.log({ floorshadowmodel: this.floorShadowModel })
+        // if (this.floorShadowModel && isGLB(this.asset.url)) {
+            // console.log({ floorshadowmodel: this.floorShadowModel })
             // this.floorShadowModel.position.y = 10;
             // this.floorShadowModel.position.z = -10;
-        }
+        // }
 
         //#region load floorShadow
         if (this.asset.floorShadow) {
