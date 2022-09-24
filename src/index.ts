@@ -16,7 +16,7 @@ const fov = THREE.MathUtils.degToRad(camera.fov);
 const hyperfocus = (camera.near + camera.far) / 2;
 const _height = 2 * Math.tan(fov / 2) * hyperfocus;
 // cameraO.zoom = window.innerHeight / _height;
-console.log("v2.2: spotify added");//just to make sure on production mode ts compiled correctly (newest version)
+console.log("v2.4: spotify added");//just to make sure on production mode ts compiled correctly (newest version)
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true,
@@ -258,7 +258,7 @@ const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Ve
 
 const contacts = new Contacts(world, scene, camera)
 
-const spotify = new Spotify(scene,world, new Vector3(0, -5, -60));
+const spotify = new Spotify(scene, world, new Vector3(0, -5, -60));
 //#endregion
 
 var key: string;
@@ -1166,21 +1166,21 @@ async function init() {
 
     contacts.init().then(() => {
     })
-    loading.setText("Loading Knowledges");
     knowledge.init(loading).then(() => {
+        loading.setText("Loading Knowledges");
         loading.addProgress(5);
     });
-    loading.setText("Loading Trees");
     trees.init().then(() => {
+        loading.setText("Loading Trees");
         loading.addProgress(15);
     })
     // loading.addProgress(15);
-    loading.setText("Loading Billboards");
     billboards.init().then(() => {
+        loading.setText("Loading Billboards");
         loading.addProgress(15);
     })
-    loading.setText("Loading Playgrounds");
     digitRegocnition.init().then(() => {
+        loading.setText("Loading Playgrounds");
         loading.addProgress(3);
     })
 
