@@ -450,7 +450,11 @@ var averageFPSbefore = 0;
 const checkingCounter = 5;
 function animate() {
     deltatime = clock.getDelta()
-
+    if (graphicQuality == GraphicQuality.Low || graphicQuality == GraphicQuality.VeryLow)
+        if (!blur && !showedGraphicWarning) {
+            showedGraphicWarning = true;
+            modalGraphicWarning.open();
+        }
     //jangan lupa saat unfocus, fps berkurang jadi tidak dihitung kedalam average FPS
     if (initialized) {
         elapsedTime += deltatime;
@@ -938,6 +942,14 @@ import { BloomPass } from "three/examples/jsm/postprocessing/BloomPass";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import { SSAARenderPass } from "three/examples/jsm/postprocessing/SSAARenderPass";
 
+const modalGraphicWarning = new Modal(
+    `<div style="display:flex;justify-content:center;align-items:center;height:100%; width:100%;font-family:montserrat; text-align:center;">
+    lag? please enable<br> HARDWARE ACCELERATION on chrome settings
+    </div>`,
+    "small", "top", 10
+);
+var showedGraphicWarning = false;
+
 function updateGraphicQuality(nextValue: GraphicQuality) {
     if (nextValue == graphicQuality) return;
     var newComposer = new EffectComposer(renderer);
@@ -966,6 +978,8 @@ function updateGraphicQuality(nextValue: GraphicQuality) {
             newComposer.addPass(fxaaPass);
             break;
         case GraphicQuality.Low:
+
+
             renderer.setPixelRatio(2);
             trees.reAdd();
             newComposer.addPass(fxaaPass);
@@ -973,6 +987,7 @@ function updateGraphicQuality(nextValue: GraphicQuality) {
             //add nothing
             break;
         case GraphicQuality.VeryLow:
+
             renderer.setPixelRatio(1);
             trees.removeAll();
             // newComposer.addPass(fxaaPass);
@@ -1026,9 +1041,10 @@ const copyPass = new ShaderPass(CopyShader);
 updateGraphicQuality(GraphicQuality.Medium);
 var ticks = 0.0;
 animate();
-
+declare var blur: boolean;
 const connection = new Connection();
 window.onblur = async () => {
+    blur = true;
     var audio: HTMLAudioElement = document.querySelector("#sound");
     // console.log("audio play")
     audio.volume = 0;
@@ -1224,6 +1240,7 @@ init();
 import gsap, { Linear } from "gsap"
 import Contacts from './Lobby/Contacts/Contacts';
 import Spotify from './Spotify/Spotify';
+import Modal from './Modal';
 function gotoPlayer(socketid: string) {
     if (socketid == connection.id) return; // yang dipencet username diri sendiri.
     const targetPosition = otherPlayers[socketid].position.clone();

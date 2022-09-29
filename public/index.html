@@ -29,8 +29,10 @@
     <canvas style="position: absolute;z-index: -1;display: none; width: 900px; height: 900px;" id="debug" width="900"
         height="900"></canvas>
     <script>
+        var blur = false;
         //yg onblur sudah ada di index.ts
         document.onfocus = async (e) => {
+            blur = false;
             var audio = document.querySelector("#sound");
             // console.log("audio play")
             audio.volume = 0.2;
@@ -54,10 +56,9 @@
     <div style=" pointer-events: none;" id="nicknames">
 
     </div>
-    <div id="modal"
-        style="height: 100%;width: 100%; position: absolute; display: none; justify-content: center;align-items: center;">
+    <div id="modal" style="height: 100%;width: 100%; position: absolute; display: none; justify-content: center;">
         <div id="modal_content"
-            style="max-width: 900px; min-width: 600px; box-shadow: 0 0 10px 5px rgba(0,0,0,0.1); opacity:0;transition: all 500ms ease; border-radius: 5px;padding:10px;width: 75%;height: 75%;transform:translateY(-100px) ;background-color: white;">
+            style="max-width: 900px; min-width: 600px; box-shadow: 0 0 10px 5px rgba(0,0,0,0.1); opacity:0;transition: all 500ms ease; width: 75%;height: 75%;transform:translateY(-100px) ;background-color: white;">
             <h1>test</h1>
         </div>
     </div>
@@ -142,23 +143,42 @@
             </div>
         </div>
     </div>
+    <style>
+        @keyframes progress {
+            0% {
+                width: 0%;
+            }
+
+
+            100% {
+                width: 100%;
+            }
+        }
+    </style>
     <script defer>
         function testfunc() {
             alert("worked")
         }
         document.querySelector("#modal").onclick = (e) => {
+            if (durationModal) return;
             if (e.target == e.currentTarget) {
                 hideModal()
             }
         }
-
-        function showModal() {
+        var durationModal = 0;
+        function showModal(duration) {
+            durationModal = duration;
             document.querySelector("#modal").style.display = "flex";
             setTimeout(() => {
                 document.querySelector("#modal_content").style.opacity = "1";
                 document.querySelector("#modal_content").style.transform = "translateY(0)";
 
             }, 0);
+            console.log({ durationModal })
+            if (durationModal) //not zero
+                setTimeout(() => {
+                    hideModal();
+                }, durationModal * 1000);
         }
         function hideModal() {
             document.querySelector("#modal_content").style.opacity = "0";
