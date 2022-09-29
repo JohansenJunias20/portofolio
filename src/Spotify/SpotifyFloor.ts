@@ -28,7 +28,6 @@ export default class SpotifyFloor extends MeshOnlyObject3d {
         const ref = this;
         window.addEventListener("spotify", (e: any) => {
             var data = (e.detail as ISpotify);
-            console.log({ data })
             this.currentSpotify = data;
             // console.log("recieve from spotify.ts file!")
             this.changeTexture = true;

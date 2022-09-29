@@ -20,9 +20,12 @@ const io = require("socket.io")(httpServer, {
 });
 const fetch = require('node-fetch');
 const IDs = {};
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
     socket.on("spotify", (e) => {
 
+    })
+    socket.on("streaming_token", async (e) => {
+        socket.emit("streaming_token", (await getStreamingToken()));
     })
     socket.emit("id", socket.id);
     socket.on("offer", (e) => {
@@ -132,7 +135,10 @@ setInterval(async () => {
     spotify.token = await getToken();
 }, 3550 * 1000);
 const refresh_token = fs.readFileSync("./refreshtoken.spotify.txt", "utf-8").replace(/(\r\n|\n|\r)/gm, "");
+const refresh_token_streaming = fs.readFileSync("./refreshtoken.streaming.txt", "utf-8").replace(/(\r\n|\n|\r)/gm, "");
 console.log({ refresh_token });
+
+console.log({ refresh_token_streaming });
 async function getToken() {
     const url = "https://accounts.spotify.com/api/token";
     var details = {
@@ -166,7 +172,39 @@ async function getToken() {
         LogError(response, "150 index.js");
     }
 }
+async function getStreamingToken() {
+    const url = "https://accounts.spotify.com/api/token";
+    var details = {
+        'refresh_token': refresh_token_streaming,
+        'grant_type': 'refresh_token'
+    };
 
+    var formBody = [];
+    for (var property in details) {
+        var encodedKey = encodeURIComponent(property);
+        var encodedValue = encodeURIComponent(details[property]);
+        formBody.push(encodedKey + "=" + encodedValue);
+    }
+    formBody = formBody.join("&");
+    var response = await (await fetch(url, {
+        method: "POST",
+        headers: {
+            "Authorization": "Basic MTgxY2RlNjM3MDNjNGU4YTgxMDMyNTQ4ODM5ZDA1NDQ6ZTc2Zjg0Zjg0Y2Q2NDk3NmExYzg4Y2U2MDQ1M2E5NTk=",
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formBody
+    })).text();
+    console.log({ response })
+    response = JSON.parse(response)
+    if (response.access_token) {
+        spotify.token = response.access_token;
+        return response.access_token;
+    }
+    else {
+        // throw JSON.stringify(response);
+        LogError(response, "201 index.js");
+    }
+}
 async function requestSpotify() {
     console.log("request spotify")
     // ait requst spotify
@@ -221,6 +259,7 @@ function broadcastSpotify({ song_name, artist, song_length, currentDuration, ima
 // io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
 //     console.log("test")
 // });
+
 httpServer.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
     console.log({ ssl, port: process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT })
 

@@ -8,6 +8,7 @@ ws-server/visitor.json
 dump
 ssl/main/archive/portfolio.orbitskomputer.com/*.pem
 ssl/main/live/portfolio.orbitskomputer.com/*.pem
-refreshtoken.spotify.txt
+# refreshtoken.spotify.txt
 ws-server/.env
 ssl
+refreshtoken.*

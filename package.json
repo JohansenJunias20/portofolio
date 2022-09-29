@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@types/cannon": "^0.1.8",
+    "@types/spotify-web-playback-sdk": "^0.1.15",
     "@types/three": "^0.135.0",
     "cannon": "^0.6.2",
     "cannon-es": "^0.18.0",

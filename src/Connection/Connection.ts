@@ -135,6 +135,29 @@ export default class Connection {
         const signalling = io(`${production ? "wss" : "ws"}://${WS_DOMAIN}:${WS_PORT}`, { secure: production });
         this.connected = true;
         this.signalling = signalling;
+        ref.signalling.on("streaming_token", async (token) => {
+            console.log("get streaming token:");
+            console.log({ token });
+
+            // const token = '[My Spotify Web API access token]';
+            const player = new Spotify.Player({
+                name: 'Web Playback SDK Quick Start Player',
+                getOAuthToken: cb => { cb(token); }
+            });
+            player.addListener('ready', ({ device_id }) => {
+                console.log('Ready with Device ID', device_id);
+            })
+            await player.connect();
+
+            // player.nextTrack().then(() => {
+            //     console.log('Skipped to next track!');
+            // });
+            // player.togglePlay()
+
+        });
+        window.onSpotifyWebPlaybackSDKReady = () => {
+            ref.signalling.emit("streaming_token");
+        }
 
         //check if I'm the first to connect?
         ref.signalling.on("first?", () => {
