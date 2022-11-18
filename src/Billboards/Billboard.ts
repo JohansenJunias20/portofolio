@@ -13,6 +13,7 @@ import loadOBJ from '../utility/loadOBJ';
 import setOpacity from '../utility/setOpacity';
 import floorFrag from "../../public/assets/shaders/floorMesh.frag";
 import floorVert from "../../public/assets/shaders/floorMesh.vert";
+type tipe = "laughing clown" | "miles madness" | "tokopedia integration" | "life of student" | "shopee integration";
 export default class Billboard {
     public isBillboard: boolean;
     private asset: {
@@ -36,7 +37,7 @@ export default class Billboard {
     private lightIntensity: number;
     text: string;
     urlRef: Array<string>;
-    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, position: Vector3, text: "laughing clown" | "miles madness" | "tokopedia integration" = "miles madness",
+    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, position: Vector3, text: tipe = "miles madness",
         scale: THREE.Vector3 = new THREE.Vector3(1, 1, 1), rotation: number = 100, urlRef: Array<string> = [],
         lightIntensity: number = 1, floorText: "download" | "open" = "download") {
         this.lightIntensity = lightIntensity;
@@ -215,8 +216,8 @@ export default class Billboard {
                 mapTexture: {
                     value: desc_text_texture
                 },
-                useTexture:{
-                    value:false
+                useTexture: {
+                    value: false
                 },
                 color: {
                     value: new THREE.Vector3(1, 1, 1)

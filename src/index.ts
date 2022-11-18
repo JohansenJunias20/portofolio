@@ -451,7 +451,7 @@ const checkingCounter = 5;
 function animate() {
     deltatime = clock.getDelta()
     if (graphicQuality == GraphicQuality.Low || graphicQuality == GraphicQuality.VeryLow)
-        if (!blur && !showedGraphicWarning) {
+        if (!blur && !showedGraphicWarning && !isMobile()) {
             showedGraphicWarning = true;
             modalGraphicWarning.open();
         }
