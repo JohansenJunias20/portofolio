@@ -6,7 +6,7 @@ on:
 
 jobs:
   build_deploy:
-    runs-on: [self-hosted, "deploy-server"]
+    runs-on: [self-hosted]
     strategy:
       matrix:
         node-version: [14.x]
