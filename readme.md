@@ -51,6 +51,7 @@ bash prod.sh
 |**Spotify Activity**|Show spotify profile, activity, and playlist|In Progress|
 |**Graphics Settings**|Add options to lower the graphics quality (disable few post-processing) |✅|
 |**Easter Egg**|Add Easter Egg||
+|**Audio Visualization**|Add Audio Echo Visualization on current playing song||
 
 <!-- ENDCOPY -->
 
