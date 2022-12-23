@@ -171,11 +171,20 @@ async function requestSpotify() {
     console.log("request spotify")
     // ait requst spotify
     console.log("request spotify")
-    var response = await (await fetch("https://api.spotify.com/v1/me/player", {
-        headers: {
-            "Authorization": `Bearer ${spotify.token ? spotify.token : await getToken()}`,
-        }
-    })).text()
+    var response;
+    try {
+
+        response = await (await fetch("https://api.spotify.com/v1/me/player", {
+            headers: {
+                "Authorization": `Bearer ${spotify.token ? spotify.token : await getToken()}`,
+            }
+        })).text()
+    }
+    catch (ex) {
+        await new Promise(res => setTimeout(res, 1000));
+        requestSpotify();
+        return;
+    }
     if (response == "") {
         //currently not playing anything
         broadcastSpotify({ is_playing: false })
