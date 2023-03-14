@@ -15,6 +15,6 @@ services:
           memory: 512M
     volumes:
       - "./ws-server:/usr/src/app"
-      - "./refreshtoken.spotify.txt:/usr/src/app/refreshtoken.spotify.txt"
+      # - "./refreshtoken.spotify.txt:/usr/src/app/refreshtoken.spotify.txt"
       - "../ssl/main:/etc/letsencrypt"
       - "../ssl/lib:/var/lib/letsencrypt"

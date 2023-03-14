@@ -16,7 +16,7 @@ const fov = THREE.MathUtils.degToRad(camera.fov);
 const hyperfocus = (camera.near + camera.far) / 2;
 const _height = 2 * Math.tan(fov / 2) * hyperfocus;
 // cameraO.zoom = window.innerHeight / _height;
-console.log("v2.4: spotify added");//just to make sure on production mode ts compiled correctly (newest version)
+console.log("v2.5: spotify added");//just to make sure on production mode ts compiled correctly (newest version)
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector("#bg"),
     antialias: true,
@@ -238,8 +238,10 @@ import ProLangs from './Knowledges/ProLang/ProLangs';
 const HOTKEYSPOSITION = new Vector3(-15, 1, 0);
 
 const hotkeys = new Hotkeys(world, scene, HOTKEYSPOSITION);
-import Showcase from "./Showcase/Main";
-const showcase = new Showcase({ scene, world, position: new Vector3(-50, 10.5, -5), camera });
+// import Showcase from "./Showcase/Showcase";
+// const showcase = new Showcase({ scene, world, position: new Vector3(-50, 10.5, -5), camera });
+import Showcases from './Showcase/Showcases';
+const showcases = new Showcases(world, scene, camera);
 
 const navigationBoards = new NavigationBoards(world, scene);
 
@@ -259,7 +261,7 @@ const digitRegocnition = new DigitRecognition(world, scene, camera, new THREE.Ve
 
 const contacts = new Contacts(world, scene, camera)
 
-const spotify = new Spotify(scene, world, new Vector3(0, -5, -60));
+const spotify = new Spotify(scene, world, new Vector3(0, -5, -60), camera, character);
 //#endregion
 
 var key: string;
@@ -577,6 +579,7 @@ function animate() {
         spotify.setWaveEffect(waveEffect)
         spotify.updateWaveEffect(deltatime)
         spotify.update(deltatime);
+        spotify.customUpdate(deltatime, intersects);
     }
 
     if (character.initialized) {
@@ -595,8 +598,14 @@ function animate() {
 
     }
 
-    if (showcase.initialized) {
-        showcase.update(deltatime);
+    // if (showcase.initialized) {
+    //     showcase.update(deltatime);
+    // }
+    if (showcases.initialized) {
+        showcases.setWaveEffect(waveEffect)
+        showcases.updateWaveEffect(deltatime)
+        showcases.update(deltatime);
+        // console.log("updated")
     }
 
     if (hotkeys.initialized) {
@@ -1047,7 +1056,7 @@ window.onblur = async () => {
     blur = true;
     var audio: HTMLAudioElement = document.querySelector("#sound");
     // console.log("audio play")
-    audio.volume = 0;
+    // audio.volume = 0;
     // await audio.pause();
     if (initialized && connection.connected) {
         connection.emit("blur", ({ position: character.body.position, quaternion: character.body.quaternion }));
@@ -1219,7 +1228,7 @@ loading.onfull = () => {
     camera.position.set(25, 36.099988, 35);
     setTimeout(() => {
         startWaveEffect = true;
-        showcase.init().then(() => {
+        showcases.init().then(() => {
 
         })
         connection.setFocus(connection.id);

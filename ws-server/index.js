@@ -210,8 +210,8 @@ async function requestSpotify() {
     }
     // console.log({response});
     try {
-
-        broadcastSpotify({ song_name: response.item.name, artist: response.item.artists[0].name, song_length: response.item.duration_ms / 1000, currentDuration: response.progress_ms / 1000, image_url: response.item.album.images[0].url, is_playing: true });
+        // console.log({ response: JSON.stringify(response) });
+        broadcastSpotify({ song_name: response.item.name, url: response.item.external_urls.spotify + "?go=1", artist: response.item.artists[0].name, song_length: response.item.duration_ms / 1000, currentDuration: response.progress_ms / 1000, image_url: response.item.album.images[0].url, is_playing: true });
     }
     catch (ex) {
         LogError(ex, "207 index.js");
@@ -222,10 +222,10 @@ async function requestSpotify() {
 }
 //to do:
 requestSpotify();
-function broadcastSpotify({ song_name, artist, song_length, currentDuration, image_url, is_playing }) {
+function broadcastSpotify({ song_name, artist, song_length, currentDuration, image_url, is_playing, url }) {
     console.log("broadcasted..")
     //no song played
-    io.emit("spotify", is_playing ? { image_url, song: { name: song_name, artist, length: song_length }, is_playing, currentDuration } : null);
+    io.emit("spotify", is_playing ? { url, image_url, song: { name: song_name, artist, length: song_length }, is_playing, currentDuration } : null);
 }
 // io.listen(process.env.PRODUCTION ? process.env.PROD_WS_PORT : process.env.DEV_WS_PORT, () => {
 //     console.log("test")

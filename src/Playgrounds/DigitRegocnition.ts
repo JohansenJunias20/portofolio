@@ -21,7 +21,7 @@ export default class DigitRecognition {
             iframeDOM.contentWindow.onfocus = (e) => {
                 var audio: HTMLAudioElement = document.querySelector("#sound");
                 // console.log("audio play")
-                audio.volume = 0.2;
+                // audio.volume = 0.2;
             }
 
         }

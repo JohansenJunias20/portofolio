@@ -62,6 +62,7 @@ export default class LightCast extends MeshOnlyObject3d {
                 value: 1
             }
         }
+        
         // this.asset.floorShadow = {
         //     textureUrl: ``, // because trees not using url string but instead use three.Texture Object.
         //     modelUrl: "",

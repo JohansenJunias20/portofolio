@@ -6,16 +6,21 @@ import vertexShader from "../../public/assets/shaders/image.vert";
 import fragShader from "../../public/assets/shaders/image.frag";
 import Modal from "../Modal";
 import gsap, { Linear } from "gsap"
+import { ShowcaseName } from "./Showcase";
 
 export default class ImageSequence {
     material: THREE.ShaderMaterial;
     position: THREE.Vector3;
     scene: THREE.Scene;
     modal: Modal;
+    name: string;
     private isAnimating: boolean;
-    constructor(scene: THREE.Scene, position: THREE.Vector3, camera: THREE.PerspectiveCamera) {
+    constructor(scene: THREE.Scene, position: THREE.Vector3, camera: THREE.PerspectiveCamera, name: ShowcaseName, imageCount: number, url: string) {
         // super(scene, position);
         this.isAnimating = false
+        this.imageCount = imageCount;
+        this.name = name.toString().toUpperCase();
+        console.log({ name: this.name })
         var loader = new THREE.TextureLoader();
         var material = new THREE.ShaderMaterial({
             vertexShader,
@@ -49,14 +54,18 @@ export default class ImageSequence {
                 if (intersect.object.uuid == this.mesh.uuid) {
                     if (this.isAnimating) return;
                     // document.onblur(e);
-                    var audio: HTMLAudioElement = document.querySelector("#sound");
+                    // var audio: HTMLAudioElement = document.querySelector("#sound");
                     // console.log("audio play")
-                    audio.volume = 0;
+                    // audio.volume = 0;
                     this.isAnimating = true;
                     //disable all input keyboard
                     (window as any).disableInput = true;
                     const modal = new Modal(
-                        `<button id="closeModal" style="cursor:pointer;position:fixed;top:0;right:0;z-index:3;margin:2rem;padding:5px;font-weight:bold;font-size:3rem; background-color:rgb(245,206,66)">CLOSE</button><iframe style="width:100%;height:100%" src="https://www.youtube.com/embed/pjDYyyMh4rM?start=3997&autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`,
+                        `<button id="closeModal" 
+                        style="cursor:pointer;position:fixed;top:0;right:0;z-index:3;margin:2rem;padding:5px;font-weight:bold;font-size:3rem; background-color:rgb(245,206,66)">CLOSE</button>
+                        <iframe style="width:100%;height:100%" 
+                        src="${url}"
+                         title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`,
                         "full");
                     const ref = this;
                     this.camera = {
@@ -109,7 +118,7 @@ export default class ImageSequence {
         this.modal.Content = "";
         var audio: HTMLAudioElement = document.querySelector("#sound");
         // console.log("audio play")
-        audio.volume = 0.2;
+        // audio.volume = 0.2;
         this.modal.close();
         gsap.to(this.refCamera.position, {
             ...this.camera.originalPos,
@@ -128,16 +137,14 @@ export default class ImageSequence {
             }
         });
     }
+    imageCount: number;
     public async init() {
         var loader = new THREE.TextureLoader();
         var scale = 1.4;
-        var imageCount = 102;
         var promises: Promise<THREE.Texture>[] = []
-        for (let i = 0; i < imageCount; i++) {
-            var promise = loader.loadAsync(`/assets/environment/projector/Reaksi portofolio dari WPU${i.toString().padStart(4, "0")}.jpg`);
-            promises.push(promise);
-        }
-        this.images = await Promise.all(promises);
+        //load the first image first for fast preview
+        var promise = loader.loadAsync(`/assets/environment/Showcase/${this.name}/image (1).jpg`);
+        this.images = await Promise.all([promise]);
         var planeGeom = new THREE.PlaneGeometry(10 * scale, 10 * .56 * scale);
         var plane = new THREE.Mesh(planeGeom, this.material);
         plane.position.copy(this.position);
@@ -149,6 +156,16 @@ export default class ImageSequence {
         // (this.mesh as any).url = "https://google.com";
         this.scene.add(plane);
         this.initialized = true;
+        for (let i = 1; i < this.imageCount; i++) {
+            promise = loader.loadAsync(`/assets/environment/Showcase/${this.name}/image (${i + 1}).jpg`);
+            promises.push(promise);
+        }
+        const ref = this;
+        Promise.all(promises).then(images => {
+            // console.log("all image loaded!")
+            ref.images = ref.images.concat(images);
+            // console.log(ref.images);
+        })
     }
     mesh: THREE.Mesh;
     initialized: boolean = false;
@@ -161,6 +178,7 @@ export default class ImageSequence {
         if (!this.initialized) return;
         var index = this.currentImage % this.images.length;
         var image = this.images[index];
+        // console.log(index);
         (this.mesh.material as ShaderMaterial).uniforms.textureMap.value = image;
         (this.mesh.material as ShaderMaterial).needsUpdate = true;
 

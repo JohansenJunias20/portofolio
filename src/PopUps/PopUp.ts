@@ -28,9 +28,9 @@ export default class PopUp {
     geometry: THREE.BufferGeometry
     urlRef: string;
     modal: Modal | undefined;
-    private floorText: "download" | "open"
+    private floorText: "download" | "open" | "play"
     constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, size: { x: number, y: number, z: number },
-        borderWidth: number = 0.1, floorText: "download" | "open" = "download", urlRef: string | Modal = "#") {
+        borderWidth: number = 0.1, floorText: "download" | "open" | "play" = "download", urlRef: string | Modal = "#") {
         this.world = world;
         this.floorText = floorText;
         if (typeof urlRef == "string")
@@ -262,6 +262,7 @@ export default class PopUp {
         if (!this.initialized) return;
         this.alphaAnimationUp += 0.05;
         this.alphaAnimationUp = clamp(this.alphaAnimationUp, 0, 1)
+        // console.log(this.ceilingPosition)
         this.fence.mesh.position.copy(this.fence.mesh.position.lerp(this.ceilingPosition, this.alphaAnimationUp));
         if (Array.isArray(this.fence.mesh.material)) {
             for (let i = 0; i < this.fence.mesh.material.length; i++) {
@@ -301,6 +302,7 @@ export default class PopUp {
 
         this.fence.material.uniforms.move.value += 1 * deltatime;
         this.fence.material.needsUpdate = true;
+        // console.log("test")
         if (this.initialized) {
             for (let i = 0; i < intersects.length; i++) {
                 const intersect = intersects[i];

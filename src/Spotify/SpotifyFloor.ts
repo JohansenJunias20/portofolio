@@ -1,12 +1,14 @@
 import MeshOnlyObject3d from "../MeshOnlyObject";
 import * as THREE from "three"
 import generateTexture from "../utility/generateTexture";
-import { ShaderMaterial } from "three";
+import { ShaderMaterial, Vector3 } from "three";
 import vertexShader from "../../public/assets/shaders/floorMesh.vert";
 import fragShader from "../../public/assets/shaders/floorMesh.frag";
 import customShader from "../utility/customShader";
 import wrapText from "../utility/WrapText";
 import { degToRad } from "three/src/math/MathUtils";
+import PopUp from "../PopUps/PopUp";
+import Character from "../Character/Character";
 export interface ISpotify {
     image_url: string;
     song: {
@@ -20,11 +22,14 @@ export interface ISpotify {
 }
 export default class SpotifyFloor extends MeshOnlyObject3d {
     currentSpotify: ISpotify | null;
+    popUpPlay: PopUp;
     canvas: HTMLCanvasElement = document.querySelector("#debug");
     // mesh: THREE.Mesh;
     changeTexture: boolean = false;
-    constructor(scene: THREE.Scene, position: THREE.Vector3) {
-        super(scene, position.clone().add(new THREE.Vector3(0, 0, 10)));
+    character: Character;
+    constructor(world: CANNON.World, scene: THREE.Scene, camera: THREE.PerspectiveCamera, position: THREE.Vector3, character: Character) {
+        super(scene, position.clone().setY(0).add(new Vector3(0,0,10)));
+        this.character = character;
         const ref = this;
         window.addEventListener("spotify", (e: any) => {
             var data = (e.detail as ISpotify);
@@ -32,7 +37,15 @@ export default class SpotifyFloor extends MeshOnlyObject3d {
             this.currentSpotify = data;
             // console.log("recieve from spotify.ts file!")
             this.changeTexture = true;
-        })
+            if (ref.popUpPlay) {
+                this.popUpPlay.urlRef = data.url;
+                // console.log(this.popUpPlay)
+            }
+        });
+        this.popUpPlay = new PopUp(world, scene, camera, {
+            x: 12, y: 2, z: 6
+        }, 0.3, "play", "");
+        this.popUpPlay.setPosition(position.clone().setY(0).add(new Vector3(0, 0, 18)));
         this.canvas.width = 600;
         this.canvas.height = 250;
         this.canvas.style.width = `${600}px`;
@@ -64,17 +77,35 @@ export default class SpotifyFloor extends MeshOnlyObject3d {
         this.mesh.rotateX(degToRad(-90))
         this.mesh.scale.x = 2;
         this.mesh.scale.y = 2;
-        this.mesh.position.copy(this.position.clone().setY(0));
         this.scene.add(this.mesh);
+        await this.popUpPlay.init();
+        this.mesh.position.copy(this.position.clone().setY(5));
+        // this.mesh.position = this.mesh.position.add(new Vector3(0,
+        this.popUpPlay.floor.mesh.visible = false;
+        this.popUpPlay.borderFloor.mesh.visible = false;
+        this.popUpPlay.fence.mesh.visible = false;
         this.initialized = true;
     }
     imageCache: HTMLImageElement;
-    public update() {
+    public customUpdate(deltatime: number, intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
         if (this.changeTexture) {
             var alreadyChange = false;
             this.changeTexture = false;
-            if (!this.currentSpotify) return; //currently not playing because value is {}
-
+            if (this.popUpPlay.initialized) {
+                this.popUpPlay.floor.mesh.visible = false;
+                this.popUpPlay.borderFloor.mesh.visible = false;
+                this.popUpPlay.fence.mesh.visible = false;
+            }
+            if (!this.currentSpotify) {
+                if (this.popUpPlay.initialized)
+                    this.popUpPlay.update(deltatime, this.character, intersects);
+                return; //currently not playing because value is {}
+            }
+            if (this.popUpPlay.initialized) {
+                this.popUpPlay.floor.mesh.visible = true;
+                this.popUpPlay.borderFloor.mesh.visible = true;
+                this.popUpPlay.fence.mesh.visible = true;
+            }
             // const canvas = document.createElement("canvas");
             // canvas.
             const ctx = this.canvas.getContext("2d");
@@ -93,7 +124,7 @@ export default class SpotifyFloor extends MeshOnlyObject3d {
                     ctx.drawImage(img, 5, 5, 200, 200);
                     ((this.mesh as any).material as ShaderMaterial).uniforms.mapTexture.value = new THREE.CanvasTexture(this.canvas);
                     ((this.mesh as any).material as ShaderMaterial).needsUpdate = true;
-                    console.log("set")
+                    // console.log("set")
                 }
             }
             else {
@@ -130,5 +161,15 @@ export default class SpotifyFloor extends MeshOnlyObject3d {
                 ((this.mesh as any).material as ShaderMaterial).needsUpdate = true;
             }
         }
+        else {
+            // if (this.popUpPlay.initialized) {
+            //     this.popUpPlay.floor.mesh.visible = false;
+            //     this.popUpPlay.borderFloor.mesh.visible = false;
+            //     this.popUpPlay.fence.mesh.visible = false;
+            // }
+        }
+        // console.log({ meshposition: this.mesh.position.y})
+        if (this.popUpPlay.initialized)
+            this.popUpPlay.update(deltatime, this.character, intersects);
     }
 }
